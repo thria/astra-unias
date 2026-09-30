@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.astraunias.com.ar/sitemap.xml
+Sitemap: https://astra-unias.vercel.app/sitemap.xml
