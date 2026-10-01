@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panel de turnos | Astra</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#FFF7F9">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <script>
+    try { var t = localStorage.getItem('astra-theme'); if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t; } catch (e) {}
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Pinyon+Script&display=swap">
+  <link rel="stylesheet" href="css/styles.css?v=31">
+  <script src="js/agenda.js?v=2" defer></script>
+</head>
+<body class="admin">
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="brand" href="/" aria-label="Astra, volver al sitio">Astra</a>
+      <a class="button button--small button--ghost" href="/">Ver el sitio</a>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container admin__inner">
+      <div class="section__head">
+        <h1 class="admin__title">Panel de turnos</h1>
+        <p>Tocá un horario para marcarlo como reservado y tocalo de nuevo para liberarlo. Los cambios se ven al instante en la página.</p>
+      </div>
+
+      <!-- Inicio de sesión -->
+      <form class="admin__login" data-login>
+        <label for="admin-password">Contraseña</label>
+        <input id="admin-password" name="password" type="password" autocomplete="current-password" required>
+        <p class="admin__error" data-login-error role="alert" hidden></p>
+        <button class="button" type="submit">Entrar</button>
+      </form>
+
+      <!-- Agenda editable (se muestra después de entrar) -->
+      <div class="agenda" data-agenda data-agenda-mode="admin" hidden>
+        <div class="agenda__bar">
+          <button class="agenda__nav" type="button" data-agenda-prev aria-label="Semana anterior" disabled>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+          </button>
+          <p class="agenda__week" data-agenda-week>Cargando horarios…</p>
+          <button class="agenda__nav" type="button" data-agenda-next aria-label="Semana siguiente" disabled>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+        <ul class="agenda__days" role="list" data-agenda-days></ul>
+        <div class="agenda__message" data-agenda-message hidden>
+          <p data-agenda-message-text></p>
+        </div>
+        <ul class="agenda__legend" role="list" aria-label="Referencias">
+          <li><span class="slot slot--free slot--sample" aria-hidden="true">10:00</span> Libre (tocá para reservar)</li>
+          <li><span class="slot slot--busy slot--sample" aria-hidden="true">10:00</span> Reservado (tocá para liberar)</li>
+        </ul>
+        <p class="admin__status" data-agenda-status role="status" aria-live="polite"></p>
+        <button class="button button--ghost admin__logout" type="button" data-logout>Cerrar sesión</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Inicio de sesión del panel: la contraseña se valida en el servidor y solo se guarda en memoria
+    (function () {
+      var form = document.querySelector('[data-login]');
+      var error = document.querySelector('[data-login-error]');
+      var agenda = document.querySelector('[data-agenda]');
+      var submit = form.querySelector('button[type="submit"]');
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        var password = form.password.value;
+        error.hidden = true;
+        submit.disabled = true;
+        submit.textContent = 'Entrando…';
+
+        fetch('/api/agenda', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Admin-Password': password },
+          body: JSON.stringify({ action: 'login' })
+        }).then(function (r) {
+          if (r.status === 401) throw new Error('Contraseña incorrecta. Revisala y probá de nuevo.');
+          if (r.status === 503) return r.json().then(function (d) { throw new Error(d.error); });
+          if (!r.ok) throw new Error('No se pudo conectar con la agenda. Probá de nuevo en un rato.');
+          window.astraAdminPassword = password;
+          form.hidden = true;
+          agenda.hidden = false;
+          window.astraAgendaLoad();
+        }).catch(function (e) {
+          error.textContent = e.message;
+          error.hidden = false;
+        }).finally(function () {
+          submit.disabled = false;
+          submit.textContent = 'Entrar';
+        });
+      });
+
+      document.querySelector('[data-logout]').addEventListener('click', function () {
+        window.astraAdminPassword = '';
+        form.reset();
+        agenda.hidden = true;
+        form.hidden = false;
+        form.password.focus();
+      });
+    })();
+  </script>
+</body>
+</html>
