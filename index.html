@@ -26,7 +26,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Pinyon+Script&family=Young+Serif&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=7">
+  <link rel="stylesheet" href="css/styles.css?v=8">
   <script src="js/theme.js?v=3" defer></script>
   <script src="js/map.js?v=2" defer></script>
 
@@ -101,9 +101,12 @@
     <section class="local" aria-labelledby="local-titulo">
       <div class="container local__inner">
         <div class="local__text">
-          <svg class="local__pin" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="10" r="2.5"/></svg>
-          <h2 id="local-titulo">Emprendimiento de La Plata</h2>
-          <p>Astra nació y trabaja en La Plata. Mi estudio está en zona Plaza Belgrano y atiendo con turno.</p>
+          <h2 id="local-titulo">Dónde atiendo</h2>
+          <p class="local__place">
+            <svg class="local__pin" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+            Zona Plaza Belgrano, La Plata
+          </p>
+          <p>El estudio de Astra está en esta zona. Mové el mapa para ubicarte; la dirección exacta te la paso cuando reservás.</p>
           <a class="local__link" href="https://www.google.com/maps/search/?api=1&amp;query=Plaza+Manuel+Belgrano%2C+La+Plata" target="_blank" rel="noopener">Abrir la zona en Google Maps</a>
         </div>
         <!-- Mapa interactivo (MapLibre + OpenFreeMap). Se carga al llegar a esta sección: js/map.js -->
@@ -246,7 +249,7 @@
       <div class="container booking">
         <div class="section__head">
           <h2 id="turnos-titulo">Cómo pedir tu turno</h2>
-          <p>La dirección exacta del estudio te la paso cuando confirmamos el turno.</p>
+          <p>Tres pasos y tu turno queda listo.</p>
         </div>
         <ol class="steps">
           <li>

@@ -344,9 +344,19 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
   gap: var(--space-xs);
   text-align: center;
 }
+.local__place {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  color: var(--color-ink);
+}
+.local p.local__place { color: var(--color-ink); }
 .local__pin {
-  width: 1.75rem;
-  height: 1.75rem;
+  flex: none;
+  width: 1.375rem;
+  height: 1.375rem;
   fill: none;
   stroke: var(--color-rose);
   stroke-width: 1.75;
@@ -604,8 +614,8 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
    ------------------------------------------------------------------------ */
 @media (min-width: 64em) {
   .local { padding-block: var(--space-xl); }
-  .local__inner { grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); align-items: center; gap: var(--space-xl); text-align: left; }
-  .local__text { justify-items: start; }
+  .local__inner { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: center; gap: var(--space-xl); text-align: left; }
+  .local__text { justify-items: start; gap: var(--space-s); }
   .local h2 { justify-self: start; }
   .local__map { margin-top: 0; height: 30rem; }
 
