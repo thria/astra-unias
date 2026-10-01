@@ -149,6 +149,8 @@ h1, h2, h3 {
 
 p { margin: 0; text-wrap: pretty; }
 
+[hidden] { display: none !important; }
+
 img { display: block; max-width: 100%; height: auto; }
 
 a { color: var(--color-rose); text-underline-offset: 0.2em; }
@@ -737,6 +739,132 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
 }
 .review blockquote { margin: 0; font-family: var(--font-display); font-size: var(--step-1); line-height: 1.45; }
 .review figcaption { color: var(--color-ink-soft); font-size: var(--step--1); }
+
+/* Agenda de turnos (datos de Google Calendar)
+   ------------------------------------------------------------------------ */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.agenda { display: grid; gap: var(--space-m); }
+
+.agenda__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-s);
+  max-width: 32rem;
+}
+.agenda__week { font-weight: 600; text-align: center; }
+.agenda__nav {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid var(--color-line);
+  border-radius: 50%;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.agenda__nav:hover:not(:disabled) { background: var(--color-blush); border-color: var(--color-petal); }
+.agenda__nav:disabled { opacity: 0.35; cursor: default; }
+.agenda__nav svg { width: 1.125rem; height: 1.125rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+.agenda__days { display: grid; gap: var(--space-s); }
+.agenda__day {
+  display: grid;
+  gap: 0.75rem;
+  padding: var(--space-s) var(--space-s) 1.1rem;
+  border-radius: 14px;
+  background: var(--color-blush);
+}
+.agenda__empty {
+  grid-column: 1 / -1;
+  padding: var(--space-m);
+  border-radius: 14px;
+  background: var(--color-blush);
+  color: var(--color-ink-soft);
+}
+.agenda__day-name {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  font-size: var(--step-1);
+}
+.agenda__tag {
+  padding: 0.2em 0.7em;
+  border-radius: 999px;
+  background: var(--color-petal);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.agenda__slots { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 4.25rem;
+  min-height: 2.5rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-decoration: none;
+}
+.slot--free {
+  border: 1.5px solid var(--color-rose);
+  background: var(--color-bg);
+  color: var(--color-rose);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.slot--free:hover { background: var(--color-rose); color: var(--color-on-rose); }
+.slot--busy {
+  border: 1.5px dashed var(--color-line);
+  color: var(--color-ink-soft);
+}
+.slot--busy s { text-decoration-thickness: 2px; text-decoration-color: var(--color-rose); }
+.slot--past { border: 1px solid var(--color-line); color: var(--color-ink-soft); opacity: 0.6; }
+.slot--sample { min-width: 3.75rem; min-height: 2rem; font-size: 0.8125rem; pointer-events: none; }
+.slot--sample.slot--busy { text-decoration: line-through; text-decoration-thickness: 2px; text-decoration-color: var(--color-rose); }
+
+.agenda__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-m);
+  color: var(--color-ink-soft);
+  font-size: var(--step--1);
+}
+.agenda__legend li { display: flex; align-items: center; gap: 0.5rem; }
+
+.agenda__message {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-s);
+  max-width: 34rem;
+  padding: var(--space-m);
+  border-radius: 14px;
+  background: var(--color-blush);
+}
+
+@media (min-width: 40em) {
+  .agenda__days { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 64em) {
+  .agenda__days { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
 
 /* Turnos: secuencia real, por eso numerada */
 .steps { display: grid; gap: var(--space-m); counter-reset: step; margin-bottom: var(--space-l); }

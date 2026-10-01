@@ -26,10 +26,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Pinyon+Script&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=28">
+  <link rel="stylesheet" href="css/styles.css?v=30">
   <script src="js/theme.js?v=3" defer></script>
   <script src="js/map.js?v=2" defer></script>
   <script src="js/carousel.js?v=1" defer></script>
+  <script src="js/agenda.js?v=1" defer></script>
 
   <script type="application/ld+json">
   {
@@ -83,7 +84,7 @@
           <li><a href="#trabajos">Trabajos</a></li>
           <li><a href="#servicios">Servicios</a></li>
           <li><a href="#opiniones">Opiniones</a></li>
-          <li><a href="#turnos">Turnos</a></li>
+          <li><a href="#agenda">Agenda</a></li>
         </ul>
       </nav>
       <div class="site-header__actions">
@@ -295,7 +296,37 @@
       </div>
     </section>
 
-    <section class="section" id="turnos" aria-labelledby="turnos-titulo">
+    <section class="section" id="agenda" aria-labelledby="agenda-titulo">
+      <div class="container">
+        <div class="section__head">
+          <h2 id="agenda-titulo">Turnos disponibles</h2>
+          <p>Elegí un horario libre y tocalo para escribirme por Instagram. Los horarios tachados ya están reservados.</p>
+        </div>
+        <!-- La agenda se arma con js/agenda.js a partir de Google Calendar (api/agenda.js). -->
+        <div class="agenda" data-agenda>
+          <div class="agenda__bar">
+            <button class="agenda__nav" type="button" data-agenda-prev aria-label="Semana anterior" disabled>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+            </button>
+            <p class="agenda__week" data-agenda-week aria-live="polite">Cargando horarios…</p>
+            <button class="agenda__nav" type="button" data-agenda-next aria-label="Semana siguiente" disabled>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
+          </div>
+          <ul class="agenda__days" role="list" data-agenda-days></ul>
+          <div class="agenda__message" data-agenda-message hidden>
+            <p data-agenda-message-text></p>
+            <a class="button" href="https://ig.me/m/astra.unias" target="_blank" rel="noopener">Escribir por Instagram</a>
+          </div>
+          <ul class="agenda__legend" role="list" aria-label="Referencias">
+            <li><span class="slot slot--free slot--sample" aria-hidden="true">10:00</span> Libre</li>
+            <li><span class="slot slot--busy slot--sample" aria-hidden="true">10:00</span> Reservado</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--tinted" id="turnos" aria-labelledby="turnos-titulo">
       <div class="container booking">
         <div class="section__head">
           <h2 id="turnos-titulo">Cómo pedir tu turno</h2>
