@@ -236,6 +236,24 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
   margin-bottom: var(--space-l);
 }
 .section__head h2 { font-size: var(--step-2); }
+
+/* Títulos en "pill": fondo rosa redondeado que marca cada sección */
+.section__head h2,
+.about__copy h2 {
+  justify-self: start;
+  width: fit-content;
+  padding: 0.3em 0.75em 0.25em;
+  border-radius: 1.2em;
+  background: var(--color-petal);
+}
+
+.service-list h3 {
+  justify-self: start;
+  width: fit-content;
+  padding: 0.3em 0.85em 0.25em;
+  border-radius: 999px;
+  background: var(--color-petal);
+}
 .section__head p { color: var(--color-ink-soft); }
 
 /* Galería */
