@@ -11,6 +11,11 @@
   <!-- Aplica el tema elegido antes de pintar la página (evita un parpadeo claro/oscuro) -->
   <script>
     try { var t = localStorage.getItem('astra-theme'); if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t; } catch (e) {}
+    // Animación de entrada del logo: solo la primera vez por visita y nunca con "reducir movimiento"
+    try {
+      if (sessionStorage.getItem('astra-intro') || matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('no-intro');
+      else sessionStorage.setItem('astra-intro', '1');
+    } catch (e) {}
   </script>
   <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
 
@@ -26,7 +31,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Pinyon+Script&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=31">
+  <link rel="stylesheet" href="css/styles.css?v=32">
   <script src="js/theme.js?v=3" defer></script>
   <script src="js/map.js?v=2" defer></script>
   <script src="js/carousel.js?v=1" defer></script>
@@ -53,6 +58,8 @@
   </script>
 </head>
 <body>
+  <!-- Pantalla de entrada: el logo se escribe y la pantalla se desvanece (solo CSS) -->
+  <div class="intro" aria-hidden="true"><span class="logo-mark intro__logo"></span></div>
   <!-- Adorno de fileteado (esquina superior izquierda). Se reutiliza girado en cada esquina de los marcos .filete -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <symbol id="filete-esquina" viewBox="0 0 80 80">
@@ -78,7 +85,7 @@
 
   <header class="site-header">
     <div class="container site-header__inner">
-      <a class="brand" href="#inicio" aria-label="Astra, ir al inicio">Astra</a>
+      <a class="brand" href="#inicio" aria-label="Astra, ir al inicio"><span class="logo-mark" aria-hidden="true"></span></a>
       <nav aria-label="Principal">
         <ul class="nav-links">
           <li><a href="#trabajos">Trabajos</a></li>
@@ -110,7 +117,7 @@
       </picture>
       <div class="container hero__content">
         <h1 class="hero__title">
-          <span class="hero__wordmark">Astra</span>
+          <span class="hero__wordmark logo-mark"><span class="sr-only">Astra</span></span>
           <span class="hero__claim">Tus deseos hechos realidad</span>
         </h1>
         <p class="hero__lead">Semipermanente, capping, soft gel y press on en La Plata.</p>
@@ -354,7 +361,7 @@
   <footer class="site-footer">
     <div class="container site-footer__inner">
       <div>
-        <p class="brand brand--footer">Astra</p>
+        <p class="brand brand--footer"><span class="logo-mark" aria-hidden="true"></span><span class="sr-only">Astra</span></p>
         <p>Manicura y belleza de uñas por Rena Illiano.<br>Zona Plaza Belgrano, La Plata.</p>
       </div>
       <ul class="footer-links" role="list">

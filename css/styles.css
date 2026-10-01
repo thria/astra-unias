@@ -41,6 +41,8 @@
   --color-ink-soft: #6B4E5C;  /* texto secundario */
   --color-line: #EBCFD8;
   --color-on-rose: #FFFFFF;   /* texto sobre botones */
+  --color-logo: #E2558D;      /* rosa del logo de Astra */
+  --color-logo-on-photo: #FF8DB8; /* logo sobre la foto del inicio (igual en ambos temas) */
   --color-petal-strong: #EFB5C6;
   --color-header: rgb(255 247 249 / 0.85);
   --color-footer-bg: #3B2330;
@@ -97,6 +99,7 @@
     --color-ink-soft: #CDB3BE;
     --color-line: #3D2A33;
     --color-on-rose: #2A1520;
+    --color-logo: #F78FB8;
     --color-petal-strong: #633649;
     --color-header: rgb(28 18 23 / 0.85);
     --color-footer-bg: #130C10;
@@ -113,6 +116,7 @@
   --color-ink-soft: #CDB3BE;
   --color-line: #3D2A33;
   --color-on-rose: #2A1520;
+  --color-logo: #F78FB8;
   --color-petal-strong: #633649;
   --color-header: rgb(28 18 23 / 0.85);
   --color-footer-bg: #130C10;
@@ -228,13 +232,25 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
   min-height: var(--header-h);
 }
 
+/* Logo de Astra: la imagen se usa como máscara y toma el color del texto,
+   así se adapta al fondo (foto, barra, pie) y al tema claro u oscuro. */
+.logo-mark {
+  display: block;
+  aspect-ratio: 817 / 237;
+  background-color: currentColor;
+  -webkit-mask: url(../img/logo-astra.png) center / contain no-repeat;
+  mask: url(../img/logo-astra.png) center / contain no-repeat;
+}
+
+/* La pantalla de entrada solo existe con animación (ver "prefers-reduced-motion" más abajo) */
+.intro { display: none; }
+html.no-intro .intro { display: none !important; }
+
 .brand {
-  font-family: var(--font-script);
-  font-size: 2.125rem;
-  line-height: 1;
-  color: var(--color-ink);
+  display: block;
+  width: 5.75rem;
+  color: var(--color-logo);
   text-decoration: none;
-  padding-top: 0.25rem;
 }
 .brand:hover { color: var(--color-rose); }
 
@@ -312,13 +328,9 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
 .hero__title { display: grid; justify-items: center; gap: var(--space-xs); }
 
 .hero__wordmark {
-  font-family: var(--font-script);
-  font-size: clamp(6.5rem, 3rem + 17vw, 13rem);
-  font-weight: 400;
-  line-height: 0.85;
-  padding: 0.12em 0.15em 0;
-  color: var(--color-hero-accent);
-  text-shadow: 0 2px 24px rgb(0 0 0 / 0.35);
+  width: clamp(16rem, 9rem + 34vw, 36rem);
+  color: var(--color-logo-on-photo);
+  filter: drop-shadow(0 2px 18px rgb(0 0 0 / 0.35));
 }
 
 .hero__claim {
@@ -355,6 +367,35 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
     animation: hero-drift 12s ease-in-out infinite alternate;
   }
   .hero__content { animation: hero-fade 0.9s 0.2s ease-out both; }
+  .hero__wordmark { animation: logo-write 1.3s 0.2s cubic-bezier(0.6, 0, 0.3, 1) both; }
+
+  /* Pantalla de entrada (index.html): el logo se escribe de izquierda a derecha y la pantalla se va */
+  .intro {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: grid;
+    place-items: center;
+    background: var(--color-bg);
+    pointer-events: none;
+    animation: intro-out 0.6s 1.65s ease forwards;
+  }
+  .intro__logo {
+    width: min(72vw, 28rem);
+    color: var(--color-logo);
+    animation: logo-write 1.3s 0.15s cubic-bezier(0.6, 0, 0.3, 1) both;
+  }
+  /* Con pantalla de entrada, el inicio aparece cuando ella se va */
+  html:not(.no-intro) .hero__content { animation-delay: 2s; }
+  html:not(.no-intro) .hero__wordmark { animation-delay: 2s; }
+
+  @keyframes logo-write {
+    from { clip-path: inset(-10% 100% -10% 0); }
+    to { clip-path: inset(-10% 0 -10% 0); }
+  }
+  @keyframes intro-out {
+    to { opacity: 0; visibility: hidden; }
+  }
 
   @keyframes hero-drift {
     from { transform: scale(1.08) translate(-2.5%, -2%); }
@@ -948,7 +989,7 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
 .site-footer a { color: var(--color-footer-fg); }
 .site-footer a:hover { color: var(--color-footer-accent); }
 .site-footer :focus-visible { outline-color: var(--color-footer-accent); }
-.brand--footer { color: var(--color-footer-fg); margin-bottom: var(--space-xs); }
+.brand--footer { width: 7rem; color: var(--color-footer-accent); margin-bottom: var(--space-s); }
 .footer-links { display: grid; gap: var(--space-xs); }
 .site-footer__legal { color: var(--color-footer-muted); }
 
