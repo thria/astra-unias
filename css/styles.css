@@ -33,14 +33,13 @@
 
   /* Tipografía */
   --font-script: "Pinyon Script", cursive;
-  --font-display: "Comforter Brush", "Brush Script MT", cursive;  /* títulos, estilo pincel */
-  --font-body: "Jost", "Century Gothic", system-ui, sans-serif;  /* texto, sans geométrica fina */
-  --tracking-caps: 0.18em;  /* mayúsculas espaciadas para subtítulos y menú */
+  --font-display: "Young Serif", Georgia, serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
 
   --step--1: 0.875rem;
   --step-0: 1rem;
   --step-1: 1.125rem;
-  --step-2: clamp(2.25rem, 1.8rem + 2vw, 3.25rem);
+  --step-2: clamp(1.5rem, 1.2rem + 1.4vw, 2rem);
   --step-3: clamp(2rem, 1.4rem + 3vw, 3.25rem);
 
   /* Espaciado */
@@ -107,31 +106,19 @@ body {
   color: var(--color-ink);
   font-family: var(--font-body);
   font-size: var(--step-0);
-  font-weight: 300;
-  line-height: 1.65;
+  line-height: 1.6;
   overflow-x: clip;
 }
 
 h1, h2, h3 {
   font-family: var(--font-display);
   font-weight: 400;
-  line-height: 1.1;
+  line-height: 1.15;
   margin: 0;
   text-wrap: balance;
 }
 
 p { margin: 0; text-wrap: pretty; }
-strong { font-weight: 500; }
-
-/* Subtítulos en mayúsculas espaciadas (como el menú de Paint Nail Bar) */
-h3,
-.hero__claim,
-.local__place {
-  font-family: var(--font-body);
-  font-weight: 400;
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-caps);
-}
 
 img { display: block; max-width: 100%; height: auto; }
 
@@ -177,7 +164,7 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
   border-radius: 999px;
   background: var(--color-rose);
   color: var(--color-on-rose);
-  font-weight: 500;
+  font-weight: 600;
   text-align: center;
   text-decoration: none;
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
@@ -304,7 +291,7 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
 }
 
 .hero__claim {
-  font-size: clamp(0.95rem, 0.8rem + 0.7vw, 1.25rem);
+  font-size: clamp(1.375rem, 1rem + 1.6vw, 2.125rem);
   color: var(--color-hero-fg);
 }
 
@@ -365,7 +352,8 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: var(--step--1);
+  font-family: var(--font-display);
+  font-size: var(--step-1);
   color: var(--color-ink);
 }
 .local p.local__place { color: var(--color-ink); }
@@ -382,7 +370,7 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
 .local h2 { font-size: var(--step-2); }
 .local p { color: var(--color-ink-soft); max-width: 34rem; }
 .local__text { display: grid; justify-items: center; gap: var(--space-xs); }
-.local__link { font-weight: 500; font-size: var(--step--1); margin-top: var(--space-xs); }
+.local__link { font-weight: 600; font-size: var(--step--1); margin-top: var(--space-xs); }
 
 /* Mapa "maqueta" */
 .local__map {
@@ -412,7 +400,7 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
   color: #FFF7F9;
   font-family: var(--font-body);
   font-size: 0.8125rem;
-  font-weight: 500;
+  font-weight: 600;
   white-space: nowrap;
   box-shadow: 0 4px 14px rgb(142 46 80 / 0.3);
 }
@@ -565,7 +553,7 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
   background: linear-gradient(0deg, var(--color-hero-scrim-bottom), var(--color-hero-scrim-top));
   color: var(--color-hero-fg);
   font-size: var(--step--1);
-  font-weight: 500;
+  font-weight: 600;
   text-align: center;
   transform: translateY(101%);
   transition: transform 0.3s ease;
@@ -610,7 +598,7 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
 .sparkle { width: 1.5rem; height: 1.5rem; fill: currentColor; flex: none; }
 
 /* Servicios */
-.services__price { font-weight: 500; }
+.services__price { font-weight: 600; }
 
 .service-list { border-top: 1px solid var(--color-line); }
 .service-list li {
@@ -619,7 +607,7 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
   padding-block: var(--space-m);
   border-bottom: 1px solid var(--color-line);
 }
-.service-list h3 { font-size: var(--step--1); }
+.service-list h3 { font-size: var(--step-1); }
 .service-list p { color: var(--color-ink-soft); max-width: 40ch; }
 
 /* Sobre mí */
@@ -647,7 +635,7 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
   background: var(--color-bg);
   border-radius: var(--radius);
 }
-.review blockquote { margin: 0; font-style: italic; font-size: var(--step-1); line-height: 1.55; }
+.review blockquote { margin: 0; font-family: var(--font-display); font-size: var(--step-1); line-height: 1.45; }
 .review figcaption { color: var(--color-ink-soft); font-size: var(--step--1); }
 
 /* Turnos: secuencia real, por eso numerada */
@@ -668,10 +656,10 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
   height: 2.5rem;
   border-radius: 50%;
   background: var(--color-petal);
-  font-weight: 500;
+  font-family: var(--font-display);
   color: var(--color-ink);
 }
-.steps h3 { font-size: var(--step--1); align-self: center; }
+.steps h3 { font-size: var(--step-1); align-self: center; }
 .steps p { color: var(--color-ink-soft); }
 
 .booking__cta { width: 100%; }
@@ -691,11 +679,6 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
 .brand--footer { color: var(--color-footer-fg); margin-bottom: var(--space-xs); }
 .footer-links { display: grid; gap: var(--space-xs); }
 .site-footer__legal { color: var(--color-footer-muted); }
-
-/* Celulares muy angostos: títulos de pincel un poco más chicos para que entren en una línea */
-@media (max-width: 24em) {
-  :root { --step-2: 1.75rem; }
-}
 
 /* ≥ 480px
    ------------------------------------------------------------------------ */
@@ -717,10 +700,8 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
   .nav-links a {
     color: var(--color-ink);
     text-decoration: none;
-    font-size: 0.8125rem;
-    font-weight: 400;
-    text-transform: uppercase;
-    letter-spacing: var(--tracking-caps);
+    font-size: var(--step--1);
+    font-weight: 600;
     padding-block: 0.5rem;
   }
   .nav-links a:hover { color: var(--color-rose); text-decoration: underline; }
