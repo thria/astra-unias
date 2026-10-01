@@ -33,7 +33,7 @@
 
   /* Tipografía */
   --font-script: "Pinyon Script", cursive;
-  --font-display: "Cormorant Garamond", Garamond, "Times New Roman", serif;  /* títulos, serif elegante */
+  --font-display: "Comforter Brush", "Brush Script MT", cursive;  /* títulos, estilo pincel */
   --font-body: "Jost", "Century Gothic", system-ui, sans-serif;  /* texto, sans geométrica fina */
   --tracking-caps: 0.18em;  /* mayúsculas espaciadas para subtítulos y menú */
 
@@ -114,7 +114,7 @@ body {
 
 h1, h2, h3 {
   font-family: var(--font-display);
-  font-weight: 600;
+  font-weight: 400;
   line-height: 1.1;
   margin: 0;
   text-wrap: balance;
@@ -692,7 +692,7 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
 .footer-links { display: grid; gap: var(--space-xs); }
 .site-footer__legal { color: var(--color-footer-muted); }
 
-/* Celulares muy angostos: títulos un poco más chicos para que entren en una línea */
+/* Celulares muy angostos: títulos de pincel un poco más chicos para que entren en una línea */
 @media (max-width: 24em) {
   :root { --step-2: 1.75rem; }
 }
