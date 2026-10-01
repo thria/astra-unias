@@ -274,16 +274,23 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
   text-shadow: 0 1px 14px rgb(0 0 0 / 0.25);
 }
 
+/* El logo es el protagonista; la frase de debajo dice qué y dónde */
+.hero__title { display: grid; justify-items: center; gap: var(--space-xs); }
+
 .hero__wordmark {
   font-family: var(--font-script);
-  font-size: clamp(3.25rem, 2rem + 5vw, 5.5rem);
-  line-height: 0.9;
+  font-size: clamp(6.5rem, 3rem + 17vw, 13rem);
+  font-weight: 400;
+  line-height: 0.85;
+  padding: 0.12em 0.15em 0;
   color: var(--color-hero-accent);
-  transform: rotate(-4deg);
-  margin-bottom: calc(var(--space-xs) * -1);
+  text-shadow: 0 2px 24px rgb(0 0 0 / 0.35);
 }
 
-.hero h1 { font-size: clamp(2.25rem, 1.3rem + 4.2vw, 4.25rem); max-width: 16ch; }
+.hero__claim {
+  font-size: clamp(1.375rem, 1rem + 1.6vw, 2.125rem);
+  color: var(--color-hero-fg);
+}
 
 .hero__lead { font-size: var(--step-1); color: var(--color-hero-fg-soft); max-width: 36rem; }
 
@@ -321,6 +328,31 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
   }
 }
 
+/* Apartado "Emprendimiento de La Plata"
+   ------------------------------------------------------------------------ */
+.local {
+  padding-block: var(--space-l);
+  background: var(--color-blush);
+  border-bottom: 1px solid var(--color-line);
+}
+.local__inner {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-xs);
+  text-align: center;
+}
+.local__pin {
+  width: 1.75rem;
+  height: 1.75rem;
+  fill: none;
+  stroke: var(--color-rose);
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.local h2 { font-size: var(--step-2); }
+.local p { color: var(--color-ink-soft); max-width: 34rem; }
+
 /* Secciones
    ------------------------------------------------------------------------ */
 .section { padding-block: var(--space-xl); }
@@ -336,13 +368,15 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
 
 /* Títulos en "pill": fondo rosa redondeado que marca cada sección */
 .section__head h2,
-.about__copy h2 {
+.about__copy h2,
+.local h2 {
   justify-self: start;
   width: fit-content;
   padding: 0.3em 0.75em 0.25em;
   border-radius: 1.2em;
   background: var(--color-petal);
 }
+.local h2 { justify-self: center; }
 
 .service-list h3 {
   justify-self: start;
