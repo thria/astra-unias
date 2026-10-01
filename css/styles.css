@@ -472,6 +472,55 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
   object-fit: cover;
 }
 
+/* Cada foto lleva a su publicación de Instagram.
+   Con mouse: el aviso sube desde abajo al pasar el cursor. En pantallas táctiles queda visible. */
+.gallery__link {
+  position: relative;
+  display: block;
+  height: 100%;
+  overflow: hidden;
+  border-radius: inherit;
+  color: var(--color-hero-fg);
+  text-decoration: none;
+}
+.gallery__link img { transition: transform 0.5s ease; }
+
+.gallery__cta {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.85rem 0.75rem;
+  background: linear-gradient(0deg, var(--color-hero-scrim-bottom), var(--color-hero-scrim-top));
+  color: var(--color-hero-fg);
+  font-size: var(--step--1);
+  font-weight: 600;
+  text-align: center;
+  transform: translateY(101%);
+  transition: transform 0.3s ease;
+}
+.gallery__cta svg {
+  flex: none;
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+}
+.gallery__cta .gallery__cta-dot { fill: currentColor; stroke: none; }
+
+.gallery__link:hover .gallery__cta,
+.gallery__link:focus-visible .gallery__cta { transform: translateY(0); }
+.gallery__link:hover img,
+.gallery__link:focus-visible img { transform: scale(1.04); }
+.gallery__link:focus-visible { outline-offset: -3px; }
+
+@media (hover: none) {
+  .gallery__cta { transform: translateY(0); padding-block: 0.6rem; }
+}
+
 .gallery__item--more a {
   display: flex;
   flex-direction: column;
