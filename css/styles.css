@@ -377,7 +377,7 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
 .local__map {
   position: relative;
   width: 100%;
-  height: clamp(20rem, 70vw, 28rem);
+  height: clamp(15rem, 62vw, 26rem); /* más ancho que alto */
   border-radius: 18px;
   overflow: hidden;
   border: 1px solid var(--color-line);
@@ -791,10 +791,10 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
   .carousel__btn--next { right: 1rem; }
 
   .local { padding-block: var(--space-xl); }
-  .local__inner { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: center; gap: var(--space-xl); text-align: left; }
+  .local__inner { grid-template-columns: minmax(16rem, 1fr) minmax(0, 2.2fr); align-items: center; gap: var(--space-l); text-align: left; }
   .local__text { justify-items: start; gap: var(--space-s); }
   .local h2 { justify-self: start; }
-  .local__map { height: 30rem; }
+  .local__map { height: clamp(24rem, 33vw, 32rem); }
   .filete--map { margin-top: 0; }
 
   .services { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: var(--space-xl); }
