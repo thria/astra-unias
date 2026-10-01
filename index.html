@@ -119,24 +119,23 @@
         </div>
       </div>
     </section>
-
-    <section class="local" aria-labelledby="local-titulo">
-      <div class="container local__inner">
-        <div class="local__text">
-          <h2 id="local-titulo">Dónde atiendo</h2>
-          <p class="local__place">
-            <svg class="local__pin" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="10" r="2.5"/></svg>
-            Zona Plaza Belgrano, La Plata
-          </p>
-          <p>El estudio de Astra está en esta zona. Mové el mapa para ubicarte; la dirección exacta te la paso cuando reservás.</p>
-          <a class="local__link" href="https://www.google.com/maps/search/?api=1&amp;query=Plaza+Manuel+Belgrano%2C+La+Plata" target="_blank" rel="noopener">Abrir la zona en Google Maps</a>
-        </div>
-        <!-- Mapa interactivo (MapLibre + OpenFreeMap). Se carga al llegar a esta sección: js/map.js -->
-        <div class="filete filete--map">
+    <section class="section section--tinted" id="sobre-mi" aria-labelledby="sobre-titulo">
+      <div class="container about">
+        <div class="filete filete--photo">
           <svg class="filete__corner filete__corner--tl" aria-hidden="true"><use href="#filete-esquina"/></svg><svg class="filete__corner filete__corner--tr" aria-hidden="true"><use href="#filete-esquina"/></svg><svg class="filete__corner filete__corner--bl" aria-hidden="true"><use href="#filete-esquina"/></svg><svg class="filete__corner filete__corner--br" aria-hidden="true"><use href="#filete-esquina"/></svg><svg class="filete__side filete__side--l" aria-hidden="true"><use href="#filete-lado"/></svg><svg class="filete__side filete__side--r" aria-hidden="true"><use href="#filete-lado"/></svg>
-        <div class="local__map" id="mapa-zona" role="region" aria-label="Mapa de la zona de Plaza Belgrano, La Plata">
-          <p class="local__map-fallback">Cargando el mapa de la zona…</p>
+        <div class="about__photo">
+          <img src="img/rena-illiano-1200.jpg"
+               srcset="img/rena-illiano-700.jpg 700w, img/rena-illiano-1200.jpg 1200w"
+               sizes="(min-width: 72rem) 34rem, (min-width: 48em) 46vw, 100vw"
+               width="1200" height="898" loading="lazy" decoding="async"
+               alt="Rena Illiano, manicurista de Astra, sentada en el piso con campera y jean celeste">
         </div>
+        </div>
+        <div class="about__copy">
+          <h2 id="sobre-titulo">Hola, soy Rena</h2>
+          <!-- REEMPLAZAR: texto provisional -->
+          <p>Soy Rena Illiano, manicurista en La Plata. Armé Astra para hacer uñas que se sientan tuyas: me traés una idea, una foto o solo un color, y lo convertimos en tu set.</p>
+          <p>Trabajo con turnos, así que cada clienta tiene su tiempo y toda mi atención. Me encantan los detalles: un gatito en relieve, una cruz de strass o un cromado perfecto.</p>
         </div>
       </div>
     </section>
@@ -218,7 +217,28 @@
         </div>
     </section>
 
-    <section class="section section--tinted" id="servicios" aria-labelledby="servicios-titulo">
+    <section class="local" aria-labelledby="local-titulo">
+      <div class="container local__inner">
+        <div class="local__text">
+          <h2 id="local-titulo">Dónde atiendo</h2>
+          <p class="local__place">
+            <svg class="local__pin" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+            Zona Plaza Belgrano, La Plata
+          </p>
+          <p>El estudio de Astra está en esta zona. Mové el mapa para ubicarte; la dirección exacta te la paso cuando reservás.</p>
+          <a class="local__link" href="https://www.google.com/maps/search/?api=1&amp;query=Plaza+Manuel+Belgrano%2C+La+Plata" target="_blank" rel="noopener">Abrir la zona en Google Maps</a>
+        </div>
+        <!-- Mapa interactivo (MapLibre + OpenFreeMap). Se carga al llegar a esta sección: js/map.js -->
+        <div class="filete filete--map">
+          <svg class="filete__corner filete__corner--tl" aria-hidden="true"><use href="#filete-esquina"/></svg><svg class="filete__corner filete__corner--tr" aria-hidden="true"><use href="#filete-esquina"/></svg><svg class="filete__corner filete__corner--bl" aria-hidden="true"><use href="#filete-esquina"/></svg><svg class="filete__corner filete__corner--br" aria-hidden="true"><use href="#filete-esquina"/></svg><svg class="filete__side filete__side--l" aria-hidden="true"><use href="#filete-lado"/></svg><svg class="filete__side filete__side--r" aria-hidden="true"><use href="#filete-lado"/></svg>
+        <div class="local__map" id="mapa-zona" role="region" aria-label="Mapa de la zona de Plaza Belgrano, La Plata">
+          <p class="local__map-fallback">Cargando el mapa de la zona…</p>
+        </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="servicios" aria-labelledby="servicios-titulo">
       <div class="container services">
         <div class="section__head">
           <h2 id="servicios-titulo">Servicios</h2>
@@ -243,27 +263,6 @@
             <p>Sets hechos a la medida de tus uñas para poner y sacar en casa cuando quieras.</p>
           </li>
         </ul>
-      </div>
-    </section>
-
-    <section class="section" id="sobre-mi" aria-labelledby="sobre-titulo">
-      <div class="container about">
-        <div class="filete filete--photo">
-          <svg class="filete__corner filete__corner--tl" aria-hidden="true"><use href="#filete-esquina"/></svg><svg class="filete__corner filete__corner--tr" aria-hidden="true"><use href="#filete-esquina"/></svg><svg class="filete__corner filete__corner--bl" aria-hidden="true"><use href="#filete-esquina"/></svg><svg class="filete__corner filete__corner--br" aria-hidden="true"><use href="#filete-esquina"/></svg><svg class="filete__side filete__side--l" aria-hidden="true"><use href="#filete-lado"/></svg><svg class="filete__side filete__side--r" aria-hidden="true"><use href="#filete-lado"/></svg>
-        <div class="about__photo">
-          <img src="img/rena-illiano-1200.jpg"
-               srcset="img/rena-illiano-700.jpg 700w, img/rena-illiano-1200.jpg 1200w"
-               sizes="(min-width: 72rem) 34rem, (min-width: 48em) 46vw, 100vw"
-               width="1200" height="898" loading="lazy" decoding="async"
-               alt="Rena Illiano, manicurista de Astra, sentada en el piso con campera y jean celeste">
-        </div>
-        </div>
-        <div class="about__copy">
-          <h2 id="sobre-titulo">Hola, soy Rena</h2>
-          <!-- REEMPLAZAR: texto provisional -->
-          <p>Soy Rena Illiano, manicurista en La Plata. Armé Astra para hacer uñas que se sientan tuyas: me traés una idea, una foto o solo un color, y lo convertimos en tu set.</p>
-          <p>Trabajo con turnos, así que cada clienta tiene su tiempo y toda mi atención. Me encantan los detalles: un gatito en relieve, una cruz de strass o un cromado perfecto.</p>
-        </div>
       </div>
     </section>
 
