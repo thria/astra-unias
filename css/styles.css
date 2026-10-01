@@ -19,6 +19,7 @@
   --color-footer-fg: #F6E4EA;
   --color-footer-muted: #CDB3BE;
   --color-footer-accent: #F4C6D4; /* el footer es oscuro en ambos temas */
+  --color-carousel-btn: rgb(28 18 23 / 0.72); /* flechas del carrusel, sobre fotos */
   /* Mapa maqueta: rosa en ambos temas */
   --color-map-ground: #FBE4EB;
   --color-map-label: #8E2E50;
@@ -509,11 +510,56 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
 }
 .section__head p { color: var(--color-ink-soft); }
 
-/* Galería */
-.gallery {
+/* Galería en carrusel (estilo NAF Salon): fila deslizable, la última foto asoma cortada */
+.carousel { position: relative; }
+
+.carousel__track {
+  --per-view: 1.35;
+  --gap: var(--space-s);
+  display: flex;
+  gap: var(--gap);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+.carousel__track::-webkit-scrollbar { display: none; }
+.carousel__track:focus-visible { outline: 2px solid var(--color-rose); outline-offset: 4px; }
+
+.carousel__track > .gallery__item {
+  flex: 0 0 calc((100% - (var(--per-view) - 1) * var(--gap)) / var(--per-view));
+  scroll-snap-align: start;
+}
+
+.carousel__btn {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-xs);
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-carousel-btn);
+  color: var(--color-hero-fg);
+  cursor: pointer;
+  translate: 0 -50%;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.2);
+  transition: background-color 0.2s ease, scale 0.2s ease;
+}
+.carousel__btn:hover { background: var(--color-rose); scale: 1.06; }
+.carousel__btn:focus-visible { outline: 2px solid var(--color-rose); outline-offset: 3px; }
+.carousel__btn svg { width: 1.25rem; height: 1.25rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.carousel__btn--prev { left: 0.75rem; }
+.carousel__btn--next { right: 0.75rem; }
+
+/* En pantallas táctiles se desliza con el dedo; las flechas solo con mouse */
+@media (hover: none) {
+  .carousel__btn { display: none; }
 }
 
 .gallery__item {
@@ -706,7 +752,7 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
   }
   .nav-links a:hover { color: var(--color-rose); text-decoration: underline; }
 
-  .gallery { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-s); }
+  .carousel__track { --per-view: 2.3; }
 
   .service-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-l); }
 
@@ -723,6 +769,10 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
 /* ≥ 1024px
    ------------------------------------------------------------------------ */
 @media (min-width: 64em) {
+  .carousel__track { --per-view: 3.3; --gap: var(--space-m); }
+  .carousel__btn--prev { left: 1rem; }
+  .carousel__btn--next { right: 1rem; }
+
   .local { padding-block: var(--space-xl); }
   .local__inner { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: center; gap: var(--space-xl); text-align: left; }
   .local__text { justify-items: start; gap: var(--space-s); }
