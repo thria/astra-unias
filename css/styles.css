@@ -2,6 +2,34 @@
    Astra Uñas — estilos (mobile-first)
    ========================================================================== */
 
+/* Young Serif con medidas corregidas: la tipografía original reserva mucho más
+   espacio arriba (104,6 %) que abajo (36,6 %), y cada navegador lo interpreta distinto,
+   así que el texto quedaba corrido dentro de los globos. Con estos valores la altura
+   de las mayúsculas queda centrada en la línea en cualquier navegador moderno.
+   Mismos archivos que sirve Google Fonts. */
+@font-face {
+  font-family: "Young Serif Astra";
+  src: url(https://fonts.gstatic.com/s/youngserif/v2/3qTpojO2nS2VtkB3KtkQZ1t93kY.woff2) format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  ascent-override: 108.1%;
+  descent-override: 33.1%;
+  line-gap-override: 0%;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Young Serif Astra";
+  src: url(https://fonts.gstatic.com/s/youngserif/v2/3qTpojO2nS2VtkB3KtkQZ1tz3kYoaQ.woff2) format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  ascent-override: 108.1%;
+  descent-override: 33.1%;
+  line-gap-override: 0%;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
 :root {
   /* Paleta */
   --color-bg: #FFF7F9;        /* blanco rosado */
@@ -34,7 +62,7 @@
 
   /* Tipografía */
   --font-script: "Pinyon Script", cursive;
-  --font-display: "Young Serif", Georgia, serif;
+  --font-display: "Young Serif Astra", "Young Serif", Georgia, serif;
   --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
 
   --step--1: 0.875rem;
@@ -495,7 +523,7 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
 .local h2 {
   justify-self: start;
   width: fit-content;
-  padding: 0.34em 0.75em 0.21em; /* respaldo: compensa el espacio extra de la letra */
+  padding: 0.28em 0.75em;
   border-radius: 1.2em;
   background: var(--color-petal);
 }
@@ -508,7 +536,7 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
 .service-list h3 {
   justify-self: start;
   width: fit-content;
-  padding: 0.3em 0.85em 0.25em;
+  padding: 0.28em 0.85em;
   border-radius: 999px;
   background: var(--color-petal);
 }
