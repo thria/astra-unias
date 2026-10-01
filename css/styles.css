@@ -7,7 +7,6 @@
   --color-bg: #FFF7F9;        /* blanco rosado */
   --color-blush: #FCE8EE;     /* rosa pastel, fondos de sección */
   --color-petal: #F4C6D4;     /* rosa del logo */
-  --color-butter: #FBE6A8;    /* amarillo manteca del brillo del logo */
   --color-rose: #B03F66;      /* acento: botones y links */
   --color-rose-dark: #8E2E50;
   --color-ink: #3B2330;       /* texto principal, ciruela */
@@ -16,12 +15,18 @@
   --color-on-rose: #FFFFFF;   /* texto sobre botones */
   --color-petal-strong: #EFB5C6;
   --color-header: rgb(255 247 249 / 0.85);
-  --color-aura-pink: #F4C6D4;
-  --color-aura-butter: #FBE6A8;
   --color-footer-bg: #3B2330;
   --color-footer-fg: #F6E4EA;
   --color-footer-muted: #CDB3BE;
   --color-footer-accent: #F4C6D4; /* el footer es oscuro en ambos temas */
+  /* Hero sobre foto: iguales en ambos temas */
+  --color-hero-fg: #FFF7F9;
+  --color-hero-fg-soft: #F6E4EA;
+  --color-hero-accent: #F4C6D4;
+  --color-hero-ink: #3B2330;
+  --color-hero-hover: rgb(255 247 249 / 0.14);
+  --color-hero-scrim-top: rgb(28 18 23 / 0.35);
+  --color-hero-scrim-bottom: rgb(28 18 23 / 0.62);
 
   /* Tipografía */
   --font-script: "Pinyon Script", cursive;
@@ -62,8 +67,6 @@
     --color-on-rose: #2A1520;
     --color-petal-strong: #633649;
     --color-header: rgb(28 18 23 / 0.85);
-    --color-aura-pink: #7A3E58;
-    --color-aura-butter: #8A6E3C;
     --color-footer-bg: #130C10;
     color-scheme: dark;
   }
@@ -80,8 +83,6 @@
   --color-on-rose: #2A1520;
   --color-petal-strong: #633649;
   --color-header: rgb(28 18 23 / 0.85);
-  --color-aura-pink: #7A3E58;
-  --color-aura-butter: #8A6E3C;
   --color-footer-bg: #130C10;
   color-scheme: dark;
 }
@@ -233,68 +234,90 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
 
 /* Hero
    ------------------------------------------------------------------------ */
-.hero { padding-block: var(--space-m) var(--space-xl); }
-
-.hero__inner {
-  display: grid;
-  gap: var(--space-m);
-  justify-items: center;
-  text-align: center;
-}
-
-/* La marca del logo: brillo rosa/manteca con la firma encima */
-.hero__mark {
+/* Foto a todo el ancho con el texto centrado encima */
+.hero {
   position: relative;
+  isolation: isolate;
   display: grid;
-  place-items: center;
-  width: min(70%, 14rem);
-  aspect-ratio: 1;
+  align-items: center;
+  min-height: clamp(32rem, 88svh, 52rem);
+  overflow: hidden;
+  color: var(--color-hero-fg);
 }
 
-.hero__aura {
+.hero__media,
+.hero__media img {
   position: absolute;
-  inset: 4%;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 50% 55%, var(--color-aura-butter) 0%, transparent 38%),
-    radial-gradient(circle at 50% 50%, var(--color-aura-pink) 0%, color-mix(in srgb, var(--color-aura-pink) 55%, transparent) 45%, transparent 70%);
-  filter: blur(6px);
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+}
+.hero__media img { object-fit: cover; object-position: 50% 40%; }
+
+/* Velo oscuro para que el texto se lea sobre la foto */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, var(--color-hero-scrim-top) 0%, var(--color-hero-scrim-bottom) 100%);
+}
+
+.hero__content {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-m);
+  max-width: 48rem;
+  padding-block: var(--space-xl);
+  text-align: center;
+  text-shadow: 0 1px 14px rgb(0 0 0 / 0.25);
 }
 
 .hero__wordmark {
-  position: relative;
   font-family: var(--font-script);
-  font-size: clamp(4.25rem, 2rem + 11vw, 9.5rem);
-  line-height: 1;
-  color: var(--color-rose);
-  padding-top: 0.15em;
-  transform: rotate(-6deg);
+  font-size: clamp(3.25rem, 2rem + 5vw, 5.5rem);
+  line-height: 0.9;
+  color: var(--color-hero-accent);
+  transform: rotate(-4deg);
+  margin-bottom: calc(var(--space-xs) * -1);
 }
 
-.hero__copy { display: grid; gap: var(--space-m); max-width: 34rem; }
+.hero h1 { font-size: clamp(2.25rem, 1.3rem + 4.2vw, 4.25rem); max-width: 16ch; }
 
-.hero h1 { font-size: var(--step-3); }
-
-.hero__lead { font-size: var(--step-1); color: var(--color-ink-soft); }
+.hero__lead { font-size: var(--step-1); color: var(--color-hero-fg-soft); max-width: 36rem; }
 
 .hero__actions {
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
+  width: min(100%, 22rem);
+  margin-top: var(--space-xs);
+  text-shadow: none;
 }
 
-/* Entrada única de la página */
-@media (prefers-reduced-motion: no-preference) {
-  .hero__aura { animation: aura-in 1.2s ease-out both; }
-  .hero__wordmark { animation: wordmark-in 1s 0.25s ease-out both; }
+.button--light {
+  background: var(--color-hero-fg);
+  border-color: var(--color-hero-fg);
+  color: var(--color-hero-ink);
+}
+.button--light:hover { background: var(--color-hero-accent); border-color: var(--color-hero-accent); color: var(--color-hero-ink); }
 
-  @keyframes aura-in {
-    from { opacity: 0; transform: scale(0.8); }
-    to { opacity: 1; transform: scale(1); }
+.button--outline-light { background: transparent; border-color: var(--color-hero-fg); color: var(--color-hero-fg); }
+.button--outline-light:hover { background: var(--color-hero-hover); color: var(--color-hero-fg); }
+
+/* Entrada única de la página: la foto se asienta y el texto aparece */
+@media (prefers-reduced-motion: no-preference) {
+  .hero__media img { animation: hero-settle 1.6s ease-out both; }
+  .hero__content { animation: hero-fade 0.9s 0.2s ease-out both; }
+
+  @keyframes hero-settle {
+    from { transform: scale(1.06); }
+    to { transform: scale(1); }
   }
-  @keyframes wordmark-in {
-    from { opacity: 0; transform: rotate(-6deg) translateY(0.5rem); }
-    to { opacity: 1; transform: rotate(-6deg) translateY(0); }
+  @keyframes hero-fade {
+    from { opacity: 0; transform: translateY(0.75rem); }
+    to { opacity: 1; transform: translateY(0); }
   }
 }
 
@@ -455,8 +478,7 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
 /* ≥ 480px
    ------------------------------------------------------------------------ */
 @media (min-width: 30em) {
-  .hero__mark { width: min(100%, 20rem); }
-  .hero__actions { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+  .hero__actions { flex-direction: row; flex-wrap: wrap; justify-content: center; width: auto; }
   .booking__cta { width: auto; }
 }
 
@@ -496,18 +518,6 @@ ul[role="list"], ol { list-style: none; margin: 0; padding: 0; }
 /* ≥ 1024px
    ------------------------------------------------------------------------ */
 @media (min-width: 64em) {
-  .hero { padding-block: var(--space-xl); }
-  .hero__inner {
-    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
-    align-items: center;
-    justify-items: start;
-    text-align: left;
-    gap: var(--space-xl);
-  }
-  .hero__copy { order: -1; }
-  .hero__mark { width: 100%; max-width: 28rem; justify-self: center; }
-  .hero__actions { justify-content: flex-start; }
-
   .services { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: var(--space-xl); }
   .services .section__head { margin-bottom: 0; align-content: start; }
 }

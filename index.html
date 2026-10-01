@@ -26,7 +26,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Pinyon+Script&family=Young+Serif&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=3">
+  <link rel="stylesheet" href="css/styles.css?v=4">
   <script src="js/theme.js?v=3" defer></script>
 
   <script type="application/ld+json">
@@ -75,18 +75,22 @@
 
   <main id="contenido">
     <section class="hero" id="inicio">
-      <div class="container hero__inner">
-        <div class="hero__mark" aria-hidden="true">
-          <span class="hero__aura"></span>
-          <span class="hero__wordmark">Astra</span>
-        </div>
-        <div class="hero__copy">
-          <h1>Uñas a tu medida en La Plata</h1>
-          <p class="hero__lead">Soy Rena Illiano y hago cada set a mano en mi estudio de zona Plaza Belgrano: semipermanente, capping, soft gel y press on, con el diseño que tengas en mente.</p>
-          <div class="hero__actions">
-            <a class="button" href="https://ig.me/m/astra.unias" target="_blank" rel="noopener">Pedir turno por Instagram</a>
-            <a class="button button--ghost" href="#trabajos">Ver trabajos</a>
-          </div>
+      <picture class="hero__media">
+        <source media="(min-width: 48em)"
+                srcset="img/hero/hero-wide-960.jpg 960w, img/hero/hero-wide-1500.jpg 1500w"
+                sizes="100vw" width="1500" height="844">
+        <img src="img/hero/hero-tall-900.jpg"
+             srcset="img/hero/hero-tall-600.jpg 600w, img/hero/hero-tall-900.jpg 900w"
+             sizes="100vw" width="900" height="1200" fetchpriority="high" decoding="async"
+             alt="Uñas cortas redondeadas en rosa viejo con efecto ojo de gato, hechas por Rena Illiano">
+      </picture>
+      <div class="container hero__content">
+        <span class="hero__wordmark" aria-hidden="true">Astra</span>
+        <h1>Tu lugar para las uñas en La Plata</h1>
+        <p class="hero__lead">Soy Rena Illiano. Convierto tu idea en un set hecho a mano: semipermanente, capping, soft gel y press on, en zona Plaza Belgrano.</p>
+        <div class="hero__actions">
+          <a class="button button--light" href="https://ig.me/m/astra.unias" target="_blank" rel="noopener">Pedir turno</a>
+          <a class="button button--outline-light" href="#trabajos">Ver trabajos</a>
         </div>
       </div>
     </section>
