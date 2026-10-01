@@ -26,8 +26,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Pinyon+Script&family=Young+Serif&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=6">
+  <link rel="stylesheet" href="css/styles.css?v=7">
   <script src="js/theme.js?v=3" defer></script>
+  <script src="js/map.js?v=2" defer></script>
 
   <script type="application/ld+json">
   {
@@ -99,9 +100,16 @@
 
     <section class="local" aria-labelledby="local-titulo">
       <div class="container local__inner">
-        <svg class="local__pin" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="10" r="2.5"/></svg>
-        <h2 id="local-titulo">Emprendimiento de La Plata</h2>
-        <p>Astra nació y trabaja en La Plata. Mi estudio está en zona Plaza Belgrano y atiendo con turno.</p>
+        <div class="local__text">
+          <svg class="local__pin" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+          <h2 id="local-titulo">Emprendimiento de La Plata</h2>
+          <p>Astra nació y trabaja en La Plata. Mi estudio está en zona Plaza Belgrano y atiendo con turno.</p>
+          <a class="local__link" href="https://www.google.com/maps/search/?api=1&amp;query=Plaza+Manuel+Belgrano%2C+La+Plata" target="_blank" rel="noopener">Abrir la zona en Google Maps</a>
+        </div>
+        <!-- Mapa interactivo (MapLibre + OpenFreeMap). Se carga al llegar a esta sección: js/map.js -->
+        <div class="local__map" id="mapa-zona" role="region" aria-label="Mapa de la zona de Plaza Belgrano, La Plata">
+          <p class="local__map-fallback">Cargando el mapa de la zona…</p>
+        </div>
       </div>
     </section>
 
