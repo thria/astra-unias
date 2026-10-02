@@ -75,7 +75,7 @@
     list.parentNode.insertBefore(wrap, list);
     wrap.appendChild(list);
     list.classList.add('reviews--marquee');
-    // velocidad pareja sin importar cuántas opiniones haya: ~9 s por opinión
-    list.style.animationDuration = (originals.length * 9) + 's';
+    // velocidad pareja y tranquila sin importar cuántas opiniones haya: ~14 s por opinión
+    list.style.animationDuration = (originals.length * 14) + 's';
   }
 })();

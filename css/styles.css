@@ -437,7 +437,7 @@ html.no-intro .intro { display: none !important; }
   .hero__content { animation: hero-fade 0.9s 0.2s ease-out both; }
   .hero__wordmark { animation: logo-write 1.3s 0.2s cubic-bezier(0.6, 0, 0.3, 1) both; }
 
-  /* Pantalla de entrada (index.html): el logo se escribe con pincel, letra por letra, y la pantalla se va */
+  /* Pantalla de entrada (index.html): el logo se escribe con un trazo parejo, letra por letra, y la pantalla se va */
   .intro {
     position: fixed;
     inset: 0;
@@ -446,7 +446,7 @@ html.no-intro .intro { display: none !important; }
     place-items: center;
     background: var(--color-bg);
     pointer-events: none;
-    animation: intro-out 0.6s 2.4s ease forwards;
+    animation: intro-out 0.6s 3.25s ease forwards;
   }
   .intro__logo {
     display: block;
@@ -460,18 +460,18 @@ html.no-intro .intro { display: none !important; }
     stroke-dasharray: 1 1;
     stroke-dashoffset: 1;
     visibility: hidden; /* sin el puntito del extremo redondeado antes de empezar */
-    animation: intro-trazo var(--d) var(--t) cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards;
+    animation: intro-trazo var(--d) var(--t) linear forwards; /* velocidad pareja, como una lapicera */
   }
   /* Al final se completa el logo para que no quede ningún detalle sin pintar */
-  .intro__relleno { opacity: 0; animation: intro-relleno 0.3s 2.05s ease forwards; }
+  .intro__relleno { opacity: 0; animation: intro-relleno 0.35s 2.9s ease forwards; }
   @keyframes intro-trazo {
     from { stroke-dashoffset: 1; visibility: visible; }
     to { stroke-dashoffset: 0; visibility: visible; }
   }
   @keyframes intro-relleno { to { opacity: 1; } }
   /* Con pantalla de entrada, el inicio aparece cuando ella se va */
-  html:not(.no-intro) .hero__content { animation-delay: 2.75s; }
-  html:not(.no-intro) .hero__wordmark { animation-delay: 2.75s; }
+  html:not(.no-intro) .hero__content { animation-delay: 3.6s; }
+  html:not(.no-intro) .hero__wordmark { animation-delay: 3.6s; }
 
   @keyframes logo-write {
     from { clip-path: inset(-10% 100% -10% 0); }
@@ -1411,14 +1411,20 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
   display: flex;
   gap: 0;
   width: max-content;
-  animation: reviews-scroll 30s linear infinite;
+  animation: reviews-scroll 42s linear infinite;
+  will-change: transform;
+  backface-visibility: hidden; /* evita que en iPhone se borre la franja a mitad del recorrido */
 }
 .reviews--marquee > li { flex: 0 0 min(21rem, 78vw); padding-right: var(--space-m); }
 .reviews--marquee > li > .review { height: 100%; }
-.reviews-marquee:hover .reviews--marquee,
+/* Pausa al pasar el mouse (solo en compu: en el celular un toque la dejaba frenada) */
+@media (hover: hover) and (pointer: fine) {
+  .reviews-marquee:hover .reviews--marquee { animation-play-state: paused; }
+}
 .reviews-marquee:focus-within .reviews--marquee { animation-play-state: paused; }
 @keyframes reviews-scroll {
-  to { transform: translateX(-50%); }
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
 }
 
 /* ≥ 480px
