@@ -639,14 +639,14 @@ html.no-intro .intro { display: none !important; }
   html:not(.no-intro) .hero { --t0: 2s; }
   html.intro-skip .hero { --t0: 0s; }
   /* la foto arranca desenfocada y más cerca, y hace foco como una cámara */
-  .hero__stage { animation: hero-focus 1.6s calc(var(--t0) - 0.25s) cubic-bezier(0.2, 0.7, 0.2, 1) backwards; }
-  .hero__wordmark { animation: hero-logo-in 0.7s var(--t0) ease-out backwards; }
+  .hero__stage { animation: hero-focus 2.8s calc(var(--t0) - 0.3s) cubic-bezier(0.33, 0, 0.2, 1) backwards; }
+  .hero__wordmark { animation: hero-logo-in 0.9s var(--t0) cubic-bezier(0.33, 0, 0.2, 1) backwards; /* empalma con el logo de la cinemática */ }
   /* cada palabra sube desde abajo, una detrás de otra */
-  .hero__word { display: inline-block; animation: hero-word 0.7s calc(var(--t0) + 0.35s + var(--i) * 0.13s) cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
-  .hero__lead { animation: hero-fade 0.8s calc(var(--t0) + 0.95s) ease-out backwards; }
+  .hero__word { display: inline-block; animation: hero-word 1.3s calc(var(--t0) + 0.9s + var(--i) * 0.3s) cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+  .hero__lead { animation: hero-fade 1.4s calc(var(--t0) + 2.1s) cubic-bezier(0.33, 0, 0.2, 1) backwards; }
   /* los botones entran al final con un pequeño rebote */
-  .hero__actions > * { animation: hero-pop 0.7s calc(var(--t0) + 1.15s) cubic-bezier(0.3, 1.5, 0.5, 1) backwards; }
-  .hero__actions > :nth-child(2) { animation-delay: calc(var(--t0) + 1.27s); }
+  .hero__actions > * { animation: hero-pop 1.2s calc(var(--t0) + 2.6s) cubic-bezier(0.34, 1.25, 0.64, 1) backwards; }
+  .hero__actions > :nth-child(2) { animation-delay: calc(var(--t0) + 2.85s); }
 
   /* Cinemática de apertura (index.html), 2,6 s en total:
      0,0 s  una bruma rosa y amarilla se dispersa girando, como un perfume en el aire
@@ -817,15 +817,15 @@ html.no-intro .intro { display: none !important; }
     to { opacity: 1; transform: translateY(0); }
   }
   @keyframes hero-focus {
-    from { filter: blur(18px) brightness(0.6); transform: scale(1.14); }
+    from { filter: blur(16px) brightness(0.65); transform: scale(1.1); }
     to { filter: none; transform: none; }
   }
   @keyframes hero-word {
-    from { opacity: 0; transform: translateY(0.7em); filter: blur(6px); }
+    from { opacity: 0; transform: translateY(0.45em); filter: blur(8px); }
     to { opacity: 1; transform: none; filter: none; }
   }
   @keyframes hero-pop {
-    from { opacity: 0; transform: translateY(0.9rem) scale(0.86); }
+    from { opacity: 0; transform: translateY(0.6rem) scale(0.94); }
     to { opacity: 1; transform: none; }
   }
 }
