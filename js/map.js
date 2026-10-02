@@ -11,9 +11,10 @@
   // Paletas de la maqueta: alegres pero armónicas con la página. Manzanas rosadas, plazas verde menta,
   // agua lila, edificios color crema manteca y la zona marcada en rosa.
   var PALETTES = {
+    // en tema oscuro el mapa brilla como una pantalla encendida: pasteles un poco más intensos
     dark: {
-      ground: '#2A2124', blocks: '#3A2930', park: '#2D4034', parkEdge: '#40594A', water: '#302C48',
-      road: '#4C3A42', roadEdge: '#634A55', building: '#4D3E35', label: '#F3DDE2', zone: '#F0A3B5'
+      ground: '#F7DCE4', blocks: '#F2C8D5', park: '#B6E4C1', parkEdge: '#93D2A3', water: '#D2C9F2',
+      road: '#FFF6F8', roadEdge: '#E2A3B6', building: '#FFE6BF', label: '#8C5361', zone: '#C9587A'
     },
     light: {
       ground: '#FDF6F3', blocks: '#F9E1E6', park: '#C4EACB', parkEdge: '#A3D6AE', water: '#DCD5F3',

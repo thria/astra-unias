@@ -2343,3 +2343,21 @@ button.almanac__day.is-selected:hover { background: var(--color-ink); color: var
 .steps h3 { font-size: 1.5rem; }
 .site-footer__motto { font-size: 1.5rem; }
 .local__place { font-size: 1.25rem; }
+
+/* Pie de página minimalista: todo centrado, logo, frase, tres links y una línea legal */
+.site-footer { padding-block: 4.5rem 2.5rem; text-align: center; }
+.site-footer__inner { display: grid; grid-template-columns: none; justify-items: center; gap: 1.25rem; }
+.brand--footer { width: 8rem; margin: 0; color: var(--color-footer-accent); }
+.brand--footer:hover { color: var(--color-footer-fg); }
+.site-footer__motto { color: var(--color-footer-fg); opacity: 0.85; }
+.site-footer__links { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem 2rem; margin-top: 0.5rem; }
+.site-footer__links a {
+  color: var(--color-footer-fg);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+.site-footer__links a:hover { color: var(--color-footer-accent); }
+.site-footer__legal { display: block; margin-top: 1.5rem; padding-top: 0; border-top: 0; font-size: 0.75rem; }
