@@ -1113,6 +1113,103 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
 }
 .site-footer__legal a { color: var(--color-footer-muted); }
 
+/* Estrellita, la gatita de Astra (js/mascot.js)
+   ------------------------------------------------------------------------ */
+.mascot {
+  /* colores del personaje: iguales en tema claro y oscuro */
+  --mascot-fur: #FFFDFE;
+  --mascot-ink: #3B2330;
+  --mascot-pink: #E2558D;
+  --mascot-blush: #F7A1BC;
+  position: fixed;
+  right: 1rem;
+  bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  opacity: 0;
+  translate: 0 1.5rem;
+  pointer-events: none;
+  transition: opacity 0.5s ease, translate 0.6s cubic-bezier(0.2, 0.8, 0.2, 1.2);
+}
+.mascot.is-in { opacity: 1; translate: 0 0; }
+.mascot.is-in > * { pointer-events: auto; }
+
+.mascot__button {
+  width: 4.5rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  filter: drop-shadow(0 6px 10px rgb(59 35 48 / 0.28));
+  transition: width 0.3s ease, opacity 0.3s ease;
+}
+.mascot__button:focus-visible { outline: 2px solid var(--color-rose); outline-offset: 4px; border-radius: 50%; }
+.mascot.is-hidden .mascot__button { width: 3rem; opacity: 0.85; }
+.mascot__cat { display: block; width: 100%; height: auto; overflow: visible; }
+
+.mascot__fur { fill: var(--mascot-fur); stroke: var(--mascot-ink); stroke-width: 2.5; stroke-linejoin: round; }
+.mascot__ear-in { fill: var(--mascot-blush); }
+.mascot__star { fill: var(--mascot-pink); stroke: var(--mascot-ink); stroke-width: 1.5; stroke-linejoin: round; }
+.mascot__eyes ellipse { fill: var(--mascot-ink); }
+.mascot__shine { fill: var(--mascot-fur); }
+.mascot__cheek { fill: var(--mascot-blush); opacity: 0.65; }
+.mascot__nose { fill: var(--mascot-pink); }
+.mascot__line { fill: none; stroke: var(--mascot-ink); stroke-width: 2; stroke-linecap: round; }
+.mascot__tail-line { fill: none; stroke: var(--mascot-ink); stroke-width: 11; stroke-linecap: round; }
+.mascot__tail-fill { fill: none; stroke: var(--mascot-fur); stroke-width: 6; stroke-linecap: round; }
+.mascot__polish { fill: var(--mascot-pink); stroke: var(--mascot-ink); stroke-width: 2; }
+.mascot__polish-cap { fill: var(--mascot-ink); }
+
+/* Globo de diálogo */
+.mascot__bubble {
+  position: relative;
+  width: max-content;
+  max-width: min(17.5rem, calc(100vw - 2rem));
+  padding: 0.85rem 1rem 0.75rem;
+  border: 1.5px solid var(--color-petal);
+  border-radius: 18px 18px 4px 18px;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-size: var(--step--1);
+  line-height: 1.5;
+  box-shadow: 0 12px 28px -14px rgb(59 35 48 / 0.45);
+}
+.mascot__actions { display: flex; gap: var(--space-s); margin-top: 0.5rem; }
+.mascot__actions button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-rose);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.mascot__actions button:hover { text-decoration: underline; }
+.mascot__close { color: var(--color-ink-soft) !important; }
+
+@media (min-width: 48em) {
+  .mascot { right: 1.5rem; bottom: 1.5rem; }
+  .mascot__button { width: 5.5rem; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .mascot.is-in .mascot__cat { animation: mascot-bob 3.2s ease-in-out infinite; }
+  .mascot__eyes { transform-box: fill-box; transform-origin: center; animation: mascot-blink 5s infinite; }
+  .mascot__tail { transform-box: fill-box; transform-origin: 0% 100%; animation: mascot-tail 1.6s ease-in-out infinite alternate; }
+  .mascot.is-talking .mascot__head { transform-box: fill-box; transform-origin: center bottom; animation: mascot-tilt 0.7s ease; }
+  .mascot.is-talking .mascot__bubble { animation: mascot-pop 0.3s cubic-bezier(0.2, 0.8, 0.2, 1.3); transform-origin: bottom right; }
+
+  @keyframes mascot-bob { 50% { translate: 0 -4px; } }
+  @keyframes mascot-blink { 0%, 92%, 100% { scale: 1 1; } 95% { scale: 1 0.1; } }
+  @keyframes mascot-tail { from { rotate: -8deg; } to { rotate: 12deg; } }
+  @keyframes mascot-tilt { 30% { rotate: -6deg; } 70% { rotate: 4deg; } }
+  @keyframes mascot-pop { from { opacity: 0; scale: 0.85; } }
+}
+
 /* Efectos de movimiento (js/effects.js)
    ------------------------------------------------------------------------ */
 /* Brillitos flotando detrás del contenido */
