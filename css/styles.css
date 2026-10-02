@@ -998,6 +998,8 @@ html.no-intro .intro { display: none !important; }
   background: radial-gradient(circle at 35% 35%, #3a4a6e 0 25%, #121520 60%);
   box-shadow: 0 0 0 1.5px #1d1f26;
 }
+.ipad { transform-origin: 50% 85%; will-change: transform; }
+.ipad.is-tilting { pointer-events: none; } /* mientras gira, el mapa no toma el mouse (las coordenadas no coincidirían) */
 .ipad .local__map { border: 0; border-radius: 1rem; } /* radio interior = exterior menos el bisel */
 .ipad .maplibregl-ctrl-top-right { top: 0.6rem; right: 0.6rem; }
 

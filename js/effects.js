@@ -1,7 +1,8 @@
 // Efectos de "vida" en la página (todos se desactivan con "reducir movimiento"):
 //  1. Brillitos y estrellas que flotan suave en el fondo de algunas secciones.
 //  2. Secciones que aparecen con un movimiento suave al bajar.
-//  3. Opiniones de clientas que pasan solas en una franja continua.
+//  3. Opiniones tipo historias de Instagram (barra de progreso, pasan solas).
+//  4. El iPad del mapa se endereza mientras bajás.
 (function () {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
@@ -35,7 +36,7 @@
   if ('IntersectionObserver' in window) {
     var targets = document.querySelectorAll(
       'main > section:not(.hero) .section__head, .about__photo, .about__copy, .carousel, .service-card, ' +
-      '.local__text, .local .ipad, .agenda, .steps li, .booking__cta'
+      '.local__text, .agenda, .steps li, .booking__cta'
     );
     document.documentElement.classList.add('reveal-on');
     var io = new IntersectionObserver(function (entries) {
@@ -129,5 +130,29 @@
     if (!autoplay) segs.forEach(function (s) { s.style.setProperty('--story-time', '0s'); });
     show(0, false);
     sync();
+  }
+
+  // ---- 4. El iPad del mapa se endereza al bajar ----
+  // Arranca más chico e inclinado hacia atrás (como apoyado en una mesa) y, con el scroll,
+  // se levanta y queda de frente. Sube y baja junto con el scroll. Al llegar, queda sin transformar
+  // para que el mapa responda bien al mouse y al dedo.
+  var ipad = document.querySelector('.local .ipad');
+  if (ipad && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    var ipadQueued = false;
+    var tiltIpad = function () {
+      ipadQueued = false;
+      // posición sin el giro (se mide desde el contenedor, que no se transforma)
+      var top = (ipad.offsetParent ? ipad.offsetParent.getBoundingClientRect().top : 0) + ipad.offsetTop;
+      var vh = window.innerHeight || 1;
+      // 0 = el iPad recién asoma abajo; 1 = su borde de arriba llegó al 22 % de la pantalla
+      var p = Math.min(1, Math.max(0, (vh - top) / (vh * 0.78)));
+      p = 1 - Math.pow(1 - p, 2); // frena suave al final
+      if (p > 0.995) { ipad.style.transform = ''; ipad.classList.remove('is-tilting'); return; }
+      ipad.classList.add('is-tilting');
+      ipad.style.transform = 'perspective(1500px) translateY(' + ((1 - p) * 4).toFixed(2) + 'rem) rotateX(' + ((1 - p) * 42).toFixed(2) + 'deg) scale(' + (0.8 + p * 0.2).toFixed(4) + ')';
+    };
+    window.addEventListener('scroll', function () { if (!ipadQueued) { ipadQueued = true; requestAnimationFrame(tiltIpad); } }, { passive: true });
+    window.addEventListener('resize', tiltIpad);
+    tiltIpad();
   }
 })();
