@@ -3,6 +3,7 @@
 //  2. Secciones que aparecen con un movimiento suave al bajar.
 //  3. Opiniones tipo historias de Instagram (barra de progreso, pasan solas).
 //  4. El iPad del mapa se endereza mientras bajás.
+//  5. La foto de "Hola, soy Rena" se descubre de arriba hacia abajo al bajar.
 (function () {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
@@ -167,5 +168,23 @@
     window.addEventListener('scroll', function () { if (!ipadQueued) { ipadQueued = true; requestAnimationFrame(tiltIpad); } }, { passive: true });
     window.addEventListener('resize', tiltIpad);
     tiltIpad();
+  }
+
+  // ---- 5. La foto de "Hola, soy Rena" se descubre siguiendo el scroll ----
+  // De arriba hacia abajo: al bajar se ve primero la parte de arriba y la imagen se va mostrando
+  // (con un zoom suave hacia atrás) hasta quedar completa cuando su borde de arriba llega al 25 % de la pantalla.
+  var aboutPhoto = document.querySelector('.about__photo');
+  if (aboutPhoto && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    var photoQueued = false;
+    var revealPhoto = function () {
+      photoQueued = false;
+      var r = aboutPhoto.getBoundingClientRect(), vh = window.innerHeight || 1;
+      var p = Math.min(1, Math.max(0, (vh - r.top) / (vh * 0.75)));
+      p = p * p * (3 - 2 * p); // arranca y termina suave; va un poco detrás del scroll para que se vea el recorrido
+      aboutPhoto.style.setProperty('--reveal', p.toFixed(4));
+    };
+    window.addEventListener('scroll', function () { if (!photoQueued) { photoQueued = true; requestAnimationFrame(revealPhoto); } }, { passive: true });
+    window.addEventListener('resize', revealPhoto);
+    revealPhoto();
   }
 })();

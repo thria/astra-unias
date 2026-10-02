@@ -1916,13 +1916,13 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
   box-shadow: none;
   transition: box-shadow 1.2s ease 0.9s;
 }
+/* La foto se descubre de arriba hacia abajo siguiendo el scroll: --reveal va de 0 a 1 (js/effects.js) */
 .reveal-on .about__photo.reveal img {
-  clip-path: inset(100% 0 0 0);
-  scale: 1.18;
-  transition: clip-path 1.5s cubic-bezier(0.65, 0, 0.2, 1), scale 2.2s cubic-bezier(0.2, 0.7, 0.2, 1);
+  clip-path: inset(0 0 calc((1 - var(--reveal, 1)) * 100%) 0);
+  scale: calc(1.12 - var(--reveal, 1) * 0.12);
+  transform-origin: 50% 0;
 }
 .reveal-on .about__photo.reveal.is-visible { box-shadow: 0 24px 48px -28px rgb(59 35 48 / 0.55); }
-.reveal-on .about__photo.reveal.is-visible img { clip-path: inset(0 0 0 0); scale: 1; }
 
 .reveal-on .about__copy.reveal {
   translate: 0 2.5rem;
