@@ -45,6 +45,8 @@
   --color-logo-on-photo: #FF8DB8; /* logo sobre la foto del inicio (igual en ambos temas) */
   --color-petal-strong: #EFB5C6;
   --color-pill: #F2A7C0;       /* globos de títulos: más fuertes que el fondo */
+  --color-card: rgb(255 255 255 / 0.82);  /* tarjeta de "Hola, soy Rena" */
+  --color-card-border: rgb(255 255 255 / 0.9);
   --color-section: rgb(255 255 255 / 0.42);    /* secciones alternadas */
   /* Fondo de la página: degradé pastel "Dreamy Pastel Wash" (cielo, rosa y crema) */
   --page-wash: radial-gradient(ellipse 60% 45% at 88% 8%, rgb(244 167 192 / 0.28), transparent 70%),
@@ -111,6 +113,8 @@
     --color-petal-strong: #633649;
     --color-map-ground: #FBE4EB;
     --color-pill: #4E2A3A;
+    --color-card: rgb(24 16 21 / 0.92);
+    --color-card-border: rgb(255 255 255 / 0.06);
     --color-section: rgb(255 255 255 / 0.035);
     --page-wash: radial-gradient(ellipse 60% 45% at 88% 8%, rgb(240 143 176 / 0.12), transparent 70%),
       linear-gradient(150deg, #161722 0%, #18202F 33%, #28171F 67%, #1F1716 100%);
@@ -136,6 +140,8 @@
   --color-petal-strong: #633649;
   --color-map-ground: #FBE4EB;
   --color-pill: #4E2A3A;
+  --color-card: rgb(24 16 21 / 0.92);
+  --color-card-border: rgb(255 255 255 / 0.06);
   --color-section: rgb(255 255 255 / 0.035);
   --page-wash: radial-gradient(ellipse 60% 45% at 88% 8%, rgb(240 143 176 / 0.12), transparent 70%),
     linear-gradient(150deg, #161722 0%, #18202F 33%, #28171F 67%, #1F1716 100%);
@@ -603,7 +609,6 @@ html.no-intro .intro { display: none !important; }
 
 .filete--map { margin-top: var(--space-m); }
 .filete--map .maplibregl-ctrl-top-right { top: 0.6rem; right: 0.6rem; }
-.filete--photo .about__photo { border-radius: 16px; }
 
 @media (min-width: 48em) {
   .filete { --filete-corner: 4.75rem; --filete-pad: 1.4rem; }
@@ -624,7 +629,6 @@ html.no-intro .intro { display: none !important; }
 
 /* Títulos en "pill": fondo rosa redondeado que marca cada sección */
 .section__head h2,
-.about__copy h2,
 .local h2 {
   justify-self: start;
   width: fit-content;
@@ -650,7 +654,6 @@ html.no-intro .intro { display: none !important; }
    (arriba hasta la altura de las mayúsculas, abajo hasta la línea base) y deja relleno parejo. */
 @supports (text-box: trim-both cap alphabetic) {
   .section__head h2,
-  .about__copy h2,
   .local h2 { text-box: trim-both cap alphabetic; padding-block: 0.46em; }
   .service-list h3 { text-box: trim-both cap alphabetic; padding-block: 0.5em; }
 }
@@ -839,18 +842,51 @@ html.no-intro .intro { display: none !important; }
 .service-list p { color: var(--color-ink-soft); max-width: 40ch; }
 
 /* Sobre mí */
-.about { display: grid; gap: var(--space-l); align-items: center; }
+/* Sobre mí: foto grande con esquinas redondeadas y tarjeta de texto apoyada encima */
+.about { display: grid; }
 
 .about__photo {
-  border-radius: var(--radius);
+  aspect-ratio: 4 / 5;
+  border-radius: 28px;
   overflow: hidden;
   background: var(--color-blush);
+  box-shadow: 0 24px 48px -28px rgb(59 35 48 / 0.55);
 }
-.about__photo img { width: 100%; }
+.about__photo img { width: 100%; height: 100%; object-fit: cover; object-position: 66% 50%; }
 
-.about__copy { display: grid; gap: var(--space-s); max-width: 34rem; }
-.about__copy h2 { font-size: var(--step-2); margin-bottom: var(--space-xs); }
-.about__copy p { font-size: var(--step-1); }
+.about__copy {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: var(--space-s);
+  margin: -4rem var(--space-xs) 0;
+  padding: var(--space-m) var(--space-m) var(--space-l);
+  border: 1px solid var(--color-card-border);
+  border-radius: 28px;
+  background: var(--color-card);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 30px 60px -30px rgb(59 35 48 / 0.6);
+}
+.about__copy h2 { font-size: var(--step-2); }
+.about__role { margin-top: -0.6rem; color: var(--color-rose); font-size: var(--step--1); font-weight: 600; letter-spacing: 0.02em; }
+.about__copy p:not(.about__role) { font-size: var(--step-0); line-height: 1.7; }
+
+/* Botones redondos (como en la tarjeta de referencia) */
+.about__links { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: var(--space-xs); }
+.about__links a {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: var(--color-ink);
+  color: var(--color-bg);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+.about__links a:hover { background: var(--color-rose); color: var(--color-on-rose); transform: translateY(-2px); }
+.about__links svg { width: 1.3rem; height: 1.3rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.about__links .about__dot { fill: currentColor; stroke: none; }
 
 /* Opiniones */
 .reviews { display: grid; gap: var(--space-m); }
@@ -1351,7 +1387,10 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
 
   .service-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
-  .about { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-xl); }
+  /* La foto ocupa ~60 % y la tarjeta se monta sobre su borde derecho */
+  .about { grid-template-columns: repeat(12, minmax(0, 1fr)); align-items: center; }
+  .about__photo { grid-column: 1 / 8; grid-row: 1; aspect-ratio: 4 / 5; }
+  .about__copy { grid-column: 7 / 13; grid-row: 1; margin: 0; padding: var(--space-l); }
 
   .reviews { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 

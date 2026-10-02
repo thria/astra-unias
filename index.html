@@ -31,13 +31,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Pinyon+Script&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=45">
+  <link rel="stylesheet" href="css/styles.css?v=46">
   <script src="js/theme.js?v=3" defer></script>
   <script src="js/map.js?v=3" defer></script>
   <script src="js/carousel.js?v=2" defer></script>
   <script src="js/agenda.js?v=4" defer></script>
   <script src="js/nails3d.js?v=8" defer></script>
-  <script src="js/effects.js?v=4" defer></script>
+  <script src="js/effects.js?v=5" defer></script>
   <script src="js/mascot.js?v=2" defer></script>
 
   <script type="application/ld+json">
@@ -164,24 +164,34 @@
       </div>
     </section>
     <section class="section section--tinted" id="sobre-mi" aria-labelledby="sobre-titulo">
+      <!-- Tarjeta de presentación: foto grande y tarjeta de texto que se apoya encima -->
       <div class="container about">
-        <div class="filete filete--photo">
-          <svg class="filete__corner filete__corner--tl" aria-hidden="true"><use href="#filete-esquina"/></svg><svg class="filete__corner filete__corner--tr" aria-hidden="true"><use href="#filete-esquina"/></svg><svg class="filete__corner filete__corner--bl" aria-hidden="true"><use href="#filete-esquina"/></svg><svg class="filete__corner filete__corner--br" aria-hidden="true"><use href="#filete-esquina"/></svg><svg class="filete__side filete__side--l" aria-hidden="true"><use href="#filete-lado"/></svg><svg class="filete__side filete__side--r" aria-hidden="true"><use href="#filete-lado"/></svg>
         <div class="about__photo">
           <img src="img/rena-illiano-1200.jpg"
                srcset="img/rena-illiano-700.jpg 700w, img/rena-illiano-1200.jpg 1200w"
-               sizes="(min-width: 72rem) 34rem, (min-width: 48em) 46vw, 100vw"
+               sizes="(min-width: 72rem) 40rem, (min-width: 48em) 58vw, 100vw"
                width="1200" height="898" loading="lazy" decoding="async"
                alt="Rena Illiano, manicurista de Astra, sentada en el piso con campera y jean celeste">
         </div>
-        </div>
         <div class="about__copy">
           <h2 id="sobre-titulo">Hola, soy Rena</h2>
+          <p class="about__role">Manicurista · Astra Uñas, La Plata</p>
           <!-- REEMPLAZAR: texto provisional -->
           <p>Soy Rena Illiano, manicurista en La Plata. Armé Astra para hacer uñas que se sientan tuyas: me traés una idea, una foto o solo un color, y lo convertimos en tu set.</p>
           <p>Hace 4 años que me dedico a esto y aprendí que un set lindo empieza por una uña sana. Por eso, además del diseño, en cada turno me ocupo de cuidar tu uña natural para que se mantenga fuerte.</p>
+          <ul class="about__links" role="list">
+            <li><a href="https://www.instagram.com/astra.unias/" target="_blank" rel="noopener" aria-label="Instagram de Astra">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" class="about__dot"/></svg></a></li>
+            <li><a href="https://ig.me/m/astra.unias" target="_blank" rel="noopener" aria-label="Escribirme por mensaje">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.5L3 21l2-5.4A8.4 8.4 0 1 1 21 11.5Z"/></svg></a></li>
+            <li><a href="#agenda" aria-label="Ver turnos disponibles">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></a></li>
+            <li><a href="#trabajos" aria-label="Ver trabajos recientes">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c.6 4.4 3.2 7 7.5 7.5-4.3.5-6.9 3.1-7.5 7.5-.6-4.4-3.2-7-7.5-7.5C8.8 10 11.4 7.4 12 3Z"/></svg></a></li>
+          </ul>
         </div>
       </div>
+
     </section>
 
     <section class="section" id="trabajos" aria-labelledby="trabajos-titulo">

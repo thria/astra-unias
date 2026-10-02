@@ -34,7 +34,7 @@
   // ---- 2. Aparecer al bajar ----
   if ('IntersectionObserver' in window) {
     var targets = document.querySelectorAll(
-      'main > section:not(.hero) .section__head, .about .filete, .about__copy, .carousel, .service-card, ' +
+      'main > section:not(.hero) .section__head, .about__photo, .about__copy, .carousel, .service-card, ' +
       '.local__text, .local .filete, .agenda, .steps li, .booking__cta'
     );
     document.documentElement.classList.add('reveal-on');
