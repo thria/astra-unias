@@ -52,6 +52,16 @@
   --pill-fg: #2A1A22;
   /* Globos de títulos: degradé rosa (igual en ambos temas) para que se despeguen del fondo */
   --pill-gradient: linear-gradient(135deg, #FFE6EF 0%, #FBC3D5 45%, #F29BBB 100%);
+  /* Cinemática de apertura: crema cálido con rosa y amarillo pastel */
+  --intro-center: #FFF8F0;
+  --intro-edge: #F6D9E3;
+  --intro-halo: rgb(255 226 170 / 0.6);
+  --intro-logo-a: #D94C86;
+  --intro-logo-b: #F28DB2;
+  --intro-sparkle: #F2C266;
+  --mist-1: rgb(247 168 196 / 0.9);
+  --mist-2: rgb(255 227 163 / 0.9);
+  --mist-3: rgb(250 205 222 / 0.9);
   --pill-ring: rgb(255 255 255 / 0.38);
   --color-card: rgb(255 255 255 / 0.82);  /* tarjeta de "Hola, soy Rena" */
   --color-card-border: rgb(255 255 255 / 0.9);
@@ -126,6 +136,15 @@
     --pill-bg: #FFFFFF;
     --pill-fg: #2A1A22;
     --pill-ring: rgb(255 255 255 / 0.1);
+    --intro-center: #2B1A22;
+    --intro-edge: #120C10;
+    --intro-halo: rgb(247 143 184 / 0.35);
+    --intro-logo-a: #F78FB8;
+    --intro-logo-b: #FFD3A8;
+    --intro-sparkle: #FFE3A3;
+    --mist-1: rgb(240 98 146 / 0.45);
+    --mist-2: rgb(255 214 150 / 0.35);
+    --mist-3: rgb(176 63 102 / 0.5);
     --color-card: rgb(24 16 21 / 0.92);
     --color-card-border: rgb(255 255 255 / 0.06);
     --color-section: rgb(255 255 255 / 0.035);
@@ -158,6 +177,15 @@
   --pill-bg: #FFFFFF;
   --pill-fg: #2A1A22;
   --pill-ring: rgb(255 255 255 / 0.1);
+  --intro-center: #2B1A22;
+  --intro-edge: #120C10;
+  --intro-halo: rgb(247 143 184 / 0.35);
+  --intro-logo-a: #F78FB8;
+  --intro-logo-b: #FFD3A8;
+  --intro-sparkle: #FFE3A3;
+  --mist-1: rgb(240 98 146 / 0.45);
+  --mist-2: rgb(255 214 150 / 0.35);
+  --mist-3: rgb(176 63 102 / 0.5);
   --color-card: rgb(24 16 21 / 0.92);
   --color-card-border: rgb(255 255 255 / 0.06);
   --color-section: rgb(255 255 255 / 0.035);
@@ -482,41 +510,151 @@ html.no-intro .intro { display: none !important; }
   .hero__content { animation: hero-fade 0.9s 0.2s ease-out both; }
   .hero__wordmark { animation: logo-write 1.3s 0.2s cubic-bezier(0.6, 0, 0.3, 1) both; }
 
-  /* Pantalla de entrada (index.html): el logo se escribe con un trazo parejo, letra por letra, y la pantalla se va */
+  /* Cinemática de apertura (index.html), 2,6 s en total:
+     0,0 s  una bruma rosa y amarilla se dispersa girando, como un perfume en el aire
+     0,15 s el logo aparece de un desenfoque a nítido mientras un anillo de luz lo rodea
+     1,05 s un brillo cruza las letras, como el gel cuando se seca bajo la lámpara (y titilan unas estrellitas)
+     2,05 s la pantalla se desvanece y el logo queda en el mismo lugar que el del inicio
+     Se saltea con un clic, un toque o cualquier tecla (ver el script al lado del HTML). */
   .intro {
     position: fixed;
     inset: 0;
     z-index: 200;
     display: grid;
     place-items: center;
-    background: var(--color-bg);
+    overflow: hidden;
+    background: radial-gradient(ellipse 80% 70% at 50% 50%, var(--intro-center) 0%, var(--intro-edge) 100%);
+    cursor: pointer;
+    animation: intro-out 0.55s 2.05s ease forwards;
+  }
+  html.intro-skip .intro { animation: intro-out 0.3s ease forwards; }
+
+  /* Bruma: tres nubes de color que giran y se expanden */
+  .intro__mist { position: absolute; inset: 0; } /* capa de fondo: no ocupa lugar en la grilla */
+  .intro__mist span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 62vmin;
+    height: 62vmin;
+    margin: -31vmin 0 0 -31vmin;
+    border-radius: 50%;
+    background: var(--c);
+    filter: blur(48px);
+    opacity: 0;
+    animation: intro-mist 2.6s cubic-bezier(0.2, 0.6, 0.3, 1) forwards;
+  }
+  @keyframes intro-mist {
+    0% { opacity: 0; transform: rotate(var(--a)) translateX(4vmin) scale(0.35); }
+    35% { opacity: 0.85; }
+    100% { opacity: 0.55; transform: rotate(calc(var(--a) + 110deg)) translateX(17vmin) scale(1.25); }
+  }
+
+  /* Anillo de luz que da una vuelta y media alrededor del logo (círculo achatado = órbita) */
+  .intro__orbit {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: min(96vw, 40rem);
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    transform: rotate(-9deg) scaleY(0.34);
     pointer-events: none;
-    animation: intro-out 0.6s 3.25s ease forwards;
+  }
+  .intro__orbit::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, transparent 0 62%, rgb(255 232 170 / 0) 64%, #FFE3A3 84%, #F7A8C4 95%, #FFFFFF 99%, transparent 100%);
+    -webkit-mask: radial-gradient(closest-side, transparent 93%, #000 95.5%, #000 97.5%, transparent 100%);
+    mask: radial-gradient(closest-side, transparent 93%, #000 95.5%, #000 97.5%, transparent 100%);
+    filter: drop-shadow(0 0 6px rgb(255 214 150 / 0.9));
+    opacity: 0;
+    animation: intro-orbit 1.9s 0.2s cubic-bezier(0.45, 0.05, 0.35, 1) forwards;
+  }
+  @keyframes intro-orbit {
+    0% { opacity: 0; transform: rotate(-60deg); }
+    20% { opacity: 1; }
+    75% { opacity: 1; }
+    100% { opacity: 0; transform: rotate(480deg); }
+  }
+
+  /* Logo: de desenfocado y chiquito a nítido, con un halo cálido detrás */
+  .intro__brand {
+    position: relative;
+    width: clamp(16rem, 9rem + 34vw, 36rem); /* mismo tamaño que el logo del inicio */
+    animation: intro-logo-in 1.1s 0.15s cubic-bezier(0.2, 0.7, 0.2, 1) both, intro-logo-out 0.55s 2.05s ease forwards;
+  }
+  .intro__brand::before {
+    content: "";
+    position: absolute;
+    inset: -30% -12%;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, var(--intro-halo), transparent);
+    animation: intro-halo 2.2s ease-in-out both;
   }
   .intro__logo {
-    display: block;
-    width: min(72vw, 28rem);
-    height: auto;
-    color: var(--color-logo);
-    overflow: visible;
+    background: linear-gradient(100deg, var(--intro-logo-a), var(--intro-logo-b) 55%, var(--intro-logo-a));
   }
-  /* Cada trazo se pinta en orden (--t: cuándo empieza, --d: cuánto tarda) */
-  .intro__trazos path {
-    stroke-dasharray: 1 1;
-    stroke-dashoffset: 1;
-    visibility: hidden; /* sin el puntito del extremo redondeado antes de empezar */
-    animation: intro-trazo var(--d) var(--t) linear forwards; /* velocidad pareja, como una lapicera */
+  /* Brillo que cruza las letras (la misma máscara del logo, con una franja de luz que se desliza) */
+  .intro__shine {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 38%, rgb(255 255 255 / 0.95) 48%, #FFF1C9 52%, transparent 62%);
+    background-size: 260% 100%;
+    background-position: 120% 0;
+    animation: intro-shine 0.95s 1.05s cubic-bezier(0.45, 0, 0.3, 1) forwards;
   }
-  /* Al final se completa el logo para que no quede ningún detalle sin pintar */
-  .intro__relleno { opacity: 0; animation: intro-relleno 0.35s 2.9s ease forwards; }
-  @keyframes intro-trazo {
-    from { stroke-dashoffset: 1; visibility: visible; }
-    to { stroke-dashoffset: 0; visibility: visible; }
+  @keyframes intro-logo-in {
+    from { opacity: 0; filter: blur(14px); transform: scale(0.86); }
+    to { opacity: 1; filter: blur(0); transform: scale(1); }
   }
-  @keyframes intro-relleno { to { opacity: 1; } }
-  /* Con pantalla de entrada, el inicio aparece cuando ella se va */
-  html:not(.no-intro) .hero__content { animation-delay: 3.6s; }
-  html:not(.no-intro) .hero__wordmark { animation-delay: 3.6s; }
+  @keyframes intro-logo-out { to { opacity: 0; transform: scale(1.06); } }
+  @keyframes intro-halo {
+    0% { opacity: 0; transform: scale(0.6); }
+    55% { opacity: 1; transform: scale(1.05); }
+    100% { opacity: 0.7; transform: scale(1); }
+  }
+  @keyframes intro-shine { to { background-position: -20% 0; } }
+
+  /* Estrellitas que titilan cuando pasa el brillo */
+  .intro__sparkle {
+    position: absolute;
+    width: var(--s);
+    height: var(--s);
+    fill: var(--intro-sparkle);
+    opacity: 0;
+    animation: intro-twinkle 0.8s var(--t) ease-in-out forwards;
+  }
+  @keyframes intro-twinkle {
+    0% { opacity: 0; transform: scale(0.2) rotate(0deg); }
+    50% { opacity: 1; transform: scale(1) rotate(45deg); }
+    100% { opacity: 0; transform: scale(0.4) rotate(90deg); }
+  }
+
+  .intro__skip {
+    position: absolute;
+    bottom: max(1.5rem, env(safe-area-inset-bottom));
+    left: 0;
+    right: 0;
+    margin: 0;
+    color: var(--color-ink-soft);
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
+    text-align: center;
+    opacity: 0;
+    animation: intro-hint 0.6s 0.7s ease forwards;
+  }
+  @keyframes intro-hint { to { opacity: 0.7; } }
+
+  /* El logo del inicio aparece justo cuando se va la pantalla, en el mismo lugar: es lo último y lo primero */
+  html:not(.no-intro) .hero__content { animation-delay: 2.15s; }
+  html:not(.no-intro) .hero__wordmark { animation: hero-logo-in 0.6s 2.05s ease-out both; }
+  html.intro-skip .hero__content,
+  html.intro-skip .hero__wordmark { animation-delay: 0s; }
+  @keyframes hero-logo-in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
 
   @keyframes logo-write {
     from { clip-path: inset(-10% 100% -10% 0); }

@@ -5,7 +5,7 @@
 // - Con "reducir movimiento" no se anima, pero sigue funcionando.
 (function () {
   var STORAGE_KEY = 'astra-mascot-hidden';
-  var FIRST_DELAY = 4500;   // aparece (callada) cuando termina la animación de entrada
+  var FIRST_DELAY = 3000;   // aparece (callada) cuando termina la cinemática de apertura
   var BUBBLE_TIME = 12000;  // cuánto queda visible cada mensaje
 
   var GREETING = '¡Hola! Soy Mizu, el gatito de Astra. Tocame y te cuento tips para tus uñas.';

@@ -11,11 +11,8 @@
   <!-- Aplica el tema elegido antes de pintar la página (evita un parpadeo claro/oscuro) -->
   <script>
     try { var t = localStorage.getItem('astra-theme'); if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t; } catch (e) {}
-    // Animación de entrada del logo: solo la primera vez por visita y nunca con "reducir movimiento"
-    try {
-      if (sessionStorage.getItem('astra-intro') || matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('no-intro');
-      else sessionStorage.setItem('astra-intro', '1');
-    } catch (e) {}
+    // Cinemática de apertura: al entrar y al recargar, nunca con "reducir movimiento"
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('no-intro');
   </script>
   <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
 
@@ -31,14 +28,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Pinyon+Script&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=57">
+  <link rel="stylesheet" href="css/styles.css?v=59">
   <script src="js/theme.js?v=3" defer></script>
   <script src="js/map.js?v=3" defer></script>
   <script src="js/carousel.js?v=2" defer></script>
   <script src="js/agenda.js?v=5" defer></script>
   <script src="js/nails3d.js?v=17" defer></script>
   <script src="js/effects.js?v=7" defer></script>
-  <script src="js/mascot.js?v=3" defer></script>
+  <script src="js/mascot.js?v=4" defer></script>
 
   <script type="application/ld+json">
   {
@@ -61,36 +58,34 @@
   </script>
 </head>
 <body>
-  <!-- Pantalla de entrada: el logo se escribe y la pantalla se desvanece (solo CSS) -->
-  <!-- Pantalla de entrada: el logo se escribe con un trazo parejo, letra por letra (A, s, t, r, a) -->
+  <!-- Cinemática de apertura (2,6 s): bruma de color, anillo de luz, el logo aparece y lo cruza un brillo.
+       Se ve al entrar o al recargar; se saltea con un clic, un toque o cualquier tecla. -->
   <div class="intro" aria-hidden="true">
-    <svg class="intro__logo" viewBox="0 0 817 237" focusable="false">
-      <defs>
-        <mask id="intro-forma" maskUnits="userSpaceOnUse" x="0" y="0" width="817" height="237">
-          <image href="img/logo-astra.png" width="817" height="237"/>
-        </mask>
-        <mask id="intro-trazo" maskUnits="userSpaceOnUse" x="0" y="0" width="817" height="237">
-          <g class="intro__trazos" fill="none" stroke="#fff" stroke-width="30" stroke-linecap="round" stroke-linejoin="round">
-            <path pathLength="1" style="--t:0.15s;--d:0.45s" d="M48,150 C30,130 5,165 15,185 C30,215 90,222 150,212 C250,195 330,150 400,95 C480,40 560,15 612,8"/>
-            <path pathLength="1" style="--t:0.65s;--d:0.44s" d="M345,8 C330,40 315,62 295,75 C250,100 180,135 120,130 C70,125 70,85 110,60 C170,35 250,40 295,75 C330,100 345,140 350,190"/>
-            <path pathLength="1" style="--t:1.14s;--d:0.06s" d="M320,222 L395,165"/>
-            <path pathLength="1" style="--t:1.25s;--d:0.15s" d="M385,200 C430,150 500,75 560,32"/>
-            <path pathLength="1" style="--t:1.45s;--d:0.14s" d="M497,112 C470,140 475,180 460,210 C450,225 400,225 385,205 C380,190 400,180 410,190"/>
-            <path pathLength="1" style="--t:1.64s;--d:0.16s" d="M410,218 C480,195 570,150 645,112"/>
-            <path pathLength="1" style="--t:1.85s;--d:0.11s" d="M490,220 C540,205 600,175 650,138"/>
-            <path pathLength="1" style="--t:2.02s;--d:0.18s" d="M457,82 C500,65 560,80 610,92 C640,105 680,105 742,78"/>
-            <path pathLength="1" style="--t:2.25s;--d:0.15s" d="M655,65 L600,222 C610,225 635,200 660,170"/>
-            <path pathLength="1" style="--t:2.45s;--d:0.16s" d="M675,100 L635,222 C670,200 700,170 735,150"/>
-            <path pathLength="1" style="--t:2.66s;--d:0.29s" d="M806,136 C760,140 715,165 700,200 C695,230 740,190 806,137 L735,222 C760,220 790,195 808,177"/>
-          </g>
-          <rect class="intro__relleno" width="817" height="237" fill="#fff"/>
-        </mask>
-      </defs>
-      <g mask="url(#intro-trazo)">
-        <rect width="817" height="237" fill="currentColor" mask="url(#intro-forma)"/>
-      </g>
-    </svg>
+    <div class="intro__mist"><span style="--c:var(--mist-1);--a:0deg"></span><span style="--c:var(--mist-2);--a:120deg"></span><span style="--c:var(--mist-3);--a:240deg"></span></div>
+    <div class="intro__orbit"></div>
+    <div class="intro__brand">
+      <span class="logo-mark intro__logo"></span>
+      <span class="logo-mark intro__shine"></span>
+      <svg class="intro__sparkle" viewBox="0 0 24 24" style="--s:1.1rem;--t:1.25s;top:-12%;left:18%"><path d="M12 0c.9 6.6 4.8 10.6 12 12-7.2 1.4-11.1 5.4-12 12-.9-6.6-4.8-10.6-12-12C7.2 10.6 11.1 6.6 12 0Z"/></svg>
+      <svg class="intro__sparkle" viewBox="0 0 24 24" style="--s:0.8rem;--t:1.5s;top:58%;left:52%"><path d="M12 0c.9 6.6 4.8 10.6 12 12-7.2 1.4-11.1 5.4-12 12-.9-6.6-4.8-10.6-12-12C7.2 10.6 11.1 6.6 12 0Z"/></svg>
+      <svg class="intro__sparkle" viewBox="0 0 24 24" style="--s:1.3rem;--t:1.7s;top:2%;left:90%"><path d="M12 0c.9 6.6 4.8 10.6 12 12-7.2 1.4-11.1 5.4-12 12-.9-6.6-4.8-10.6-12-12C7.2 10.6 11.1 6.6 12 0Z"/></svg>
+    </div>
+    <p class="intro__skip">Tocá para saltar</p>
   </div>
+  <script>
+    // Saltar la cinemática con un clic, un toque o cualquier tecla; después se quita del documento
+    (function () {
+      var intro = document.querySelector('.intro'), root = document.documentElement;
+      if (!intro || root.classList.contains('no-intro')) return;
+      function skip() { root.classList.add('intro-skip'); off(); }
+      function off() { intro.removeEventListener('click', skip); document.removeEventListener('keydown', skip); }
+      intro.addEventListener('click', skip);
+      document.addEventListener('keydown', skip);
+      intro.addEventListener('animationend', function (e) {
+        if (e.target === intro) { off(); intro.remove(); }
+      });
+    })();
+  </script>
 
   <!-- Adorno de fileteado (esquina superior izquierda). Se reutiliza girado en cada esquina de los marcos .filete -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
