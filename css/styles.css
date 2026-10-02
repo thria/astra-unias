@@ -45,7 +45,11 @@
   --color-logo-on-photo: #FF8DB8; /* logo sobre la foto del inicio (igual en ambos temas) */
   --color-petal-strong: #EFB5C6;
   --color-pill: #F2A7C0;       /* globos de títulos: más fuertes que el fondo */
-  --color-section: #FADCE6;    /* secciones alternadas */
+  --color-section: rgb(255 255 255 / 0.42);    /* secciones alternadas */
+  /* Fondo de la página: degradé pastel "Dreamy Pastel Wash" (cielo, rosa y crema) */
+  --page-wash: radial-gradient(ellipse 60% 45% at 88% 8%, rgb(244 167 192 / 0.28), transparent 70%),
+    linear-gradient(150deg, #E2EDF8 0%, #C6DBEF 33%, #F5D6E3 67%, #FAF0E6 100%);
+  --page-grain-opacity: 0.1;
   --color-model-a: #FCE3EB;    /* fondo de los modelos 3D */
   --color-model-b: #EEB4C7;
   --color-header: rgb(255 247 249 / 0.85);
@@ -107,7 +111,10 @@
     --color-petal-strong: #633649;
     --color-map-ground: #FBE4EB;
     --color-pill: #4E2A3A;
-    --color-section: #26181F;
+    --color-section: rgb(255 255 255 / 0.035);
+    --page-wash: radial-gradient(ellipse 60% 45% at 88% 8%, rgb(240 143 176 / 0.12), transparent 70%),
+      linear-gradient(150deg, #161722 0%, #18202F 33%, #28171F 67%, #1F1716 100%);
+    --page-grain-opacity: 0.16;
     --color-model-a: #1C1217;
     --color-model-b: #26181F;
     --color-header: rgb(28 18 23 / 0.85);
@@ -129,7 +136,10 @@
   --color-petal-strong: #633649;
   --color-map-ground: #FBE4EB;
   --color-pill: #4E2A3A;
-  --color-section: #26181F;
+  --color-section: rgb(255 255 255 / 0.035);
+  --page-wash: radial-gradient(ellipse 60% 45% at 88% 8%, rgb(240 143 176 / 0.12), transparent 70%),
+    linear-gradient(150deg, #161722 0%, #18202F 33%, #28171F 67%, #1F1716 100%);
+  --page-grain-opacity: 0.16;
   --color-model-a: #1C1217;
   --color-model-b: #26181F;
   --color-header: rgb(28 18 23 / 0.85);
@@ -155,6 +165,28 @@ body {
   font-size: var(--step-0);
   line-height: 1.6;
   overflow-x: clip;
+}
+
+/* Degradé fijo detrás de toda la página, con un grano suave tipo película.
+   Va en una capa fija (y no con background-attachment) para que funcione igual en iPhone. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--page-wash);
+  pointer-events: none;
+}
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 140px 140px;
+  opacity: var(--page-grain-opacity);
+  mix-blend-mode: overlay;
+  pointer-events: none;
 }
 
 h1, h2, h3 {
