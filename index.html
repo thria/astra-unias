@@ -31,11 +31,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Pinyon+Script&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=46">
+  <link rel="stylesheet" href="css/styles.css?v=47">
   <script src="js/theme.js?v=3" defer></script>
   <script src="js/map.js?v=3" defer></script>
   <script src="js/carousel.js?v=2" defer></script>
-  <script src="js/agenda.js?v=4" defer></script>
+  <script src="js/agenda.js?v=5" defer></script>
   <script src="js/nails3d.js?v=8" defer></script>
   <script src="js/effects.js?v=5" defer></script>
   <script src="js/mascot.js?v=2" defer></script>
@@ -369,22 +369,30 @@
         </div>
         <!-- La agenda se arma con js/agenda.js con los turnos guardados en /api/agenda (ver api/agenda.js). -->
         <div class="agenda" data-agenda>
+          <!-- Widget de agenda (vidrio esmerilado): lo completa js/agenda.js -->
           <div class="agenda__layout">
-            <!-- Hoja de almanaque: la arma js/agenda.js (mes, días y su estado) -->
-            <div class="almanac">
-              <div class="almanac__rings" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
-              <div class="almanac__head">
-                <button class="agenda__nav" type="button" data-agenda-prev aria-label="Mes anterior" disabled>
+            <div class="agenda__top">
+              <div class="segmented" role="group" aria-label="Ver la agenda por">
+                <button type="button" class="segmented__btn" data-agenda-view="week" aria-pressed="false">Semana</button>
+                <button type="button" class="segmented__btn" data-agenda-view="month" aria-pressed="true">Mes</button>
+              </div>
+              <a class="agenda__icon" href="https://www.instagram.com/astra.unias/" target="_blank" rel="noopener" aria-label="Instagram de Astra">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" class="agenda__icon-dot"/></svg>
+              </a>
+            </div>
+            <div class="almanac__head">
+              <p class="almanac__month" data-agenda-week aria-live="polite">Cargando…</p>
+              <div class="almanac__arrows">
+                <button class="agenda__nav" type="button" data-agenda-prev aria-label="Anterior" disabled>
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
                 </button>
-                <p class="almanac__month" data-agenda-week aria-live="polite">Cargando…</p>
-                <button class="agenda__nav" type="button" data-agenda-next aria-label="Mes siguiente" disabled>
+                <button class="agenda__nav" type="button" data-agenda-next aria-label="Siguiente" disabled>
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
                 </button>
               </div>
-              <div class="almanac__weekdays" aria-hidden="true"><span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sá</span><span>Do</span></div>
-              <div class="almanac__grid" data-agenda-grid></div>
             </div>
+            <div class="almanac__weekdays" aria-hidden="true"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+            <div class="almanac__grid" data-agenda-grid></div>
             <!-- Horarios del día elegido -->
             <div class="agenda__detail" data-agenda-detail aria-live="polite"></div>
           </div>
