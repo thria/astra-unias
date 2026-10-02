@@ -540,6 +540,39 @@ html.no-intro .intro { display: none !important; }
   opacity: 0.25;
 }
 
+
+/* Portada a pantalla completa que queda fija; el resto de la página sube encima como una cortina */
+.hero { height: 100vh; height: 100svh; min-height: 32rem; }
+@supports (position: sticky) {
+  .hero { position: sticky; top: 0; z-index: 0; }
+}
+/* al taparse, la foto se aleja apenas, el texto sube y todo se oscurece un poco */
+.hero__stage { scale: calc(1 - var(--cover, 0) * 0.06); }
+.hero__content { translate: 0 calc(var(--cover, 0) * -3rem); }
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: #0d0a0c;
+  opacity: calc(var(--cover, 0) * 0.6);
+  pointer-events: none;
+}
+.page-sheet {
+  position: relative;
+  z-index: 1;
+  margin-top: -1.75rem; /* asoma un poquito sobre la portada */
+  border-radius: 1.75rem 1.75rem 0 0;
+  background: var(--page-wash), var(--color-bg);
+  background-attachment: fixed;
+  box-shadow: 0 -18px 40px -12px rgb(0 0 0 / 0.45);
+  overflow: clip;
+}
+/* en iPhone el fondo fijo no funciona: va normal (la diferencia casi no se nota) */
+@supports (-webkit-touch-callout: none) {
+  .page-sheet { background-attachment: scroll; }
+}
+
 /* Velo oscuro para que el texto se lea sobre la foto */
 .hero::before {
   content: "";
