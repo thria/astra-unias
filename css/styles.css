@@ -1781,6 +1781,7 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
   --mascot-black: #1B1216;
   --mascot-cream: #FFF3E8;
   --mascot-pink: #F6A9C2;
+  --mascot-mask: #4A3741;   /* cara más clara que el pelo */
   --mascot-glow: rgb(255 247 249 / 0.7); /* contorno claro para que se vea sobre fondos oscuros y la foto */
   position: fixed;
   right: 1rem;
@@ -1810,17 +1811,19 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
 .mascot__button:focus-visible { outline: 2px solid var(--color-rose); outline-offset: 4px; border-radius: 50%; }
 .mascot.is-hidden .mascot__button { width: 3rem; opacity: 0.85; }
 .mascot__cat { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 0 1.2px var(--mascot-glow)) drop-shadow(0 0 1.2px var(--mascot-glow)); }
-/* Mizu: silueta negra, ojos crema, rosa solo en orejas, nariz y collar */
-.mascot__body { fill: var(--mascot-black); }
+/* Mizu: bolita de pelo negra con la cara más clara, ojos enormes y rosa en orejas, nariz y lengua */
+.mascot__fur { fill: url(#mz-fur); }
+.mascot__ear, .mascot__arm, .mascot__leg { fill: var(--mascot-black); }
+.mascot__mask { fill: var(--mascot-mask); }
 .mascot__ear-in { fill: var(--mascot-pink); }
 .mascot__star { fill: var(--mascot-pink); }
-.mascot__whisker { fill: none; stroke: var(--mascot-cream); stroke-width: 0.9; stroke-linecap: round; opacity: 0.55; }
 .mascot__eye-ring { fill: var(--mascot-cream); }
-.mascot__eye { fill: var(--mascot-black); }
+.mascot__eye { fill: url(#mz-iris); }
 .mascot__shine { fill: #FFFFFF; }
 .mascot__nose { fill: var(--mascot-pink); }
-.mascot__ribbon { fill: none; stroke: var(--mascot-pink); stroke-width: 2.2; stroke-linecap: round; }
-.mascot__tail { fill: none; stroke: var(--mascot-black); stroke-width: 11; stroke-linecap: round; }
+.mascot__mouth { fill: #1A0A12; }
+.mascot__tongue { fill: #F28DAE; }
+.mascot__fang { fill: #FFFFFF; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .mascot { --mascot-glow: rgb(255 235 243 / 0.9); } }
 :root[data-theme="dark"] .mascot { --mascot-glow: rgb(255 235 243 / 0.9); }
 
@@ -1860,7 +1863,7 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
 @media (prefers-reduced-motion: no-preference) {
   .mascot.is-in .mascot__cat { animation: mascot-bob 3.2s ease-in-out infinite; }
   .mascot__eyes { transform-box: fill-box; transform-origin: center; animation: mascot-blink 5s infinite; }
-  .mascot__tail { transform-box: fill-box; transform-origin: 0% 100%; animation: mascot-tail 1.6s ease-in-out infinite alternate; }
+  .mascot__arm--wave { transform-box: fill-box; transform-origin: 50% 90%; animation: mascot-tail 1.6s ease-in-out infinite alternate; }
   .mascot.is-talking .mascot__head { transform-box: fill-box; transform-origin: center bottom; animation: mascot-tilt 0.7s ease; }
   .mascot.is-talking .mascot__bubble { animation: mascot-pop 0.3s cubic-bezier(0.2, 0.8, 0.2, 1.3); transform-origin: bottom right; }
 
