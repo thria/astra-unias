@@ -821,8 +821,8 @@ html.no-intro .intro { display: none !important; }
     to { filter: none; transform: none; }
   }
   @keyframes hero-word {
-    from { opacity: 0; transform: translateY(0.45em); filter: blur(8px); }
-    to { opacity: 1; transform: none; filter: none; }
+    from { opacity: 0; transform: translateY(0.45em); }
+    to { opacity: 1; transform: none; }
   }
   @keyframes hero-pop {
     from { opacity: 0; transform: translateY(0.6rem) scale(0.94); }
