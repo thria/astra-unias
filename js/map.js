@@ -129,7 +129,7 @@
     el.className = 'map-marker';
     el.innerHTML =
       '<span class="map-marker__label">Zona Plaza Belgrano</span>' +
-      '<svg class="map-marker__pin" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="10" r="2.5"/></svg>';
+      '<svg class="map-marker__pin" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s6.8-5.8 6.8-11.4a6.8 6.8 0 1 0-13.6 0C5.2 15.2 12 21 12 21Z"/><circle cx="12" cy="9.6" r="2.4"/></svg>';
     return el;
   }
 

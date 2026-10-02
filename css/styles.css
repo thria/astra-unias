@@ -113,6 +113,7 @@
   --container: 72rem;
   --gutter: clamp(1rem, 0.5rem + 2.5vw, 2.5rem);
   --header-h: 4rem;
+  --icon-stroke: 2.4; /* todos los íconos: trazo grueso y redondeado ("chunky") */
   color-scheme: light;
 }
 
@@ -389,7 +390,7 @@ html.no-intro .intro { display: none !important; }
 }
 .theme-switch button:hover { color: var(--color-ink); }
 .theme-switch button[aria-checked="true"] { color: var(--pill-fg); }
-.theme-switch svg { width: 1.1rem; height: 1.1rem; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.theme-switch svg { width: 1.1rem; height: 1.1rem; fill: none; stroke: currentColor; stroke-width: var(--icon-stroke); stroke-linecap: round; stroke-linejoin: round; }
 .theme-switch__thumb {
   position: absolute;
   top: 0.2rem;
@@ -858,7 +859,7 @@ html.no-intro .intro { display: none !important; }
   height: 1.375rem;
   fill: none;
   stroke: var(--color-rose);
-  stroke-width: 1.75;
+  stroke-width: var(--icon-stroke);
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -904,7 +905,8 @@ html.no-intro .intro { display: none !important; }
   height: 2rem;
   fill: var(--color-map-label);
   stroke: #FFF7F9;
-  stroke-width: 1.5;
+  stroke-width: 2;
+  stroke-linejoin: round;
 }
 .map-marker__pin circle { fill: #FFF7F9; stroke: none; }
 
@@ -1120,7 +1122,7 @@ html.no-intro .intro { display: none !important; }
 .carousel__btn:hover { background: var(--color-rose); scale: 1.06; }
 .carousel__btn:disabled { opacity: 0; pointer-events: none; }
 .carousel__btn:focus-visible { outline: 2px solid var(--color-rose); outline-offset: 3px; }
-.carousel__btn svg { width: 1.1rem; height: 1.1rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.carousel__btn svg { width: 1.1rem; height: 1.1rem; fill: none; stroke: currentColor; stroke-width: var(--icon-stroke); stroke-linecap: round; stroke-linejoin: round; }
 .carousel__btn--prev { left: 0.75rem; }
 .carousel__btn--next { right: 0.75rem; }
 
@@ -1197,7 +1199,9 @@ html.no-intro .intro { display: none !important; }
   height: 1.1rem;
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.8;
+  stroke-width: var(--icon-stroke);
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .gallery__cta .gallery__cta-dot { fill: currentColor; stroke: none; }
 
@@ -1300,7 +1304,7 @@ html.has-lightbox { overflow: hidden; }
 .lightbox__nav:hover { background: rgb(255 182 217 / 0.35); scale: 1.06; }
 .lightbox__close:focus-visible,
 .lightbox__nav:focus-visible { outline: 2px solid #FFB6D9; outline-offset: 3px; }
-.lightbox svg { width: 1.2rem; height: 1.2rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.lightbox svg { width: 1.2rem; height: 1.2rem; fill: none; stroke: currentColor; stroke-width: var(--icon-stroke); stroke-linecap: round; stroke-linejoin: round; }
 .lightbox__close { position: absolute; top: clamp(0.75rem, 2vw, 1.5rem); right: clamp(0.75rem, 2vw, 1.5rem); }
 .lightbox__nav--prev { grid-column: 1; }
 .lightbox__nav--next { grid-column: 3; }
@@ -1396,7 +1400,7 @@ html.has-lightbox { overflow: hidden; }
   transition: transform 0.2s ease, background-color 0.2s ease;
 }
 .about__links a:hover { background: var(--color-rose); color: var(--color-on-rose); transform: translateY(-2px); }
-.about__links svg { width: 1.3rem; height: 1.3rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.about__links svg { width: 1.3rem; height: 1.3rem; fill: none; stroke: currentColor; stroke-width: var(--icon-stroke); stroke-linecap: round; stroke-linejoin: round; }
 .about__links .about__dot { fill: currentColor; stroke: none; }
 
 /* Opiniones: carrusel tipo historias de Instagram (js/effects.js).
@@ -1541,7 +1545,7 @@ html.has-lightbox { overflow: hidden; }
 }
 .stories__btn:hover { background: var(--color-rose); color: var(--color-on-rose); scale: 1.06; }
 .stories__btn:focus-visible { outline: 2px solid var(--color-rose); outline-offset: 3px; }
-.stories__btn svg { width: 1.2rem; height: 1.2rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.stories__btn svg { width: 1.2rem; height: 1.2rem; fill: none; stroke: currentColor; stroke-width: var(--icon-stroke); stroke-linecap: round; stroke-linejoin: round; }
 .stories__btn--prev { right: 3.4rem; }
 .stories__btn--next { right: 0; }
 @media (hover: none) {
@@ -1616,7 +1620,7 @@ html.has-lightbox { overflow: hidden; }
   transition: background-color 0.2s ease;
 }
 .agenda__icon:hover { background: var(--pill-ring); }
-.agenda__icon svg { width: 1.3rem; height: 1.3rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.agenda__icon svg { width: 1.3rem; height: 1.3rem; fill: none; stroke: currentColor; stroke-width: var(--icon-stroke); stroke-linecap: round; stroke-linejoin: round; }
 .agenda__icon .agenda__icon-dot { fill: currentColor; stroke: none; }
 
 .almanac__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-s); margin-top: var(--space-xs); }
@@ -1640,7 +1644,7 @@ html.has-lightbox { overflow: hidden; }
 }
 .agenda__nav:hover:not(:disabled) { background: var(--pill-ring); }
 .agenda__nav:disabled { opacity: 0.3; cursor: default; }
-.agenda__nav svg { width: 1.125rem; height: 1.125rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.agenda__nav svg { width: 1.125rem; height: 1.125rem; fill: none; stroke: currentColor; stroke-width: var(--icon-stroke); stroke-linecap: round; stroke-linejoin: round; }
 
 .almanac__weekdays,
 .almanac__grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.25rem; }
@@ -1710,7 +1714,8 @@ button.almanac__day.is-selected:hover {
 .agenda__detail-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; }
 .agenda__detail-note,
 .agenda__detail-empty { display: flex; align-items: center; gap: 0.4rem; color: var(--color-ink-soft); font-size: var(--step--1); }
-.agenda__detail-note svg { flex: none; width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.agenda__detail-empty svg,
+.agenda__detail-note svg { flex: none; width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: var(--icon-stroke); stroke-linecap: round; stroke-linejoin: round; }
 .agenda__cta {
   display: inline-flex;
   align-items: center;
@@ -1729,7 +1734,7 @@ button.almanac__day.is-selected:hover {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 .agenda__cta:hover { background: var(--color-rose); color: var(--color-on-rose); }
-.agenda__cta svg { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
+.agenda__cta svg { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: var(--icon-stroke); stroke-linecap: round; stroke-linejoin: round; }
 
 .agenda__slots { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .slot {
