@@ -269,51 +269,55 @@
         return new THREE.Mesh(puffy(s, 0.004, r * 0.22), chrome);
       }
 
-      // 1. Negra con venas cromadas: líneas orgánicas en relieve que se ramifican y arman celditas,
-      //    gruesas en el medio y finitas en las puntas (como cromo líquido)
-      function vein(nail, pts, rMax) {
-        var curve = new THREE.CatmullRomCurve3(pts.map(function (q) { var p = uv(nail, q[0], q[1]); return surface(p[0], p[1], 0); }), false, 'centripetal');
-        var seg = pts.length * 16, radial = 12;
-        var geo = new THREE.TubeGeometry(curve, seg, rMax, radial, false);
-        var pos = geo.attributes.position, center = new THREE.Vector3(), v = new THREE.Vector3();
-        for (var i = 0; i <= seg; i++) {
-          var t = i / seg;
-          var k = 0.55 + 0.45 * Math.pow(Math.sin(Math.PI * t), 0.6) * (0.85 + 0.15 * Math.sin(t * 13)); // afinado y con leve ondulación
-          curve.getPointAt(t, center);
-          for (var j = 0; j <= radial; j++) {
-            var idx = i * (radial + 1) + j;
-            v.fromBufferAttribute(pos, idx).sub(center).multiplyScalar(k);
-            v.z *= 0.7;                       // apenas aplastado, como un hilo de gel cromado
-            v.add(center);
-            v.z += rMax * k * 0.45;           // apoyado sobre la uña, no hundido
-            pos.setXYZ(idx, v.x, v.y, v.z);
-          }
+      // 1. Negra con diseño neo tribal (cybersigilism, gótico y2k): columna central afilada y espinas curvas
+      //    simétricas que se abren hacia los costados, todo en cromo en relieve que copia la curva de la uña.
+      function chromePiece(nail, shape) {
+        var geo = new THREE.ExtrudeGeometry(shape, { depth: 0.003, bevelEnabled: true, bevelThickness: 0.014, bevelSize: 0.009, bevelSegments: 5, curveSegments: 28 });
+        var pos = geo.attributes.position;
+        for (var i = 0; i < pos.count; i++) { // apoyar la pieza sobre la superficie curva
+          var x = pos.getX(i), y = pos.getY(i);
+          pos.setZ(i, pos.getZ(i) + 1.7 * T - (x * x) / (2 * BEND) + 0.012);
         }
         geo.computeVertexNormals();
         nail.add(new THREE.Mesh(geo, chrome));
       }
-      function knot(nail, u, v, r) { // uniones redondeadas donde se juntan las venas
-        var s = new THREE.Mesh(new THREE.SphereGeometry(r, 16, 12), chrome);
-        s.scale.z = 0.7;
-        place(nail, s, u, v, r * 0.35);
+      function tribal(nail) {
+        var W = nail.userData.width, L = nail.userData.len;
+        var X = function (u) { return (u - 0.5) * W; }, Y = function (v) { return v * L; };
+        // Columna central: hoja larga y afilada en ambas puntas
+        var spine = new THREE.Shape();
+        spine.moveTo(X(0.5), Y(0.08));
+        spine.quadraticCurveTo(X(0.555), Y(0.45), X(0.5), Y(0.93));
+        spine.quadraticCurveTo(X(0.445), Y(0.45), X(0.5), Y(0.08));
+        chromePiece(nail, spine);
+        // Espina curva (media luna): nace en la columna y termina en punta
+        function thorn(rootV, half, tipU, tipV, cU, cV, d, mirror) {
+          var m = function (u) { return mirror ? 1 - u : u; };
+          var s = new THREE.Shape();
+          s.moveTo(X(m(0.5)), Y(rootV + half));
+          s.quadraticCurveTo(X(m(cU)), Y(cV + d), X(m(tipU)), Y(tipV));
+          s.quadraticCurveTo(X(m(cU - 0.04)), Y(cV - d), X(m(0.5)), Y(rootV - half));
+          chromePiece(nail, s);
+        }
+        [
+          [0.66, 0.024, 0.69, 0.87, 0.82, 0.66, 0.026],  // sube hacia la punta
+          [0.47, 0.026, 0.88, 0.43, 0.78, 0.57, 0.03], // sale al costado con gancho
+          [0.31, 0.024, 0.8, 0.12, 0.84, 0.33, 0.026],  // baja hacia la cutícula
+          [0.2, 0.02, 0.64, 0.05, 0.6, 0.18, 0.02]     // espinita chica en la base
+        ].forEach(function (t) {
+          thorn(t[0], t[1], t[2], t[3], t[4], t[5], t[6], false);
+          thorn(t[0], t[1], t[2], t[3], t[4], t[5], t[6], true);
+        });
+        // Puntitos cromados entre las espinas, como en los diseños tribales
+        [[0.66, 0.6], [0.72, 0.3]].forEach(function (p) {
+          [p[0], 1 - p[0]].forEach(function (u) {
+            var b = new THREE.Mesh(new THREE.SphereGeometry(0.017, 14, 10), chrome);
+            b.scale.z = 0.7;
+            place(nail, b, u, p[1], 0.008);
+          });
+        });
       }
-      // Red de grietas: nodos (u, v) y uniones entre ellos con una leve curva, que arman celditas cerradas
-      var N = {
-        a: [0.22, 0.14], b: [0.36, 0.29], c: [0.62, 0.27], d: [0.88, 0.33], e: [0.29, 0.49], f: [0.55, 0.46],
-        g: [0.77, 0.54], h: [0.14, 0.62], i: [0.43, 0.65], j: [0.64, 0.71], k: [0.37, 0.81], l: [0.53, 0.89],
-        m: [0.86, 0.48], n: [0.12, 0.4]
-      };
-      [['a', 'b', 0.03], ['b', 'c', -0.04], ['c', 'd', 0.03], ['b', 'e', 0.04], ['c', 'f', -0.03], ['e', 'f', 0.03],
-       ['f', 'g', -0.03], ['g', 'm', 0.02], ['e', 'h', -0.03], ['n', 'e', 0.02], ['e', 'i', -0.03], ['f', 'i', 0.03],
-       ['i', 'j', -0.03], ['j', 'g', 0.03], ['i', 'k', 0.03], ['k', 'l', -0.02], ['j', 'l', 0.03]
-      ].forEach(function (s) {
-        var p = N[s[0]], q = N[s[1]];
-        var mx = (p[0] + q[0]) / 2, my = (p[1] + q[1]) / 2, dx = q[0] - p[0], dy = q[1] - p[1], len = Math.hypot(dx, dy);
-        vein(nails[0], [p, [mx - dy / len * s[2], my + dx / len * s[2]], q], 0.017);
-      });
-      ['b', 'c', 'e', 'f', 'g', 'i', 'j', 'k', 'l'].forEach(function (id) { knot(nails[0], N[id][0], N[id][1], 0.019); });
-
-
+      tribal(nails[0]);
 
       // 2. Nude con dos bandas cromadas y una cruz gótica
       function band(v, bow, u0, u1) { var pts = []; for (var k = 0; k <= 8; k++) { var f = k / 8; pts.push([u0 + (u1 - u0) * f, v + Math.sin(f * Math.PI) * bow]); } return pts; }
