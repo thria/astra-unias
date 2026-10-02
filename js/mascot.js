@@ -25,7 +25,7 @@
   // Lo que comenta de cada sección si la tocan mientras se mira esa parte (una vez cada una)
   var SECTION_TIPS = {
     'sobre-mi': 'Rena hace 4 años que se dedica a las uñas. ¡Estás en buenas manos!',
-    trabajos: 'Tocá cualquier foto para verla en Instagram. Hay más de 280 trabajos.',
+    trabajos: 'Tocá cualquier foto para verla de cerca. Hay más de 280 trabajos en Instagram.',
     'local-titulo': 'El estudio está por Plaza Belgrano, en La Plata. La dirección exacta te la pasa al reservar.',
     servicios: 'Arrastrá las uñas 3D para girarlas y verlas de cerca.',
     opiniones: 'Estas son algunas opiniones de clientas de Astra. ¡Gracias por tanto amor!',

@@ -1058,50 +1058,69 @@ html.no-intro .intro { display: none !important; }
 }
 .section__head p { color: var(--color-ink-soft); }
 
-/* Galería en carrusel (estilo NAF Salon): fila deslizable, la última foto asoma cortada */
+/* Galería en carrusel (js/carousel.js): fila deslizable con la foto del centro más grande,
+   parallax sutil con el mouse, hover con sombra rosada, puntitos abajo y foto ampliada al tocar */
 .carousel { position: relative; }
 
 .carousel__track {
-  --per-view: 1.35;
+  --per-view: 1.3;
   --gap: var(--space-s);
   display: flex;
   gap: var(--gap);
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
   scrollbar-width: none;
-  padding-bottom: 2px;
+  /* aire arriba y abajo para que la foto que crece y su sombra no se corten */
+  padding-block: 1.75rem;
+  margin-block: -1.75rem;
 }
+.carousel__track.is-gliding { scroll-snap-type: none; } /* mientras se desliza con las flechas */
 .carousel__track::-webkit-scrollbar { display: none; }
-.carousel__track:focus-visible { outline: 2px solid var(--color-rose); outline-offset: 4px; }
+.carousel__track:focus-visible { outline: 2px solid var(--color-rose); outline-offset: -2px; }
 
 .carousel__track > .gallery__item {
   flex: 0 0 calc((100% - (var(--per-view) - 1) * var(--gap)) / var(--per-view));
-  scroll-snap-align: start;
+  scroll-snap-align: center;
+  scale: var(--depth, 1);
+  transition: scale 0.45s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease;
+}
+.carousel__track > .gallery__item > a { opacity: var(--fade, 1); transition: opacity 0.35s ease; }
+@media (hover: hover) and (pointer: fine) {
+  .carousel__track > .gallery__item:hover {
+    scale: calc(var(--depth, 1) + 0.06);
+    box-shadow: 0 24px 44px -20px rgb(255 182 217 / 0.45);
+    z-index: 1;
+  }
+  .carousel__track > .gallery__item:hover > a { opacity: 1; }
+  /* las demás se apagan apenas */
+  .carousel__track:hover > .gallery__item:not(:hover) > a { opacity: calc(var(--fade, 1) * 0.86); }
 }
 
+/* Flechas finas de vidrio; se apagan en los extremos */
 .carousel__btn {
   position: absolute;
   top: 50%;
   z-index: 3;
   display: grid;
   place-items: center;
-  width: 3rem;
-  height: 3rem;
+  width: 2.6rem;
+  height: 2.6rem;
   padding: 0;
-  border: 0;
+  border: 1px solid rgb(255 255 255 / 0.28);
   border-radius: 50%;
-  background: var(--color-carousel-btn);
-  color: var(--color-hero-fg);
+  background: rgb(20 14 18 / 0.42);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: #FFF7F9;
   cursor: pointer;
-  translate: 0 -50%;
-  box-shadow: 0 4px 14px rgb(0 0 0 / 0.2);
-  transition: background-color 0.2s ease, scale 0.2s ease;
+  translate: 0 calc(-50% - 1.1rem); /* centradas en las fotos (abajo están los puntitos) */
+  transition: background-color 0.25s ease, scale 0.25s ease, opacity 0.3s ease;
 }
 .carousel__btn:hover { background: var(--color-rose); scale: 1.06; }
+.carousel__btn:disabled { opacity: 0; pointer-events: none; }
 .carousel__btn:focus-visible { outline: 2px solid var(--color-rose); outline-offset: 3px; }
-.carousel__btn svg { width: 1.25rem; height: 1.25rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.carousel__btn svg { width: 1.1rem; height: 1.1rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .carousel__btn--prev { left: 0.75rem; }
 .carousel__btn--next { right: 0.75rem; }
 
@@ -1110,9 +1129,25 @@ html.no-intro .intro { display: none !important; }
   .carousel__btn { display: none; }
 }
 
+/* Puntitos: uno por foto; el activo se estira en una pastilla rosa */
+.carousel__dots { display: flex; justify-content: center; gap: 0.45rem; margin-top: 1.5rem; }
+.carousel__dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-ink) 28%, transparent);
+  cursor: pointer;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
+}
+.carousel__dot[aria-current="true"] { width: 1.6rem; background: var(--color-logo); }
+.carousel__dot:focus-visible { outline: 2px solid var(--color-rose); outline-offset: 3px; }
+
 .gallery__item {
   aspect-ratio: 3 / 4;
   overflow: hidden;
+  border: 1px solid rgb(255 182 217 / 0.15);
   border-radius: var(--radius);
   background: var(--color-blush);
 }
@@ -1122,8 +1157,12 @@ html.no-intro .intro { display: none !important; }
   height: 100%;
   object-fit: cover;
 }
+/* parallax: la imagen es apenas más grande que su marco y se corre con el mouse (--px, js/carousel.js) */
+@media (hover: hover) and (pointer: fine) {
+  .gallery__link img { scale: 1.1; translate: var(--px, 0px) 0; }
+}
 
-/* Cada foto lleva a su publicación de Instagram.
+/* Cada foto se abre en grande al tocarla.
    Con mouse: el aviso sube desde abajo al pasar el cursor. En pantallas táctiles queda visible. */
 .gallery__link {
   position: relative;
@@ -1133,8 +1172,8 @@ html.no-intro .intro { display: none !important; }
   border-radius: inherit;
   color: var(--color-hero-fg);
   text-decoration: none;
+  cursor: zoom-in;
 }
-.gallery__link img { transition: transform 0.5s ease; }
 
 .gallery__cta {
   position: absolute;
@@ -1164,8 +1203,6 @@ html.no-intro .intro { display: none !important; }
 
 .gallery__link:hover .gallery__cta,
 .gallery__link:focus-visible .gallery__cta { transform: translateY(0); }
-.gallery__link:hover img,
-.gallery__link:focus-visible img { transform: scale(1.04); }
 .gallery__link:focus-visible { outline-offset: -3px; }
 
 @media (hover: none) {
@@ -1201,6 +1238,81 @@ html.no-intro .intro { display: none !important; }
 }
 .gallery__item--more .sparkle { width: 2.75rem; height: 2.75rem; color: var(--color-rose); }
 .gallery__more-text { max-width: 12ch; } /* texto angosto: no queda debajo de las flechas */
+
+/* Foto ampliada (lightbox, js/carousel.js) */
+html.has-lightbox { overflow: hidden; }
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-s);
+  padding: clamp(1rem, 3vw, 2.5rem);
+  background: rgb(15 20 25 / 0.88);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.lightbox.is-open { opacity: 1; }
+.lightbox[hidden] { display: none; }
+.lightbox__figure {
+  grid-column: 2;
+  display: grid;
+  justify-items: center;
+  gap: 0.9rem;
+  margin: 0;
+  min-width: 0;
+  pointer-events: none; /* el clic en el fondo cierra; la foto y el pie se habilitan abajo */
+}
+.lightbox__img {
+  max-width: 100%;
+  max-height: calc(100svh - 9rem);
+  border-radius: 10px;
+  box-shadow: 0 30px 60px -20px rgb(0 0 0 / 0.7);
+  pointer-events: auto;
+  opacity: 0;
+  scale: 0.97;
+  transition: opacity 0.35s ease, scale 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.lightbox__img.is-in { opacity: 1; scale: 1; }
+.lightbox__caption { display: flex; align-items: center; gap: 1.25rem; color: #F6E4EA; font-size: var(--step--1); pointer-events: auto; }
+.lightbox__count { font-variant-numeric: tabular-nums; letter-spacing: 0.08em; opacity: 0.8; }
+.lightbox__ig { color: #FFB6D9; font-weight: 600; }
+.lightbox__ig:hover { color: #FFFFFF; }
+.lightbox__close,
+.lightbox__nav {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid rgb(255 255 255 / 0.25);
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.08);
+  color: #FFF7F9;
+  cursor: pointer;
+  transition: background-color 0.25s ease, scale 0.25s ease;
+}
+.lightbox__close:hover,
+.lightbox__nav:hover { background: rgb(255 182 217 / 0.35); scale: 1.06; }
+.lightbox__close:focus-visible,
+.lightbox__nav:focus-visible { outline: 2px solid #FFB6D9; outline-offset: 3px; }
+.lightbox svg { width: 1.2rem; height: 1.2rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.lightbox__close { position: absolute; top: clamp(0.75rem, 2vw, 1.5rem); right: clamp(0.75rem, 2vw, 1.5rem); }
+.lightbox__nav--prev { grid-column: 1; }
+.lightbox__nav--next { grid-column: 3; }
+@media (max-width: 40em) {
+  /* en el celular las flechas van abajo, a los costados del pie; también se desliza con el dedo */
+  .lightbox { grid-template-columns: 1fr; padding-inline: 0.75rem; }
+  .lightbox__figure { grid-column: 1; }
+  .lightbox__nav { position: absolute; bottom: 1.25rem; }
+  .lightbox__nav--prev { left: 1rem; }
+  .lightbox__nav--next { right: 1rem; }
+  .lightbox__img { max-height: calc(100svh - 10rem); }
+}
 
 .sparkle { width: 1.5rem; height: 1.5rem; fill: currentColor; flex: none; }
 
@@ -1983,7 +2095,7 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
   }
   .nav-links a:hover { color: var(--color-rose); text-decoration: underline; }
 
-  .carousel__track { --per-view: 2.3; }
+  .carousel__track { --per-view: 2.2; }
 
   .service-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
@@ -2002,7 +2114,7 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
 /* ≥ 1024px
    ------------------------------------------------------------------------ */
 @media (min-width: 64em) {
-  .carousel__track { --per-view: 3.3; --gap: var(--space-m); }
+  .carousel__track { --per-view: 3; --gap: var(--space-m); }
   .carousel__btn--prev { left: 1rem; }
   .carousel__btn--next { right: 1rem; }
 
@@ -2023,7 +2135,7 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
 
 /* ≥ 1440px: más fotos a la vista en pantallas grandes */
 @media (min-width: 90em) {
-  .carousel__track { --per-view: 4.3; }
+  .carousel__track { --per-view: 3; --gap: var(--space-l); }
 }
 
 @media (prefers-reduced-motion: reduce) {

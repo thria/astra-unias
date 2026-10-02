@@ -30,14 +30,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Pinyon+Script&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=80">
+  <link rel="stylesheet" href="css/styles.css?v=81">
   <script src="js/theme.js?v=7" defer></script>
   <script src="js/map.js?v=3" defer></script>
-  <script src="js/carousel.js?v=2" defer></script>
+  <script src="js/carousel.js?v=3" defer></script>
   <script src="js/agenda.js?v=5" defer></script>
   <script src="js/nails3d.js?v=18" defer></script>
   <script src="js/effects.js?v=13" defer></script>
-  <script src="js/mascot.js?v=9" defer></script>
+  <script src="js/mascot.js?v=10" defer></script>
 
   <script type="application/ld+json">
   {
@@ -227,7 +227,8 @@
       <h2 id="trabajos-titulo" class="sr-only">Trabajos recientes</h2>
       <!-- El carrusel va fuera del .container para ocupar todo el ancho de la sección.
            Para sumar trabajos: exportá cada foto vertical 3:4 en dos anchos (480 y 960 px)
-             como img/trabajos/trabajo-XX-480.jpg y trabajo-XX-960.jpg y copiá un <li>. -->
+             como img/trabajos/trabajo-XX-480.jpg y trabajo-XX-960.jpg y copiá un <li> (con su link de Instagram).
+             js/carousel.js arma solo los puntitos, la foto ampliada y el contador. -->
         <div class="carousel" role="region" aria-roledescription="carrusel" aria-labelledby="trabajos-titulo">
           <button class="carousel__btn carousel__btn--prev" type="button" aria-controls="carrusel-trabajos" aria-label="Ver trabajos anteriores">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
@@ -240,7 +241,7 @@
               sizes="(min-width: 90em) 24vw, (min-width: 64em) 30vw, (min-width: 48em) 42vw, 74vw"
               width="960" height="1279" loading="lazy" decoding="async"
               alt="Uñas cortas nude con gatitos negros en relieve 3D, teclas de piano, notas musicales y una uña bordó con estrella">
-              <span class="gallery__cta"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" class="gallery__cta-dot"/></svg>Ver en Instagram</span>
+              <span class="gallery__cta"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5M11 8.5v5M8.5 11h5"/></svg>Ver de cerca</span>
             </a>
           </li>
           <li class="gallery__item">
@@ -250,7 +251,7 @@
               sizes="(min-width: 90em) 24vw, (min-width: 64em) 30vw, (min-width: 48em) 42vw, 74vw"
               width="960" height="1279" loading="lazy" decoding="async"
               alt="Uñas almendra con caras de mujer pintadas a mano, flores rosas, la frase Love You en letra cursiva y francesita bordó">
-              <span class="gallery__cta"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" class="gallery__cta-dot"/></svg>Ver en Instagram</span>
+              <span class="gallery__cta"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5M11 8.5v5M8.5 11h5"/></svg>Ver de cerca</span>
             </a>
           </li>
           <li class="gallery__item">
@@ -260,7 +261,7 @@
               sizes="(min-width: 90em) 24vw, (min-width: 64em) 30vw, (min-width: 48em) 42vw, 74vw"
               width="960" height="1279" loading="lazy" decoding="async"
               alt="Uñas almendra en rosa, celeste y nude perlado con lunares marrones y estrellas pintadas a mano">
-              <span class="gallery__cta"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" class="gallery__cta-dot"/></svg>Ver en Instagram</span>
+              <span class="gallery__cta"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5M11 8.5v5M8.5 11h5"/></svg>Ver de cerca</span>
             </a>
           </li>
           <li class="gallery__item">
@@ -270,7 +271,7 @@
               sizes="(min-width: 90em) 24vw, (min-width: 64em) 30vw, (min-width: 48em) 42vw, 74vw"
               width="960" height="1279" loading="lazy" decoding="async"
               alt="Uñas stiletto nude y gris con efecto cromado en relieve, cruces plateadas y strass">
-              <span class="gallery__cta"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" class="gallery__cta-dot"/></svg>Ver en Instagram</span>
+              <span class="gallery__cta"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5M11 8.5v5M8.5 11h5"/></svg>Ver de cerca</span>
             </a>
           </li>
           <li class="gallery__item">
@@ -280,7 +281,7 @@
               sizes="(min-width: 90em) 24vw, (min-width: 64em) 30vw, (min-width: 48em) 42vw, 74vw"
               width="960" height="1279" loading="lazy" decoding="async"
               alt="Uñas almendra rosa con efecto aurora nacarado y una línea de strass y perlas plateadas">
-              <span class="gallery__cta"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" class="gallery__cta-dot"/></svg>Ver en Instagram</span>
+              <span class="gallery__cta"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5M11 8.5v5M8.5 11h5"/></svg>Ver de cerca</span>
             </a>
           </li>
           <li class="gallery__item gallery__item--more">
