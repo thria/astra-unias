@@ -745,22 +745,9 @@ html.no-intro .intro { display: none !important; }
 
 .services__models { display: grid; gap: var(--space-s); }
 
-/* Columna de texto: guía rápida y diseños para sumar */
+/* Columna de texto */
 .services__aside { display: grid; align-content: start; gap: var(--space-l); }
 .services__aside .section__head { margin-bottom: 0; }
-.services__subtitle { font-size: var(--step-1); margin-bottom: var(--space-s); }
-.guide-list { display: grid; gap: 0.85rem; margin: 0; }
-.guide-list > div { display: grid; gap: 0.15rem; padding-left: 0.85rem; border-left: 3px solid var(--color-petal); }
-.guide-list dt { font-weight: 600; }
-.guide-list dd { margin: 0; color: var(--color-ink-soft); font-size: var(--step--1); }
-.chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-.chips li {
-  padding: 0.35rem 0.85rem;
-  border: 1px solid var(--color-petal);
-  border-radius: 999px;
-  background: var(--color-blush);
-  font-size: var(--step--1);
-}
 .service-list { display: grid; gap: var(--space-m); }
 
 /* Tarjeta de servicio con modelo 3D arriba */

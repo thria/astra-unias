@@ -35,7 +35,7 @@
   if ('IntersectionObserver' in window) {
     var targets = document.querySelectorAll(
       'main > section:not(.hero) .section__head, .about .filete, .about__copy, .carousel, .service-card, ' +
-      '.local__text, .local .filete, .agenda, .steps li, .booking__cta, .services__guide, .services__extras'
+      '.local__text, .local .filete, .agenda, .steps li, .booking__cta'
     );
     document.documentElement.classList.add('reveal-on');
     var io = new IntersectionObserver(function (entries) {
