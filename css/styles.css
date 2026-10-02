@@ -356,7 +356,7 @@ html.no-intro .intro { display: none !important; }
 
 .site-header__actions { display: flex; align-items: center; gap: var(--space-xs); }
 
-/* Selector de tema en cápsula de vidrio (claro · oscuro · automático): la pastilla rosa se desliza a la opción elegida */
+/* Selector de tema en cápsula de vidrio (claro · oscuro): la pastilla rosa se desliza a la opción elegida */
 .theme-switch {
   --opt: 2.25rem;
   position: relative;
@@ -400,7 +400,6 @@ html.no-intro .intro { display: none !important; }
   transition: transform 0.35s cubic-bezier(0.3, 1.3, 0.5, 1);
 }
 .theme-switch[data-mode="dark"] .theme-switch__thumb { transform: translateX(100%); }
-.theme-switch[data-mode="auto"] .theme-switch__thumb { transform: translateX(200%); }
 
 /* "Pedir turno" del encabezado: misma pastilla de vidrio con degradé rosa que los títulos */
 .site-header .button--small {
