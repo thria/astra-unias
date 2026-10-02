@@ -2107,3 +2107,239 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition-duration: 0.01ms !important; }
 }
+
+/* ==========================================================================
+   Rediseño minimalista (octubre 2026)
+   Referencias: estudios y marcas de belleza de lujo (Aesop, Byredo, Le Labo, Dior Beauty,
+   Glossier, Olive & June, Paintbox): fondo neutro cálido, mucho aire, un solo acento,
+   superficies planas con líneas finas y una serif editorial para los títulos.
+   - Sin degradés de color ni brillos: todo plano.
+   - Paleta: marfil, hueso y espresso + rosa empolvado como único acento.
+   - Títulos en Instrument Serif (elegante, editorial); textos en Figtree (limpia, de "salud").
+   Se mantienen la portada, el encabezado de vidrio, los modelos 3D, el mapa y Mizu.
+   ========================================================================== */
+:root {
+  --color-bg: #F8F4EF;          /* marfil */
+  --color-blush: #F1EBE4;       /* hueso */
+  --color-petal: #E9DCD5;
+  --color-petal-strong: #E0CCC4;
+  --color-rose: #A86A77;        /* rosa empolvado: único acento */
+  --color-rose-dark: #8C5361;
+  --color-ink: #2A2321;         /* espresso */
+  --color-ink-soft: #6F6560;
+  --color-line: #E3DAD1;
+  --color-on-rose: #FFFFFF;
+  --color-logo: #C98593;
+  --glass-border: rgb(255 255 255 / 0.7);
+  --glass-highlight: rgb(255 255 255 / 0.5);
+  --pill-gradient: #F8F4EF;     /* (antes degradé) ahora color plano */
+  --pill-fg: #2A2321;
+  --pill-ring: rgb(255 255 255 / 0.3);
+  --color-card: #FFFFFF;
+  --color-card-border: #E3DAD1;
+  --color-section: #F1EBE4;
+  --page-wash: #F8F4EF;
+  --page-grain-opacity: 0;
+  --color-model-a: #F1EBE4;
+  --color-model-b: #F1EBE4;
+  --color-header-glass: rgb(248 244 239 / 0.7);
+  --color-footer-bg: #1F1A18;
+  --color-footer-fg: #EDE6DF;
+  --color-footer-muted: #A39890;
+  --color-footer-accent: #D8B3BA;
+  --intro-center: #F8F4EF;
+  --intro-edge: #EDE4DB;
+  --intro-halo: rgb(216 179 186 / 0.35);
+  --intro-logo-a: #B97986;
+  --intro-logo-b: #D9A9B2;
+  --intro-sparkle: #D8B3BA;
+  --mist-1: rgb(216 179 186 / 0.35);
+  --mist-2: rgb(232 220 205 / 0.5);
+  --mist-3: rgb(216 179 186 / 0.25);
+  --font-display: "Instrument Serif", "Times New Roman", serif;
+  --radius: 4px;
+  --radius-card: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #151211;
+    --color-blush: #1C1816;
+    --color-petal: #2C2522;
+    --color-petal-strong: #362D29;
+    --color-rose: #D8A6AF;
+    --color-rose-dark: #E8C2C8;
+    --color-ink: #EEE7E0;
+    --color-ink-soft: #A89D95;
+    --color-line: #2D2724;
+    --color-on-rose: #1A1513;
+    --color-logo: #E0AAB4;
+    --glass-border: rgb(255 255 255 / 0.12);
+    --glass-highlight: rgb(255 255 255 / 0.06);
+    --pill-gradient: #EEE7E0;
+    --pill-fg: #1A1513;
+    --pill-ring: rgb(255 255 255 / 0.06);
+    --color-card: #1C1816;
+    --color-card-border: #2D2724;
+    --color-section: #1A1715;
+    --page-wash: #151211;
+    --page-grain-opacity: 0;
+    --color-model-a: #1C1816;
+    --color-model-b: #1C1816;
+    --color-header-glass: rgb(21 18 17 / 0.6);
+    --color-footer-bg: #0F0D0C;
+    --intro-center: #1A1615;
+    --intro-edge: #0F0D0C;
+    --intro-halo: rgb(216 166 175 / 0.2);
+    --intro-logo-a: #D8A6AF;
+    --intro-logo-b: #EED9C9;
+    --intro-sparkle: #EED9C9;
+    --mist-1: rgb(216 166 175 / 0.18);
+    --mist-2: rgb(238 217 201 / 0.12);
+    --mist-3: rgb(216 166 175 / 0.12);
+  }
+}
+:root[data-theme="dark"] {
+  --color-bg: #151211;
+  --color-blush: #1C1816;
+  --color-petal: #2C2522;
+  --color-petal-strong: #362D29;
+  --color-rose: #D8A6AF;
+  --color-rose-dark: #E8C2C8;
+  --color-ink: #EEE7E0;
+  --color-ink-soft: #A89D95;
+  --color-line: #2D2724;
+  --color-on-rose: #1A1513;
+  --color-logo: #E0AAB4;
+  --glass-border: rgb(255 255 255 / 0.12);
+  --glass-highlight: rgb(255 255 255 / 0.06);
+  --pill-gradient: #EEE7E0;
+  --pill-fg: #1A1513;
+  --pill-ring: rgb(255 255 255 / 0.06);
+  --color-card: #1C1816;
+  --color-card-border: #2D2724;
+  --color-section: #1A1715;
+  --page-wash: #151211;
+  --page-grain-opacity: 0;
+  --color-model-a: #1C1816;
+  --color-model-b: #1C1816;
+  --color-header-glass: rgb(21 18 17 / 0.6);
+  --color-footer-bg: #0F0D0C;
+  --intro-center: #1A1615;
+  --intro-edge: #0F0D0C;
+  --intro-halo: rgb(216 166 175 / 0.2);
+  --intro-logo-a: #D8A6AF;
+  --intro-logo-b: #EED9C9;
+  --intro-sparkle: #EED9C9;
+  --mist-1: rgb(216 166 175 / 0.18);
+  --mist-2: rgb(238 217 201 / 0.12);
+  --mist-3: rgb(216 166 175 / 0.12);
+}
+
+body { -webkit-font-smoothing: antialiased; }
+h1, h2, h3 { letter-spacing: -0.01em; }
+
+/* Títulos: sin globos ni degradés. Serif grande, con una línea fina rosa arriba */
+.section__head h2,
+.local h2,
+.service-list h3 {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--color-ink);
+  text-box: normal;
+}
+.section__head h2,
+.local h2 { font-size: clamp(2.5rem, 1.7rem + 3.4vw, 4rem); line-height: 1; }
+.section__head::before,
+.local__text::before {
+  content: "";
+  width: 2.5rem;
+  height: 1px;
+  background: var(--color-rose);
+}
+.local__text::before { margin-bottom: var(--space-xs); }
+.section__head p { color: var(--color-ink-soft); }
+.service-list h3 { font-size: 1.75rem; }
+.about__copy h2 { font-size: clamp(2.25rem, 1.8rem + 1.6vw, 3rem); line-height: 1; }
+.hero__claim { font-size: clamp(1.75rem, 1.2rem + 2.2vw, 2.75rem); letter-spacing: 0; }
+
+/* Botones: pastilla plana en espresso (sin brillos ni sombras) */
+.button:not(.button--light):not(.button--outline-light):not(.button--ghost) { background: var(--color-ink); border-color: var(--color-ink); color: var(--color-bg); }
+.button { letter-spacing: 0.02em; }
+.button:not(.button--light):not(.button--outline-light):not(.button--ghost):hover { background: var(--color-rose); border-color: var(--color-rose); color: var(--color-on-rose); }
+.site-header .button--small,
+.site-header .button--small:hover { box-shadow: none; }
+.site-header .button--small { background: var(--pill-gradient); color: var(--pill-fg); }
+.site-header .button--small:hover { background: var(--color-rose); color: #FFFFFF; transform: none; }
+.theme-switch, .theme-switch__thumb { box-shadow: none; }
+
+/* Sin brillitos flotando ni grano: fondo limpio */
+.sparkles { display: none; }
+
+/* Superficies planas con línea fina */
+.about__photo { border-radius: var(--radius-card); box-shadow: none; }
+.reveal-on .about__photo.reveal.is-visible { box-shadow: none; }
+.about__copy {
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-card);
+  background: var(--color-card);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+.about__links a { border: 1px solid var(--color-line); background: transparent; color: var(--color-ink); }
+.about__links a:hover { background: var(--color-ink); border-color: var(--color-ink); color: var(--color-bg); }
+
+.gallery__item { border-color: var(--color-line); border-radius: var(--radius-card); }
+.carousel__track > .gallery__item:hover { box-shadow: 0 24px 44px -26px rgb(0 0 0 / 0.35); }
+.gallery__item--more a { background: var(--color-blush); }
+.gallery__item--more a:hover { background: var(--color-petal); }
+.carousel__dot[aria-current="true"] { background: var(--color-ink); }
+
+.service-card { border: 1px solid var(--color-card-border); border-radius: var(--radius-card); background: var(--color-card); }
+.service-card__model { border-radius: var(--radius); background: var(--color-blush); }
+
+.review {
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-card);
+  background: var(--color-card);
+  box-shadow: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .review:hover { transform: translateY(-4px); box-shadow: none; }
+}
+.story.is-active .review { border-color: var(--color-rose); }
+.review__avatar { border-color: var(--color-line); background: var(--color-blush); color: var(--color-ink); box-shadow: none; }
+.review__who span { color: var(--color-rose); }
+.stories__progress span::after { background: var(--color-ink); }
+.stories__btn { background: var(--color-card); border-color: var(--color-line); -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; }
+
+.agenda__layout {
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-card);
+  background: var(--color-card);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+.segmented { background: var(--color-blush); border-color: var(--color-line); }
+.segmented__btn[aria-pressed="true"] { background: var(--color-ink); color: var(--color-bg); box-shadow: none; }
+.almanac__day.is-selected,
+button.almanac__day.is-selected:hover { background: var(--color-ink); color: var(--color-bg); box-shadow: none; }
+.almanac__day.is-selected .almanac__num { color: var(--color-bg); }
+.almanac__day.is-selected::after { background: var(--color-bg); }
+
+.steps li::before { background: transparent; border: 1px solid var(--color-line); font-size: 1.25rem; }
+
+.local__map .maplibregl-ctrl-group { box-shadow: none; border: 1px solid var(--color-line); }
+.mascot__bubble { border: 1px solid var(--color-line); box-shadow: 0 12px 28px -18px rgb(0 0 0 / 0.35); }
+.page-sheet { background: var(--color-bg); } /* fondo plano (antes degradé) */
+:root { --color-map-label: #8C5361; } /* cartelito y pin del mapa en rosa empolvado oscuro (se lee en ambos temas) */
+.map-marker__label { box-shadow: 0 4px 14px rgb(0 0 0 / 0.18); }
+/* la serif nueva tiene letras más bajas: se agranda donde se usa en tamaño chico */
+.review blockquote { font-size: 1.45rem; line-height: 1.3; }
+.steps h3 { font-size: 1.5rem; }
+.site-footer__motto { font-size: 1.5rem; }
+.local__place { font-size: 1.25rem; }

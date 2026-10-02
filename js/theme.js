@@ -5,7 +5,7 @@
   var picker = document.querySelector('.theme-switch');
   var themeColor = document.querySelector('meta[name="theme-color"]');
   var systemDark = window.matchMedia('(prefers-color-scheme: dark)');
-  var COLORS = { light: '#FFF7F9', dark: '#1C1217' };
+  var COLORS = { light: '#F8F4EF', dark: '#151211' };
   if (!picker) return;
   var options = Array.prototype.slice.call(picker.querySelectorAll('[data-theme-mode]'));
 
