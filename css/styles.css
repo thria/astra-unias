@@ -1855,11 +1855,10 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
    ------------------------------------------------------------------------ */
 .mascot {
   /* colores del personaje: iguales en tema claro y oscuro */
-  --mascot-black: #1B1216;
-  --mascot-cream: #FFF3E8;
-  --mascot-pink: #F6A9C2;
-  --mascot-mask: #4A3741;   /* cara más clara que el pelo */
-  --mascot-glow: rgb(255 247 249 / 0.7); /* contorno claro para que se vea sobre fondos oscuros y la foto */
+  --mz-pink: #FFB6D9;
+  --mz-yellow: #FFFACD;
+  --mz-line: #231C1E;       /* contorno negro grueso */
+  --mascot-glow: rgb(255 255 255 / 0.55); /* halo claro para que el contorno se vea sobre fondos oscuros */
   position: fixed;
   right: 1rem;
   bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
@@ -1888,19 +1887,29 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
 .mascot__button:focus-visible { outline: 2px solid var(--color-rose); outline-offset: 4px; border-radius: 50%; }
 .mascot.is-hidden .mascot__button { width: 3rem; opacity: 0.85; }
 .mascot__cat { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 0 1.2px var(--mascot-glow)) drop-shadow(0 0 1.2px var(--mascot-glow)); }
-/* Mizu: bolita de pelo negra con la cara más clara, ojos enormes y rosa en orejas, nariz y lengua */
-.mascot__fur { fill: url(#mz-fur); }
-.mascot__ear, .mascot__arm, .mascot__leg { fill: var(--mascot-black); }
-.mascot__mask { fill: var(--mascot-mask); }
-.mascot__ear-in { fill: var(--mascot-pink); }
-.mascot__star { fill: var(--mascot-pink); }
-.mascot__eye-ring { fill: var(--mascot-cream); }
-.mascot__eye { fill: url(#mz-iris); }
-.mascot__shine { fill: #FFFFFF; }
-.mascot__nose { fill: var(--mascot-pink); }
-.mascot__mouth { fill: #1A0A12; }
-.mascot__tongue { fill: #F28DAE; }
-.mascot__fang { fill: #FFFFFF; }
+/* Mizu: estilo coreano minimalista. Rosa pastel, amarillo y blanco con contorno negro grueso */
+.mascot .mz-out { stroke: var(--mz-line); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+.mascot .mz-thin { stroke-width: 2; }
+.mz-pink { fill: var(--mz-pink); }
+.mz-yellow { fill: var(--mz-yellow); }
+.mz-white { fill: #FFFFFF; }
+.mz-ink { fill: var(--mz-line); }
+.mz-heart { fill: #FF7DB4; }
+.mz-tongue { fill: #FF8FBD; }
+.mz-blush { fill: #FF8FC1; opacity: 0.55; }
+.mascot .mz-line { fill: none; stroke: var(--mz-line); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.mascot .mz-line.mz-thin { stroke-width: 2; }
+.mz-tail-line { fill: none; stroke: var(--mz-line); stroke-width: 11; stroke-linecap: round; }
+.mz-tail { fill: none; stroke: var(--mz-pink); stroke-width: 5; stroke-linecap: round; }
+/* una sola cara a la vez, según el ánimo */
+.mz-face { display: none; }
+.mascot[data-mood="idle"] .mz-face[data-face="idle"],
+.mascot[data-mood="wow"] .mz-face[data-face="wow"],
+.mascot[data-mood="shy"] .mz-face[data-face="shy"],
+.mascot[data-mood="gossip"] .mz-face[data-face="gossip"],
+.mascot[data-mood="love"] .mz-face[data-face="love"],
+.mascot[data-mood="think"] .mz-face[data-face="think"] { display: inline; }
+.mascot[data-mood="shy"] .mz-blush { opacity: 0.9; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .mascot { --mascot-glow: rgb(255 235 243 / 0.9); } }
 :root[data-theme="dark"] .mascot { --mascot-glow: rgb(255 235 243 / 0.9); }
 

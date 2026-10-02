@@ -1,4 +1,4 @@
-// Mizu: el monstruito de Astra (personaje propio: bolita peluda negra, petisa y simpática) que aparece abajo a la derecha
+// Mizu: el gato monstruito de Astra (personaje propio, estilo coreano minimalista, con 6 caras) que aparece abajo a la derecha
 // con un globo de diálogo, al estilo de Clippy. Solo habla cuando la tocan: nunca habla sola.
 // - Tocarla: la primera vez saluda; después comenta la sección que se está mirando o tira un tip.
 // - "Ocultar": la achica (se recuerda en este navegador).
@@ -8,7 +8,7 @@
   var FIRST_DELAY = 800;    // sin cinemática: aparece (callada) casi enseguida
   var BUBBLE_TIME = 12000;  // cuánto queda visible cada mensaje
 
-  var GREETING = '¡Hola! Soy Mizu, el monstruito de Astra. Tocame y te cuento tips para tus uñas.';
+  var GREETING = '¡Hola! Soy Mizu, el gatito monstruo de Astra. Tocame y te cuento tips para tus uñas.';
 
   var TIPS = [
     'Usá aceite de cutículas todas las noches: ayuda a que la uña crezca más sana.',
@@ -36,47 +36,66 @@
   var hidden = false;
   try { hidden = localStorage.getItem(STORAGE_KEY) === '1'; } catch (e) {}
 
-  // Mizu: monstruito peludo, rechoncho y petiso (más bolita que gato). Negro con una "máscara" más clara
-  // en la cara, ojos enormes, boca abierta sonriente con un colmillito, orejitas con rosa por dentro,
-  // bracitos cortos y patitas. El contorno de pelo se arma con ondas alrededor de un óvalo.
-  function fluff(cx, cy, rx, ry, n, depth) {
-    var d = '', pt = function (a, ex) { return ((cx + (rx + ex) * Math.cos(a)).toFixed(1) + ' ' + (cy + (ry + ex) * Math.sin(a)).toFixed(1)); };
-    for (var i = 0; i < n; i++) {
-      var a0 = i / n * Math.PI * 2, a1 = (i + 1) / n * Math.PI * 2;
-      if (!i) d = 'M' + pt(a0, 0);
-      d += 'Q' + pt((a0 + a1) / 2, depth) + ' ' + pt(a1, 0);
-    }
-    return d + 'Z';
-  }
+  // Mizu: gato monstruito en estilo coreano minimalista (tipo Kakao / Line Friends).
+  // Bolita rosa pastel con contorno negro grueso, orejas suaves con amarillo por dentro, panza blanca,
+  // bracitos y patitas cortas, un mechón despeinado (imperfección linda) y la estrellita de Astra.
+  // Tiene 6 caras que cambian según lo que pasa (data-mood en .mascot):
+  //   idle (contento) · wow (sorprendido) · shy (tímido) · gossip (chismoso) · love (enamorado) · think (pensativo)
+  var HEART = function (x, y, s) { // corazón centrado en (x, y), de tamaño s
+    return 'M' + x + ' ' + (y + s * 0.55) + 'C' + (x - s * 1.1) + ' ' + (y - s * 0.1) + ' ' + (x - s * 0.55) + ' ' + (y - s * 0.95) + ' ' + x + ' ' + (y - s * 0.35) +
+      'C' + (x + s * 0.55) + ' ' + (y - s * 0.95) + ' ' + (x + s * 1.1) + ' ' + (y - s * 0.1) + ' ' + x + ' ' + (y + s * 0.55) + 'Z';
+  };
+  var FACES = {
+    idle:
+      '<g class="mascot__eyes"><ellipse class="mz-ink" cx="44" cy="58" rx="5.5" ry="7"/><ellipse class="mz-ink" cx="76" cy="58" rx="5.5" ry="7"/>' +
+      '<circle class="mz-white" cx="45.8" cy="55.4" r="1.9"/><circle class="mz-white" cx="77.8" cy="55.4" r="1.9"/></g>' +
+      '<path class="mz-line" d="M54 69.5q6 6 12 0"/>',
+    wow:
+      '<circle class="mz-white mz-out" cx="44" cy="57" r="9"/><circle class="mz-white mz-out" cx="76" cy="57" r="9"/>' +
+      '<circle class="mz-ink" cx="44" cy="58" r="4.6"/><circle class="mz-ink" cx="76" cy="58" r="4.6"/>' +
+      '<circle class="mz-white" cx="45.6" cy="56.2" r="1.5"/><circle class="mz-white" cx="77.6" cy="56.2" r="1.5"/>' +
+      '<path class="mz-line" d="M35 42l9-3M85 42l-9-3"/>' +
+      '<ellipse class="mz-ink" cx="60" cy="74" rx="4" ry="5"/>' +
+      '<path class="mz-line" d="M107 22v9"/><circle class="mz-ink" cx="107" cy="36" r="1.8"/>',
+    shy:
+      '<ellipse class="mz-ink" cx="43" cy="61" rx="4" ry="5"/><ellipse class="mz-ink" cx="73" cy="61" rx="4" ry="5"/>' +
+      '<path class="mz-line" d="M53 72q2.3-2.2 4.6 0t4.6 0t4.6 0"/>' +
+      '<path class="mz-line mz-thin" d="M27 67l-2 4M31.5 67l-2 4M36 67l-2 4M84 67l2 4M88.5 67l2 4M93 67l2 4"/>' +
+      '<path class="mz-white mz-out" d="M103 30c-3 5-4 7-4 9a4 4 0 0 0 8 0c0-2-1-4-4-9Z"/>',
+    gossip:
+      '<path class="mz-ink" d="M38 58a6 6 0 0 0 12 0Z"/><path class="mz-ink" d="M70 58a6 6 0 0 0 12 0Z"/>' +
+      '<path class="mz-line" d="M37 57.5h14M69 57.5h14M70 46q6-4 12 0"/>' +
+      '<path class="mz-line" d="M53 71q8 4.5 14-3"/><path class="mz-white mz-out mz-thin" d="M57 72.4l1.6 3.4 1.6-3"/>',
+    love:
+      '<path class="mz-heart mz-out" d="' + HEART(44, 59, 9) + '"/><path class="mz-heart mz-out" d="' + HEART(76, 59, 9) + '"/>' +
+      '<path class="mz-ink mz-out" d="M52.5 68.5q7.5 11 15 0Z"/><ellipse class="mz-tongue" cx="60" cy="74.2" rx="3.4" ry="1.9"/>' +
+      '<path class="mz-heart mz-out mz-thin" d="' + HEART(106, 26, 5.5) + '"/>',
+    think:
+      '<ellipse class="mz-ink" cx="46" cy="55" rx="5" ry="6.5"/><ellipse class="mz-ink" cx="78" cy="55" rx="3.8" ry="5"/>' +
+      '<path class="mz-line" d="M70 44l12 2"/>' +
+      '<path class="mz-line" d="M54 72q3-3 6 0t6 0"/>' +
+      '<path class="mz-line" d="M101 19q0-6 6-6t6 5q0 4-6 6v3"/><circle class="mz-ink" cx="107" cy="31.5" r="1.8"/>'
+  };
+  var faces = Object.keys(FACES).map(function (k) { return '<g class="mz-face" data-face="' + k + '">' + FACES[k] + '</g>'; }).join('');
+
   var CAT_SVG =
     '<svg class="mascot__cat" viewBox="0 0 120 132" aria-hidden="true">' +
-      '<defs>' +
-        '<radialGradient id="mz-fur" cx="38%" cy="30%" r="75%"><stop offset="0" stop-color="#3A2C34"/><stop offset="1" stop-color="#140D11"/></radialGradient>' +
-        '<radialGradient id="mz-iris" cx="45%" cy="65%" r="70%"><stop offset="0" stop-color="#7A3F5E"/><stop offset=".6" stop-color="#2E1624"/><stop offset="1" stop-color="#140910"/></radialGradient>' +
-      '</defs>' +
-      '<rect class="mascot__leg" x="40" y="98" width="15" height="22" rx="6"/>' +
-      '<rect class="mascot__leg" x="65" y="98" width="15" height="22" rx="6"/>' +
+      '<path class="mz-tail-line" d="M82 114Q103 117 106 97"/>' +
+      '<path class="mz-tail" d="M82 114Q103 117 106 97"/>' +
+      '<ellipse class="mz-pink mz-out" cx="60" cy="100" rx="29" ry="21"/>' +
+      '<ellipse class="mz-white" cx="60" cy="104" rx="14" ry="11"/>' +
+      '<ellipse class="mz-pink mz-out" cx="48" cy="120" rx="9" ry="6"/><ellipse class="mz-pink mz-out" cx="72" cy="120" rx="9" ry="6"/>' +
+      '<g class="mascot__arm--l"><ellipse class="mz-pink mz-out" cx="32" cy="98" rx="6" ry="9" transform="rotate(30 32 98)"/></g>' +
+      '<g class="mascot__arm--wave"><ellipse class="mz-pink mz-out" cx="88" cy="98" rx="6" ry="9" transform="rotate(-30 88 98)"/></g>' +
       '<g class="mascot__head">' +
-        '<path class="mascot__ear" d="M22 44C18 26 22 12 30 9c6-2 13 9 18 19Z"/>' +
-        '<path class="mascot__ear" d="M72 28c5-10 12-21 18-19 8 3 12 17 8 35Z"/>' +
-        '<path class="mascot__ear-in" d="M28 36c-2-11 1-19 4-21 3-1 8 5 11 11Z"/>' +
-        '<path class="mascot__ear-in" d="M77 26c3-6 8-12 11-11 3 2 6 10 4 21Z"/>' +
-        '<path class="mascot__fur" d="' + fluff(60, 66, 45, 41, 26, 5) + '"/>' +
-        '<ellipse class="mascot__mask" cx="60" cy="61" rx="33" ry="24"/>' +
-        '<path class="mascot__star" d="M106 4c.6 4.4 3.2 7.1 8 8-4.8.9-7.4 3.6-8 8-.6-4.4-3.2-7.1-8-8 4.8-.9 7.4-3.6 8-8Z"/>' +
-        '<g class="mascot__eyes">' +
-          '<ellipse class="mascot__eye-ring" cx="44.5" cy="58" rx="12.5" ry="13.5"/><ellipse class="mascot__eye-ring" cx="75.5" cy="58" rx="12.5" ry="13.5"/>' +
-          '<circle class="mascot__eye" cx="46.5" cy="60" r="8.8"/><circle class="mascot__eye" cx="73.5" cy="60" r="8.8"/>' +
-          '<circle class="mascot__shine" cx="49.5" cy="56" r="3.1"/><circle class="mascot__shine" cx="76.5" cy="56" r="3.1"/>' +
-          '<circle class="mascot__shine" cx="43.5" cy="64" r="1.4"/><circle class="mascot__shine" cx="70.5" cy="64" r="1.4"/>' +
-        '</g>' +
-        '<path class="mascot__nose" d="M58 68.5h4c-.6 1.8-1.3 2.5-2 2.6-.7-.1-1.4-.8-2-2.6Z"/>' +
-        '<path class="mascot__mouth" d="M53.5 73.5Q60 74.6 66.5 73.5 65 83 60 83t-6.5-9.5Z"/>' +
-        '<ellipse class="mascot__tongue" cx="60.5" cy="80.6" rx="3.6" ry="2.2"/>' +
-        '<path class="mascot__fang" d="M55.6 73.9l1.5 3.2 1.4-3.1Z"/>' +
+        '<path class="mz-pink mz-out" d="M21 42Q18 15 33 12q10 1 19 14Z"/><path class="mz-pink mz-out" d="M99 42q3-27-12-30-10 1-19 14Z"/>' +
+        '<path class="mz-yellow" d="M27 35q-1-14 7-16 6 1 11 8Z"/><path class="mz-yellow" d="M93 35q1-14-7-16-6 1-11 8Z"/>' +
+        '<ellipse class="mz-pink mz-out" cx="60" cy="56" rx="44" ry="37"/>' +
+        '<path class="mz-line" d="M55 20q3-8 9-4"/>' +
+        '<path class="mz-yellow mz-out mz-thin" d="M13 1c.6 4.4 3.2 7.1 8 8-4.8.9-7.4 3.6-8 8-.6-4.4-3.2-7.1-8-8 4.8-.9 7.4-3.6 8-8Z"/>' +
+        '<ellipse class="mz-blush" cx="31" cy="70" rx="6.5" ry="3.6"/><ellipse class="mz-blush" cx="89" cy="70" rx="6.5" ry="3.6"/>' +
+        faces +
       '</g>' +
-      '<g class="mascot__arm--l"><ellipse class="mascot__arm" cx="11" cy="82" rx="6.5" ry="10.5" transform="rotate(28 11 82)"/></g>' +
-      '<g class="mascot__arm--wave"><ellipse class="mascot__arm" cx="109" cy="82" rx="6.5" ry="10.5" transform="rotate(-28 109 82)"/></g>' +
     '</svg>';
 
 
@@ -97,21 +116,26 @@
   var text = root.querySelector('.mascot__text');
   var catButton = root.querySelector('.mascot__button');
   var tipIndex = Math.floor(Math.random() * TIPS.length);
-  var hideTimer = null;
+  var hideTimer = null, moodTimer = null;
 
-  function say(message, stay) {
+  // cambia la cara de Mizu (ver FACES)
+  function mood(m) { root.dataset.mood = m; }
+  mood('idle');
+
+  function say(message, stay, face) {
+    mood(face || 'idle');
     text.textContent = message;
     bubble.hidden = false;
     root.classList.remove('is-talking');
     void root.offsetWidth; // reinicia la animación del globo
     root.classList.add('is-talking');
     clearTimeout(hideTimer);
-    if (!stay) hideTimer = setTimeout(function () { bubble.hidden = true; root.classList.remove('is-talking'); }, BUBBLE_TIME);
+    if (!stay) hideTimer = setTimeout(function () { bubble.hidden = true; root.classList.remove('is-talking'); mood('idle'); }, BUBBLE_TIME);
   }
 
   function nextTip() {
     tipIndex = (tipIndex + 1) % TIPS.length;
-    say(TIPS[tipIndex]);
+    say(TIPS[tipIndex], false, 'think');
   }
 
   var greeted = false;
@@ -120,10 +144,10 @@
 
   // Al tocarla: la primera vez saluda; después comenta la sección que se está mirando o tira un tip
   function talk() {
-    if (!greeted) { greeted = true; say(GREETING); return; }
+    if (!greeted) { greeted = true; say(GREETING, false, 'love'); return; }
     if (currentSection && SECTION_TIPS[currentSection] && !spoken[currentSection]) {
       spoken[currentSection] = true;
-      say(SECTION_TIPS[currentSection]);
+      say(SECTION_TIPS[currentSection], false, 'gossip');
       return;
     }
     nextTip();
@@ -137,11 +161,17 @@
     }
     talk();
   });
+  // al pasar el mouse se sorprende (si no está hablando)
+  catButton.addEventListener('mouseenter', function () { if (!root.classList.contains('is-talking')) mood('wow'); });
+  catButton.addEventListener('mouseleave', function () { if (!root.classList.contains('is-talking')) mood('idle'); });
   root.querySelector('.mascot__more').addEventListener('click', function () { nextTip(); });
   root.querySelector('.mascot__close').addEventListener('click', function () {
     hidden = true;
     bubble.hidden = true;
     root.classList.add('is-hidden');
+    clearTimeout(moodTimer);
+    mood('shy'); // se pone tímido al esconderse
+    moodTimer = setTimeout(function () { mood('idle'); }, 1800);
     try { localStorage.setItem(STORAGE_KEY, '1'); } catch (e) {}
     catButton.focus();
   });
