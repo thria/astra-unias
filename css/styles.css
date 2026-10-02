@@ -645,7 +645,8 @@ html.no-intro .intro { display: none !important; }
   .hero__wordmark { animation: hero-logo-in 0.9s var(--t0) cubic-bezier(0.33, 0, 0.2, 1) backwards; /* empalma con el logo de la cinemática */ }
   /* cada palabra sube desde abajo, una detrás de otra */
   /* cada palabra sube desde atrás de una línea invisible (máscara), nítida, una detrás de otra */
-  .hero__word > span { display: inline-block; animation: hero-rise 0.95s calc(var(--t0) + 0.6s + var(--i) * 0.14s) cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+  /* curva de salida cúbica: frena suave pero llega y se detiene de una (sin arrastre final de milímetros) */
+  .hero__word > span { display: inline-block; animation: hero-rise 0.75s calc(var(--t0) + 0.6s + var(--i) * 0.13s) cubic-bezier(0.33, 1, 0.68, 1) backwards; }
   /* una sola pasada de brillo de gel por el botón Pedir turno, al final de la entrada */
   .hero__actions .button--light { position: relative; overflow: hidden; }
   .hero__actions .button--light::after {
@@ -2488,12 +2489,3 @@ button.almanac__day.is-selected:hover { background: var(--color-ink); color: var
 .reveal-on .carousel.reveal.is-visible .carousel__track > * { opacity: 1; translate: none; clip-path: inset(-3rem); } /* margen negativo: no recorta la sombra ni el zoom del hover */
 .reveal-on .carousel.reveal .gallery__item img { scale: 1.1; transition: scale 1.5s cubic-bezier(0.22, 1, 0.36, 1) var(--enter-delay, 0s); }
 .reveal-on .carousel.reveal.is-visible .gallery__item img { scale: 1; }
-
-/* Pie: logo gigante de Astra que ocupa todo el ancho y se descubre de abajo hacia arriba */
-.footer-wordmark { display: block; width: 100%; margin-top: 2.5rem; color: var(--color-footer-accent); text-decoration: none; transition: color 0.4s ease; }
-.footer-wordmark:hover { color: var(--color-footer-fg); }
-.footer-wordmark .logo-mark { width: 100%; }
-@media (prefers-reduced-motion: no-preference) {
-  .footer-wordmark .logo-mark { clip-path: inset(100% 0 -10% 0); translate: 0 12%; transition: clip-path 1.4s cubic-bezier(0.65, 0, 0.2, 1), translate 1.6s cubic-bezier(0.22, 1, 0.36, 1); }
-  .footer-wordmark.is-visible .logo-mark { clip-path: inset(-10% 0 -10% 0); translate: 0 0; }
-}
