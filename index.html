@@ -30,13 +30,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Pinyon+Script&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=65">
+  <link rel="stylesheet" href="css/styles.css?v=66">
   <script src="js/theme.js?v=6" defer></script>
   <script src="js/map.js?v=3" defer></script>
   <script src="js/carousel.js?v=2" defer></script>
   <script src="js/agenda.js?v=5" defer></script>
   <script src="js/nails3d.js?v=18" defer></script>
-  <script src="js/effects.js?v=7" defer></script>
+  <script src="js/effects.js?v=8" defer></script>
   <script src="js/mascot.js?v=5" defer></script>
 
   <script type="application/ld+json">
@@ -364,27 +364,74 @@
         <div class="section__head">
           <h2 id="opiniones-titulo">Opiniones de clientas</h2>
         </div>
-        <!-- REEMPLAZAR: opiniones provisionales. Copiá las reales (texto + nombre o inicial) -->
-        <ul class="reviews" role="list">
-          <li>
-            <figure class="review">
-              <blockquote><p>Le mostré una foto de Pinterest y me las hizo todavía más lindas. Me duraron impecables hasta el siguiente turno.</p></blockquote>
-              <figcaption>Nombre de la clienta</figcaption>
-            </figure>
-          </li>
-          <li>
-            <figure class="review">
-              <blockquote><p>Tenía las uñas muy débiles y con el capping por fin me crecieron. Rena te explica todo y es súper detallista.</p></blockquote>
-              <figcaption>Nombre de la clienta</figcaption>
-            </figure>
-          </li>
-          <li>
-            <figure class="review">
-              <blockquote><p>Los gatitos en 3D son una locura, todo el mundo me pregunta dónde me las hice.</p></blockquote>
-              <figcaption>Nombre de la clienta</figcaption>
-            </figure>
-          </li>
-        </ul>
+        <!-- REEMPLAZAR: opiniones provisionales. Copiá las reales: texto, nombre (o inicial), servicio y estrellas.
+             Carrusel tipo historias de Instagram (js/effects.js): barra de progreso arriba, pasa sola y se desliza con el dedo. -->
+        <div class="stories" data-stories>
+          <div class="stories__progress" aria-hidden="true"></div>
+          <ul class="stories__track" role="list" tabindex="0" aria-label="Opiniones de clientas, deslizá para ver más">
+            <li class="story">
+              <figure class="review">
+                <span class="review__mark" aria-hidden="true">“</span>
+                <blockquote><p>Le mostré una foto de Pinterest y me las hizo todavía más lindas. Me duraron impecables hasta el siguiente turno.</p></blockquote>
+                <figcaption class="review__meta">
+                  <span class="review__avatar" aria-hidden="true">N</span>
+                  <span class="review__who"><strong>Nombre de la clienta</strong><span>Soft gel</span></span>
+                  <span class="review__stars" role="img" aria-label="5 de 5 estrellas"><i></i><i></i><i></i><i></i><i></i></span>
+                </figcaption>
+              </figure>
+            </li>
+            <li class="story">
+              <figure class="review">
+                <span class="review__mark" aria-hidden="true">“</span>
+                <blockquote><p>Tenía las uñas muy débiles y con el capping por fin me crecieron. Rena te explica todo y es súper detallista.</p></blockquote>
+                <figcaption class="review__meta">
+                  <span class="review__avatar" aria-hidden="true">N</span>
+                  <span class="review__who"><strong>Nombre de la clienta</strong><span>Capping</span></span>
+                  <span class="review__stars" role="img" aria-label="5 de 5 estrellas"><i></i><i></i><i></i><i></i><i></i></span>
+                </figcaption>
+              </figure>
+            </li>
+            <li class="story">
+              <figure class="review">
+                <span class="review__mark" aria-hidden="true">“</span>
+                <blockquote><p>Los gatitos en 3D son una locura, todo el mundo me pregunta dónde me las hice.</p></blockquote>
+                <figcaption class="review__meta">
+                  <span class="review__avatar" aria-hidden="true">N</span>
+                  <span class="review__who"><strong>Nombre de la clienta</strong><span>Diseño 3D</span></span>
+                  <span class="review__stars" role="img" aria-label="5 de 5 estrellas"><i></i><i></i><i></i><i></i><i></i></span>
+                </figcaption>
+              </figure>
+            </li>
+            <li class="story">
+              <figure class="review">
+                <span class="review__mark" aria-hidden="true">“</span>
+                <blockquote><p>El semipermanente me duró casi un mes sin un saltado. Ya tengo mi turno fijo.</p></blockquote>
+                <figcaption class="review__meta">
+                  <span class="review__avatar" aria-hidden="true">N</span>
+                  <span class="review__who"><strong>Nombre de la clienta</strong><span>Semipermanente</span></span>
+                  <span class="review__stars" role="img" aria-label="5 de 5 estrellas"><i></i><i></i><i></i><i></i><i></i></span>
+                </figcaption>
+              </figure>
+            </li>
+            <li class="story">
+              <figure class="review">
+                <span class="review__mark" aria-hidden="true">“</span>
+                <blockquote><p>Me hizo un set de press on para mi casamiento y quedaron perfectas en las fotos.</p></blockquote>
+                <figcaption class="review__meta">
+                  <span class="review__avatar" aria-hidden="true">N</span>
+                  <span class="review__who"><strong>Nombre de la clienta</strong><span>Press on</span></span>
+                  <span class="review__stars" role="img" aria-label="5 de 5 estrellas"><i></i><i></i><i></i><i></i><i></i></span>
+                </figcaption>
+              </figure>
+            </li>
+          </ul>
+          <button class="stories__btn stories__btn--prev" type="button" aria-label="Opinión anterior">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+          </button>
+          <button class="stories__btn stories__btn--next" type="button" aria-label="Opinión siguiente">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
       </div>
     </section>
 

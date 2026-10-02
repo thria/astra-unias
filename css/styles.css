@@ -1232,19 +1232,154 @@ html.no-intro .intro { display: none !important; }
 .about__links svg { width: 1.3rem; height: 1.3rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .about__links .about__dot { fill: currentColor; stroke: none; }
 
-/* Opiniones */
-.reviews { display: grid; gap: var(--space-m); }
+/* Opiniones: carrusel tipo historias de Instagram (js/effects.js).
+   Tarjetas alargadas que se deslizan con el dedo (o con flechas en compu), barra de progreso arriba
+   que avanza sola, la tarjeta crece un poquito al pasar el mouse y las estrellas titilan suave. */
+.stories { position: relative; --story-w: min(18.75rem, 80vw); --story-gap: var(--space-s); }
+
+.stories__progress { display: flex; gap: 0.3rem; margin-bottom: var(--space-s); }
+.stories__progress span {
+  flex: 1;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-ink) 16%, transparent);
+}
+.stories__progress span::after {
+  content: "";
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--pill-gradient);
+  transform: scaleX(var(--fill, 0));
+  transform-origin: left;
+}
+.stories__progress span.is-done { --fill: 1; }
+.stories__progress span.is-active::after { animation: story-fill var(--story-time, 6s) linear forwards; }
+.stories.is-paused .stories__progress span.is-active::after { animation-play-state: paused; }
+@keyframes story-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+.stories__track {
+  display: flex;
+  gap: var(--story-gap);
+  margin: 0;
+  padding: 0.75rem 0 1rem;
+  list-style: none;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, #000 88%, transparent);
+}
+.stories__track::-webkit-scrollbar { display: none; }
+.stories__track:focus-visible { outline: 2px solid var(--color-rose); outline-offset: 4px; border-radius: 1.25rem; }
+.story { flex: 0 0 var(--story-w); scroll-snap-align: start; }
+.story:last-child { margin-right: 3rem; }
 
 .review {
-  margin: 0;
-  display: grid;
+  position: relative;
+  display: flex;
+  flex-direction: column;
   gap: var(--space-s);
-  padding: var(--space-m);
-  background: var(--color-bg);
-  border-radius: var(--radius);
+  height: 100%;
+  min-height: 21rem;
+  margin: 0;
+  padding: 1.5rem 1.35rem 1.25rem;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  border-radius: 1.25rem;
+  background:
+    radial-gradient(120% 70% at 100% 0%, rgb(242 155 187 / 0.28), transparent 60%),
+    linear-gradient(170deg, color-mix(in srgb, var(--color-bg) 82%, #F29BBB), var(--color-bg));
+  box-shadow: inset 0 1px 0 var(--glass-highlight), 0 14px 30px -20px rgb(59 35 48 / 0.6);
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s ease;
 }
-.review blockquote { margin: 0; font-family: var(--font-display); font-size: var(--step-1); line-height: 1.45; }
-.review figcaption { color: var(--color-ink-soft); font-size: var(--step--1); }
+.story.is-active .review { border-color: color-mix(in srgb, var(--color-rose) 45%, var(--glass-border)); }
+@media (hover: hover) and (pointer: fine) {
+  .review:hover { transform: scale(1.035); box-shadow: inset 0 1px 0 var(--glass-highlight), 0 22px 40px -20px rgb(176 63 102 / 0.55); }
+}
+.review__mark {
+  font-family: var(--font-display);
+  font-size: 4.5rem;
+  line-height: 0.6;
+  height: 2rem;
+  color: var(--color-rose);
+  opacity: 0.55;
+}
+.review blockquote { flex: 1; margin: 0; font-family: var(--font-display); font-size: var(--step-1); line-height: 1.45; }
+.review__meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.35rem 0.7rem;
+  padding-top: var(--space-s);
+  border-top: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
+}
+.review__avatar {
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 50%;
+  background: var(--pill-gradient);
+  color: var(--pill-fg);
+  font-family: var(--font-display);
+  box-shadow: 0 0 0 0.18rem var(--pill-ring);
+}
+.review__who { display: grid; line-height: 1.25; }
+.review__who strong { font-size: var(--step--1); }
+.review__who span { color: var(--color-rose); font-size: var(--step--1); font-weight: 600; }
+.review__stars { display: flex; gap: 0.15rem; }
+.review__stars i {
+  width: 0.95rem;
+  height: 0.95rem;
+  background: #F2B33D;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .review__stars i { animation: star-twinkle 3.6s ease-in-out infinite; }
+  .review__stars i:nth-child(2) { animation-delay: 0.3s; }
+  .review__stars i:nth-child(3) { animation-delay: 0.6s; }
+  .review__stars i:nth-child(4) { animation-delay: 0.9s; }
+  .review__stars i:nth-child(5) { animation-delay: 1.2s; }
+}
+@keyframes star-twinkle {
+  0%, 70%, 100% { opacity: 1; transform: scale(1); }
+  80% { opacity: 0.55; transform: scale(0.82); }
+  90% { opacity: 1; transform: scale(1.12); }
+}
+
+.stories__btn {
+  position: absolute;
+  top: -3.6rem; /* arriba a la derecha, al lado del título: no tapan las tarjetas */
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid var(--glass-border);
+  border-radius: 50%;
+  background: var(--color-header-glass);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: var(--color-ink);
+  cursor: pointer;
+  box-shadow: 0 6px 16px -8px rgb(0 0 0 / 0.4);
+  transition: background-color 0.2s ease, color 0.2s ease, scale 0.2s ease;
+}
+.stories__btn:hover { background: var(--color-rose); color: var(--color-on-rose); scale: 1.06; }
+.stories__btn:focus-visible { outline: 2px solid var(--color-rose); outline-offset: 3px; }
+.stories__btn svg { width: 1.2rem; height: 1.2rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.stories__btn--prev { right: 3.4rem; }
+.stories__btn--next { right: 0; }
+@media (hover: none) {
+  .stories__btn { display: none; }
+}
 
 /* Agenda de turnos
    ------------------------------------------------------------------------ */
@@ -1723,32 +1858,6 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
 }
 .reveal-on .carousel.reveal.is-visible .carousel__track > * { opacity: 1; translate: 0 0; }
 
-/* Opiniones en franja continua */
-.reviews-marquee {
-  overflow: hidden;
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
-}
-.reviews.reviews--marquee {
-  display: flex;
-  gap: 0;
-  width: max-content;
-  animation: reviews-scroll 42s linear infinite;
-  will-change: transform;
-  backface-visibility: hidden; /* evita que en iPhone se borre la franja a mitad del recorrido */
-}
-.reviews--marquee > li { flex: 0 0 min(21rem, 78vw); padding-right: var(--space-m); }
-.reviews--marquee > li > .review { height: 100%; }
-/* Pausa al pasar el mouse (solo en compu: en el celular un toque la dejaba frenada) */
-@media (hover: hover) and (pointer: fine) {
-  .reviews-marquee:hover .reviews--marquee { animation-play-state: paused; }
-}
-.reviews-marquee:focus-within .reviews--marquee { animation-play-state: paused; }
-@keyframes reviews-scroll {
-  from { transform: translate3d(0, 0, 0); }
-  to { transform: translate3d(-50%, 0, 0); }
-}
-
 /* ≥ 480px
    ------------------------------------------------------------------------ */
 @media (min-width: 30em) {
@@ -1783,8 +1892,6 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
   .about { grid-template-columns: repeat(12, minmax(0, 1fr)); align-items: center; }
   .about__photo { grid-column: 1 / 8; grid-row: 1; aspect-ratio: 4 / 5; }
   .about__copy { grid-column: 7 / 13; grid-row: 1; margin: 0; padding: var(--space-l); }
-
-  .reviews { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
   .steps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 

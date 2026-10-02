@@ -61,21 +61,73 @@
     });
   }
 
-  // ---- 3. Opiniones que pasan solas ----
-  var list = document.querySelector('.reviews');
-  if (list && list.children.length > 1) {
-    var originals = Array.prototype.slice.call(list.children);
-    originals.forEach(function (item) {
-      var copy = item.cloneNode(true);
-      copy.setAttribute('aria-hidden', 'true'); // la copia es solo visual para que la franja no se corte
-      list.appendChild(copy);
+  // ---- 3. Opiniones tipo historias de Instagram ----
+  // Barra de progreso arriba (un segmento por opinión) que avanza sola y pasa a la siguiente tarjeta.
+  // Se pausa al pasar el mouse, al tocar o al usar el teclado; si la persona desliza, la barra la sigue.
+  var stories = document.querySelector('[data-stories]');
+  if (stories) {
+    var track = stories.querySelector('.stories__track');
+    var cards = Array.prototype.slice.call(track.children);
+    var bar = stories.querySelector('.stories__progress');
+    var segs = cards.map(function () { var s = document.createElement('span'); bar.appendChild(s); return s; });
+    var autoplay = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var current = -1, programmatic = 0, onScreen = false, holds = 0;
+
+    var show = function (i, scroll) {
+      current = (i + cards.length) % cards.length;
+      segs.forEach(function (s, k) {
+        s.classList.remove('is-active');
+        s.classList.toggle('is-done', k < current);
+      });
+      void bar.offsetWidth; // reinicia la animación del segmento activo
+      segs[current].classList.add('is-active');
+      cards.forEach(function (c, k) { c.classList.toggle('is-active', k === current); });
+      if (scroll) {
+        programmatic = Date.now();
+        track.scrollTo({ left: cards[current].offsetLeft - cards[0].offsetLeft, behavior: autoplay ? 'smooth' : 'auto' });
+      }
+    };
+    var paused = function () { return !autoplay || !onScreen || holds > 0 || document.hidden; };
+    var sync = function () { stories.classList.toggle('is-paused', paused()); };
+
+    // al terminar de llenarse el segmento, pasa a la siguiente (y al final vuelve a la primera)
+    bar.addEventListener('animationend', function () { show(current + 1, true); });
+
+    stories.querySelector('.stories__btn--prev').addEventListener('click', function () { show(current - 1, true); });
+    stories.querySelector('.stories__btn--next').addEventListener('click', function () { show(current + 1, true); });
+
+    // si la persona desliza, la barra sigue a la tarjeta que quedó al principio
+    var scrollTimer;
+    track.addEventListener('scroll', function () {
+      if (Date.now() - programmatic < 900) return;
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(function () {
+        var x = track.scrollLeft + cards[0].offsetLeft, best = 0;
+        cards.forEach(function (c, k) { if (Math.abs(c.offsetLeft - x) < Math.abs(cards[best].offsetLeft - x)) best = k; });
+        if (track.scrollLeft + track.clientWidth >= track.scrollWidth - 4 && best < current) return; // al final del todo
+        if (best !== current) show(best, false);
+      }, 120);
+    }, { passive: true });
+
+    var hold = function (on) { holds = Math.max(0, holds + (on ? 1 : -1)); sync(); };
+    stories.addEventListener('mouseenter', function () { hold(true); });
+    stories.addEventListener('mouseleave', function () { hold(false); });
+    stories.addEventListener('focusin', function () { hold(true); });
+    stories.addEventListener('focusout', function () { hold(false); });
+    track.addEventListener('touchstart', function () { hold(true); }, { passive: true });
+    track.addEventListener('touchend', function () { setTimeout(function () { hold(false); }, 1500); }, { passive: true });
+    document.addEventListener('visibilitychange', sync);
+    track.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); show(current + (e.key === 'ArrowRight' ? 1 : -1), true); }
     });
-    var wrap = document.createElement('div');
-    wrap.className = 'reviews-marquee';
-    list.parentNode.insertBefore(wrap, list);
-    wrap.appendChild(list);
-    list.classList.add('reviews--marquee');
-    // velocidad pareja y tranquila sin importar cuántas opiniones haya: ~14 s por opinión
-    list.style.animationDuration = (originals.length * 14) + 's';
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) { onScreen = entries[0].isIntersecting; sync(); }, { threshold: 0.35 }).observe(stories);
+    } else {
+      onScreen = true;
+    }
+    if (!autoplay) segs.forEach(function (s) { s.style.setProperty('--story-time', '0s'); });
+    show(0, false);
+    sync();
   }
 })();
