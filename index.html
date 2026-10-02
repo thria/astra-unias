@@ -31,11 +31,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Pinyon+Script&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=33">
+  <link rel="stylesheet" href="css/styles.css?v=35">
   <script src="js/theme.js?v=3" defer></script>
   <script src="js/map.js?v=2" defer></script>
   <script src="js/carousel.js?v=1" defer></script>
   <script src="js/agenda.js?v=2" defer></script>
+  <script src="js/nails3d.js?v=4" defer></script>
+  <script src="js/effects.js?v=1" defer></script>
 
   <script type="application/ld+json">
   {
@@ -253,24 +255,33 @@
           <p>Todos se pueden combinar con diseño: cromados, strass, dibujos a mano y apliques en 3D.</p>
           <p class="services__price">Los precios están en el catálogo. <a href="https://ig.me/m/astra.unias" target="_blank" rel="noopener">Pedímelo por mensaje</a>.</p>
         </div>
+        <div class="services__models">
+        <!-- Cada tarjeta tiene un modelo 3D (js/nails3d.js) que se puede girar y acercar.
+             data-model elige el modelo: semi, capping, softgel, presson. -->
         <ul class="service-list" role="list">
-          <li>
+          <li class="service-card">
+            <div class="service-card__model" data-model="semi" role="img" aria-label="Modelo 3D de una uña corta con esmalte semipermanente rosa brillante"></div>
             <h3>Semipermanente</h3>
             <p>Esmalte en gel sobre tu uña natural. Brillo intenso que dura semanas sin descascararse.</p>
           </li>
-          <li>
+          <li class="service-card">
+            <div class="service-card__model" data-model="capping" role="img" aria-label="Modelo 3D de una uña natural cubierta por una capa de gel transparente"></div>
             <h3>Capping</h3>
             <p>Una capa de gel que protege la uña natural y la ayuda a crecer más fuerte.</p>
           </li>
-          <li>
+          <li class="service-card">
+            <div class="service-card__model" data-model="softgel" role="img" aria-label="Modelo 3D de una uña almendra larga de soft gel, de nude a rosa"></div>
             <h3>Soft gel</h3>
             <p>Extensiones con tips de gel suave. Elegís el largo y la forma: almendra, cuadrada, stiletto.</p>
           </li>
-          <li>
+          <li class="service-card">
+            <div class="service-card__model" data-model="presson" role="img" aria-label="Modelo 3D de un set de cinco uñas press on en abanico"></div>
             <h3>Press on</h3>
             <p>Sets hechos a la medida de tus uñas para poner y sacar en casa cuando quieras.</p>
           </li>
         </ul>
+        <p class="service-hint">Girá las uñas arrastrando con el mouse o con dos dedos en el celular. Para acercar: Ctrl + rueda del mouse, o pellizcando la pantalla.</p>
+        </div>
       </div>
     </section>
 
