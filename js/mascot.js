@@ -1,4 +1,4 @@
-// Mizu: el gatito de Astra (personaje propio: una mancha negra con forma de gato y ojos que lo dicen todo) que aparece abajo a la derecha
+// Mizu: el gatito de Astra (personaje propio dibujado a mano, estilo garabato de tinta, con caras de manga) que aparece abajo a la derecha
 // con un globo de diálogo, al estilo de Clippy. Solo habla cuando la tocan: nunca habla sola.
 // - Tocarla: la primera vez saluda; después comenta la sección que se está mirando o tira un tip.
 // - "Ocultar": la achica (se recuerda en este navegador).
@@ -36,60 +36,79 @@
   var hidden = false;
   try { hidden = localStorage.getItem(STORAGE_KEY) === '1'; } catch (e) {}
 
-  // Mizu: una mancha negra con forma de gato (caricatura simple, plana). Todo lo expresan los ojos,
-  // con símbolos estilo manga japonés alrededor (!!, ♡, ?, ♪, gotita, Zz) en rosa.
-  // Caras (data-mood en .mascot): idle · wow · shy · gossip · love · think · sleep
-  var HEART = function (x, y, s) { // corazón centrado en (x, y), de tamaño s
-    return 'M' + x + ' ' + (y + s * 0.55) + 'C' + (x - s * 1.1) + ' ' + (y - s * 0.1) + ' ' + (x - s * 0.55) + ' ' + (y - s * 0.95) + ' ' + x + ' ' + (y - s * 0.35) +
-      'C' + (x + s * 0.55) + ' ' + (y - s * 0.95) + ' ' + (x + s * 1.1) + ' ' + (y - s * 0.1) + ' ' + x + ' ' + (y + s * 0.55) + 'Z';
+  // Mizu: gatito dibujado a mano (estilo garabato de tinta): cabeza blanca con trazo negro grueso e
+  // irregular (filtro SVG que "tiembla" el borde, como pincel), caras y símbolos de manga.
+  // Cada ánimo es un dibujo completo (cambian también las orejas y la postura de la cabeza):
+  //   idle · wow (mouse encima) · love (saludo, ojos brillantes) · gossip (ojos afilados + chispa)
+  //   grumpy (si lo tocan muchas veces seguidas, con venita 💢) · shy (al ocultarse, ojos llorosos)
+  //   think (tips: espía desde abajo con dientes) · sleep (acostado con la lengua afuera, zzz)
+  var HEAD = 'M22 84C18 58 36 45 60 45s42 13 38 39c-2 16-16 24-38 24S24 100 22 84Z';
+  var EARS = '<path class="mzi-fill" d="M27 62 31 18q4-4 8 0l17 29Z"/><path class="mzi-fill" d="M93 62 89 18q-4-4-8 0L64 47Z"/>' +
+    '<path class="mzi-line mzi-thin" d="M35 28l5 13M85 28l-5 13"/>';
+  var head = function (inner, ears) { return (ears === undefined ? EARS : ears) + '<path class="mzi-fill" d="' + HEAD + '"/>' + inner; };
+  var STAR = function (x, y, r) { // destello de 4 puntas
+    return '<path class="mzi-ink mzi-out" d="M' + x + ' ' + (y - r) + 'Q' + x + ' ' + y + ' ' + (x + r) + ' ' + y + 'Q' + x + ' ' + y + ' ' + x + ' ' + (y + r) +
+      'Q' + x + ' ' + y + ' ' + (x - r) + ' ' + y + 'Q' + x + ' ' + y + ' ' + x + ' ' + (y - r) + 'Z"/>';
   };
-  var SPARK = function (x, y, r) { // destellito de 4 puntas
-    return 'M' + x + ' ' + (y - r) + 'Q' + x + ' ' + y + ' ' + (x + r) + ' ' + y + 'Q' + x + ' ' + y + ' ' + x + ' ' + (y + r) + 'Q' + x + ' ' + y + ' ' + (x - r) + ' ' + y + 'Q' + x + ' ' + y + ' ' + x + ' ' + (y - r) + 'Z';
+  var BURST = function (x, y, r) { // estallido de 8 puntas
+    var d = '';
+    for (var i = 0; i < 16; i++) {
+      var a = i / 16 * Math.PI * 2, rr = i % 2 ? r * 0.38 : r;
+      d += (i ? 'L' : 'M') + (x + Math.cos(a) * rr).toFixed(1) + ' ' + (y + Math.sin(a) * rr).toFixed(1);
+    }
+    return '<path class="mzi-ink mzi-out" d="' + d + 'Z"/>';
   };
-  // ojos: blanco + pupila (dx, dy corren la mirada) + brillito
-  var EYES = function (o) {
-    o = o || {};
-    var rx = o.rx || 12, ry = o.ry || 13, pr = o.pr || 6.5, dx = o.dx || 0, dy = o.dy || 0, s = '';
-    [45, 75].forEach(function (cx, i) {
-      var px = cx + (i ? -2 : 2) + dx, py = 73 + dy;
-      s += '<ellipse class="mzc-white" cx="' + cx + '" cy="72" rx="' + rx + '" ry="' + ry + '"/>' +
-        '<ellipse class="mzc-ink" cx="' + px + '" cy="' + py + '" rx="' + pr + '" ry="' + (pr * 1.12) + '"/>' +
-        '<circle class="mzc-white" cx="' + (px + pr * 0.35) + '" cy="' + (py - pr * 0.45) + '" r="' + (pr * 0.3) + '"/>';
-    });
-    return s;
-  };
+  var MOUTH = '<path class="mzi-line mzi-thin" d="M55 88q2.5 3 5 0 2.5 3 5 0"/>';
   var FACES = {
-    idle: '<g class="mascot__eyes">' + EYES() + '</g>',
-    wow: EYES({ rx: 13.5, ry: 14.5, pr: 3.4 }) +
-      '<path class="mzc-mark" d="M101 12v11M110 9v11"/><circle class="mzc-dot" cx="101" cy="29" r="2"/><circle class="mzc-dot" cx="110" cy="26" r="2"/>',
-    shy: EYES({ pr: 5.2, dx: -3, dy: 5 }) +
-      '<ellipse class="mzc-blush" cx="36" cy="88" rx="6" ry="3.2"/><ellipse class="mzc-blush" cx="84" cy="88" rx="6" ry="3.2"/>' +
-      '<path class="mzc-blush-line" d="M33 86.5l-1.5 3M37 86.5l-1.5 3M81 86.5l1.5 3M85 86.5l1.5 3"/>' +
-      '<path class="mzc-drop" d="M106 14c-3.5 6-5 8.5-5 11a5 5 0 0 0 10 0c0-2.5-1.5-5-5-11Z"/>',
-    gossip: EYES({ pr: 5.6, dx: 5, dy: 3 }) +
-      '<path class="mzc-lid" d="M31 72.5Q45 70 59 72.5V56H31ZM61 72.5Q75 70 89 72.5V56H61Z"/>' +
-      '<path class="mzc-mark" d="M103 28V12l8-2v14"/><circle class="mzc-dot" cx="100.5" cy="28.5" r="3"/><circle class="mzc-dot" cx="108.5" cy="24.5" r="3"/>',
-    love: '<ellipse class="mzc-white" cx="45" cy="72" rx="12" ry="13"/><ellipse class="mzc-white" cx="75" cy="72" rx="12" ry="13"/>' +
-      '<path class="mzc-heart" d="' + HEART(46, 73, 10) + '"/><path class="mzc-heart" d="' + HEART(74, 73, 10) + '"/>' +
-      '<path class="mzc-heart" d="' + HEART(106, 18, 7) + '"/><path class="mzc-dot" d="' + SPARK(96, 8, 4.5) + '"/>',
-    think: EYES({ pr: 5.8, dx: -3, dy: -5 }) +
-      '<path class="mzc-mark" d="M101 13q0-6 6-6t6 5q0 4-6 6v3"/><circle class="mzc-dot" cx="107" cy="27" r="2"/>' +
-      '<circle class="mzc-dot" cx="94" cy="34" r="1.6"/><circle class="mzc-dot" cx="99" cy="36" r="1.6"/>',
-    sleep: '<path class="mzc-shut" d="M36 72q9 8 18 0M66 72q9 8 18 0"/>' +
-      '<path class="mzc-mark mzc-thin" d="M99 20h7l-7 8h7M108 8h5l-5 6h5"/>'
+    idle: head('<g class="mascot__eyes"><ellipse class="mzi-ink" cx="47" cy="76" rx="5" ry="6.5"/><ellipse class="mzi-ink" cx="73" cy="76" rx="5" ry="6.5"/>' +
+      '<circle class="mzi-white" cx="48.6" cy="73.6" r="1.8"/><circle class="mzi-white" cx="74.6" cy="73.6" r="1.8"/></g>' + MOUTH),
+    wow: head('<circle class="mzi-fill" cx="46" cy="75" r="9.5"/><circle class="mzi-fill" cx="74" cy="75" r="9.5"/>' +
+      '<circle class="mzi-ink" cx="46" cy="75" r="3.4"/><circle class="mzi-ink" cx="74" cy="75" r="3.4"/>' +
+      '<ellipse class="mzi-ink" cx="60" cy="91" rx="2.6" ry="3.2"/>') +
+      '<path class="mzi-line mzi-out" d="M104 30v11M112 27v11"/><circle class="mzi-ink mzi-out" cx="104" cy="47" r="2.2"/><circle class="mzi-ink mzi-out" cx="112" cy="44" r="2.2"/>',
+    love: head('<circle class="mzi-ink" cx="46" cy="76" r="10"/><circle class="mzi-ink" cx="74" cy="76" r="10"/>' +
+      '<circle class="mzi-white" cx="43" cy="72.5" r="4"/><circle class="mzi-white" cx="71" cy="72.5" r="4"/>' +
+      '<circle class="mzi-white" cx="49.5" cy="80" r="2.4"/><circle class="mzi-white" cx="77.5" cy="80" r="2.4"/>' +
+      '<path class="mzi-line mzi-thin" d="M38 64.5l-2-3.5M44 62.5l-.5-4M50 63.5l1.5-3.5M70 63.5l-1.5-3.5M76 62.5l.5-4M82 64.5l2-3.5"/>' +
+      '<path class="mzi-blush" d="M53 90l2-3M56.5 90l2-3M60 90l2-3M63.5 90l2-3"/>') +
+      STAR(13, 66, 7) + STAR(106, 100, 6) + '<path class="mzi-heart" d="M108 34c-6-4-8-8-5-11 2-2 4-1 5 1 1-2 3-3 5-1 3 3 1 7-5 11Z"/>',
+    gossip: head('<path class="mzi-fill" d="M33 75q10-9 22-2-7 11-22 2Z"/><path class="mzi-fill" d="M87 75q-10-9-22-2 7 11 22 2Z"/>' +
+      '<circle class="mzi-ink" cx="49.5" cy="74.5" r="4.6"/><circle class="mzi-ink" cx="70.5" cy="74.5" r="4.6"/>' +
+      '<path class="mzi-line mzi-thin" d="M56 89q4 2 8 0"/>',
+      '<path class="mzi-fill" d="M27 62 31 18q4-4 8 0l17 29Z"/><path class="mzi-fill" d="M93 62 89 18q-4-4-8 0L64 47Z"/>' +
+      '<path class="mzi-ink" d="M33 24q4-3 6 0l8 17-12 9Z"/>') + BURST(14, 60, 10),
+    grumpy: head('<path class="mzi-line mzi-thick" d="M36 75h17M67 75h17"/>' +
+      '<path class="mzi-ink" d="M38 76a7 6 0 0 0 14 0Z"/><path class="mzi-ink" d="M68 76a7 6 0 0 0 14 0Z"/>' +
+      '<path class="mzi-fill" d="M47 87q13 9 26 0-13 3-26 0Z"/><path class="mzi-line mzi-thin" d="M54 89.5v3"/>',
+      '<path class="mzi-fill" d="M27 62 31 18q4-4 8 0l17 29Z"/><path class="mzi-fill" d="M70 50q18-22 40-8 2 6-6 8-14-6-28 10Z"/>') +
+      '<path class="mzi-line mzi-out" d="M8 50q6 0 6-6M20 44q0 6 6 6M8 56q6 0 6 6M26 56q-6 0-6 6"/>',
+    shy: head('<circle class="mzi-ink" cx="46" cy="76" r="10.5"/><circle class="mzi-ink" cx="74" cy="76" r="10.5"/>' +
+      '<circle class="mzi-white" cx="42.5" cy="72" r="4.6"/><circle class="mzi-white" cx="70.5" cy="72" r="4.6"/>' +
+      '<circle class="mzi-white" cx="49.5" cy="80.5" r="2"/><circle class="mzi-white" cx="77.5" cy="80.5" r="2"/>' +
+      '<path class="mzi-tear" d="M38 86q8 4 16 0M66 86q8 4 16 0"/>' +
+      '<path class="mzi-fill" d="M34 108q0-9 9-9t9 9Z"/><path class="mzi-fill" d="M68 108q0-9 9-9t9 9Z"/>',
+      '<path class="mzi-fill" d="M30 66Q6 62 6 80q2 7 24 0Z"/><path class="mzi-fill" d="M90 66q24-4 24 14-2 7-24 0Z"/>') +
+      '<path class="mzi-line mzi-thin mzi-out" d="M104 50v13M110 47v14M116 50v11"/>',
+    think: '<path class="mzi-fill" d="M30 80 36 48q4-4 8 0l13 24Z"/><path class="mzi-fill" d="M76 72q16-20 34-10 2 7-6 9-12-4-22 9Z"/>' +
+      '<path class="mzi-ink" d="M101 62q6-1 9 0 2 7-6 9-3-3-3-9Z"/>' +
+      '<path class="mzi-fill" d="M18 100c-2-18 18-28 42-28s44 10 42 28c-1 10-16 14-42 14s-41-4-42-14Z"/>' +
+      '<path class="mzi-line mzi-thick" d="M38 94h16M66 94h16"/>' +
+      '<path class="mzi-fill" d="M54 103h12v6H54Z"/><path class="mzi-line mzi-thin" d="M60 103v6"/>',
+    sleep: '<path class="mzi-ink" d="M44 82Q22 66 10 70q-2 8 24 20Z"/><path class="mzi-fill" d="M38 88Q14 80 8 88q2 8 30 10Z"/>' +
+      '<path class="mzi-fill" d="M16 100c-2-14 20-22 46-21 26 1 44 9 42 21-1 9-18 13-44 13s-43-4-44-13Z"/>' +
+      '<path class="mzi-line mzi-thick" d="M66 98h13"/>' +
+      '<path class="mzi-tongue" d="M84 108q3 9 10 4 1-5-6-6Z"/>' +
+      '<path class="mzi-line mzi-out" d="M86 62h9l-9 9h9M100 48h7l-7 7h7"/>'
   };
   var FACES_SVG = Object.keys(FACES).map(function (k) { return '<g class="mz-face" data-face="' + k + '">' + FACES[k] + '</g>'; }).join('');
 
   var CAT_SVG =
     '<svg class="mascot__cat" viewBox="0 0 120 132" aria-hidden="true">' +
-      '<g class="mascot__head">' +
-        '<path class="mzc-body mzc-tail" d="M99 103C113 104 105 87 114 80"/>' +
-        '<path class="mzc-body" d="M24 52Q22 24 29 14q4-3 9 1l17 18Z"/><path class="mzc-body" d="M96 52q2-28-5-38-4-3-9 1L65 33Z"/>' +
-        '<ellipse class="mzc-body" cx="60" cy="74" rx="46" ry="42"/>' +
-        '<path class="mzc-gloss" d="M24 66q3-15 15-23M47 37q6-2 12-1.5"/>' +
-        '<path class="mzc-nose" d="M57.5 87.5h5l-2.5 3Z"/>' +
-        FACES_SVG +
-      '</g>' +
+      '<defs><filter id="mzi-ink" x="-8%" y="-8%" width="116%" height="116%">' + // trazo de pincel: bordes que tiemblan apenas
+        '<feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="5" result="n"/>' +
+        '<feDisplacementMap in="SourceGraphic" in2="n" scale="3.4" xChannelSelector="R" yChannelSelector="G"/>' +
+      '</filter></defs>' +
+      '<g class="mascot__head" filter="url(#mzi-ink)">' + FACES_SVG + '</g>' +
     '</svg>';
 
 
@@ -154,12 +173,17 @@
     nextTip();
   }
 
+  var clicks = []; // si lo tocan muchas veces seguidas, se enoja un poquito (con venita de manga)
   catButton.addEventListener('click', function () {
     if (hidden) {
       hidden = false;
       root.classList.remove('is-hidden');
       try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
     }
+    var now = Date.now();
+    clicks = clicks.filter(function (t) { return now - t < 2500; });
+    clicks.push(now);
+    if (clicks.length >= 4) { clicks = []; say('¡Ey, despacio! Me vas a despeinar.', false, 'grumpy'); return; }
     talk();
   });
   // al pasar el mouse se sorprende (si no está hablando)

@@ -1902,6 +1902,24 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
 .mascot__tongue { fill: #F28DAE; }
 .mascot__fang { fill: #FFFFFF; }
 /* Caras de Mizu: una sola a la vez, según el ánimo (data-mood, js/mascot.js) */
+/* Mizu dibujado a mano: relleno blanco, trazo de tinta grueso (el filtro mzi-ink lo hace temblar) */
+.mascot { --mzi-ink: #141012; --mzi-mark: #141012; }
+:root[data-theme="dark"] .mascot { --mzi-mark: #F6EEE8; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .mascot { --mzi-mark: #F6EEE8; } }
+.mzi-fill { fill: #FFFFFF; stroke: var(--mzi-ink); stroke-width: 4.5; stroke-linejoin: round; stroke-linecap: round; }
+.mzi-ink { fill: var(--mzi-ink); }
+.mzi-white { fill: #FFFFFF; }
+.mzi-line { fill: none; stroke: var(--mzi-ink); stroke-width: 3.6; stroke-linecap: round; stroke-linejoin: round; }
+.mzi-line.mzi-thin { stroke-width: 2.4; }
+.mzi-line.mzi-thick { stroke-width: 5; }
+.mzi-blush { fill: none; stroke: #F48FB1; stroke-width: 2; stroke-linecap: round; }
+.mzi-tear { fill: none; stroke: #9FD3EE; stroke-width: 3; stroke-linecap: round; }
+.mzi-tongue { fill: #F48FB1; stroke: var(--mzi-ink); stroke-width: 3; stroke-linejoin: round; }
+.mzi-heart { fill: #F48FB1; stroke: var(--mzi-ink); stroke-width: 2.4; stroke-linejoin: round; }
+/* símbolos fuera de la cabeza (!!, |||, zzz, estrellas, venita): en tema oscuro van claros */
+.mzi-out.mzi-line { stroke: var(--mzi-mark); }
+.mzi-out.mzi-ink { fill: var(--mzi-mark); }
+.mascot[data-mood="grumpy"] .mz-face[data-face="grumpy"] { display: inline; }
 /* Mizu caricatura: mancha negra plana con forma de gato; símbolos estilo manga en rosa (js/mascot.js) */
 .mzc-body { fill: #141012; }
 .mzc-tail { fill: none; stroke: #141012; stroke-width: 9; stroke-linecap: round; }
