@@ -144,12 +144,12 @@
       // posición sin el giro (se mide desde el contenedor, que no se transforma)
       var top = (ipad.offsetParent ? ipad.offsetParent.getBoundingClientRect().top : 0) + ipad.offsetTop;
       var vh = window.innerHeight || 1;
-      // 0 = el iPad recién asoma abajo; 1 = su borde de arriba llegó al 22 % de la pantalla
-      var p = Math.min(1, Math.max(0, (vh - top) / (vh * 0.78)));
-      p = 1 - Math.pow(1 - p, 2); // frena suave al final
+      // 0 = el iPad recién asoma abajo; 1 = su borde de arriba llegó al 12 % de la pantalla (se endereza al final)
+      var p = Math.min(1, Math.max(0, (vh - top) / (vh * 0.88)));
+      p = p * p * (3 - 2 * p); // arranca y termina suave: primero se aprecia inclinado, después se endereza
       if (p > 0.995) { ipad.style.transform = ''; ipad.classList.remove('is-tilting'); return; }
       ipad.classList.add('is-tilting');
-      ipad.style.transform = 'perspective(1500px) translateY(' + ((1 - p) * 4).toFixed(2) + 'rem) rotateX(' + ((1 - p) * 42).toFixed(2) + 'deg) scale(' + (0.8 + p * 0.2).toFixed(4) + ')';
+      ipad.style.transform = 'perspective(1500px) translateY(' + ((1 - p) * 1.5).toFixed(2) + 'rem) rotateX(' + ((1 - p) * 16).toFixed(2) + 'deg) scale(' + (0.93 + p * 0.07).toFixed(4) + ')';
     };
     window.addEventListener('scroll', function () { if (!ipadQueued) { ipadQueued = true; requestAnimationFrame(tiltIpad); } }, { passive: true });
     window.addEventListener('resize', tiltIpad);
