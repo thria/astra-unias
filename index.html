@@ -31,7 +31,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Pinyon+Script&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=49">
+  <link rel="stylesheet" href="css/styles.css?v=53">
   <script src="js/theme.js?v=3" defer></script>
   <script src="js/map.js?v=3" defer></script>
   <script src="js/carousel.js?v=2" defer></script>
@@ -138,7 +138,10 @@
 
   <main id="contenido">
     <section class="hero" id="inicio">
-      <picture class="hero__media">
+      <!-- Foto inclinada en perspectiva con grilla encima y algunos cuadraditos que se iluminan -->
+      <div class="hero__stage">
+        <div class="hero__plane">
+          <picture class="hero__media">
         <source media="(min-width: 48em)"
                 srcset="img/hero/hero-wide-960.jpg 960w, img/hero/hero-wide-1500.jpg 1500w"
                 sizes="100vw" width="1500" height="844">
@@ -146,7 +149,10 @@
              srcset="img/hero/hero-tall-600.jpg 600w, img/hero/hero-tall-900.jpg 900w"
              sizes="100vw" width="900" height="1200" fetchpriority="high" decoding="async"
              alt="Uñas cortas redondeadas en rosa viejo con efecto ojo de gato, hechas por Rena Illiano">
-      </picture>
+          </picture>
+          <div class="hero__grid" aria-hidden="true"><span style="--c:6;--r:4;--d:0s"></span><span style="--c:11;--r:6;--d:1.6s"></span><span style="--c:8;--r:9;--d:3.1s"></span><span style="--c:4;--r:7;--d:2.2s"></span><span style="--c:13;--r:3;--d:4s"></span><span style="--c:9;--r:5;--d:5.2s"></span></div>
+        </div>
+      </div>
       <div class="container hero__content">
         <h1 class="hero__title">
           <span class="hero__wordmark logo-mark"><span class="sr-only">Astra</span></span>
