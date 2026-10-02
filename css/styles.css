@@ -446,7 +446,7 @@ html.no-intro .intro { display: none !important; }
   margin-inline: auto;
   padding-inline: 1rem 0.5rem;
   border: 1px solid var(--glass-border);
-  border-radius: 0.9rem;
+  border-radius: 4px; /* puntas casi rectas, como la referencia */
   background: var(--color-header-glass);
   -webkit-backdrop-filter: blur(16px) saturate(140%);
   backdrop-filter: blur(16px) saturate(140%);
