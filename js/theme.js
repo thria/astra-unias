@@ -40,3 +40,18 @@
   systemDark.addEventListener('change', syncUi);
   syncUi();
 })();
+
+// Encabezado flotante: vidrio transparente con textos claros mientras está sobre la foto del inicio
+(function () {
+  var header = document.querySelector('.site-header--floating');
+  var hero = document.querySelector('.hero');
+  if (!header || !hero) return;
+  var bar = header.querySelector('.site-header__inner'), queued = false;
+  function update() {
+    queued = false;
+    header.classList.toggle('is-over-hero', hero.getBoundingClientRect().bottom > bar.getBoundingClientRect().bottom);
+  }
+  window.addEventListener('scroll', function () { if (!queued) { queued = true; requestAnimationFrame(update); } }, { passive: true });
+  window.addEventListener('resize', update);
+  update();
+})();

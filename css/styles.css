@@ -73,6 +73,7 @@
   --color-model-a: #FCE3EB;    /* fondo de los modelos 3D */
   --color-model-b: #EEB4C7;
   --color-header: rgb(255 247 249 / 0.85);
+  --color-header-glass: rgb(255 247 249 / 0.62);
   --color-footer-bg: #3B2330;
   --color-footer-fg: #F6E4EA;
   --color-footer-muted: #CDB3BE;
@@ -154,6 +155,7 @@
     --color-model-a: #1C1217;
     --color-model-b: #26181F;
     --color-header: rgb(28 18 23 / 0.85);
+    --color-header-glass: rgb(28 18 23 / 0.55);
     --color-footer-bg: #130C10;
     color-scheme: dark;
   }
@@ -195,6 +197,7 @@
   --color-model-a: #1C1217;
   --color-model-b: #26181F;
   --color-header: rgb(28 18 23 / 0.85);
+  --color-header-glass: rgb(28 18 23 / 0.55);
   --color-footer-bg: #130C10;
   color-scheme: dark;
 }
@@ -421,6 +424,53 @@ html.no-intro .intro { display: none !important; }
   .site-header .button--small { padding-inline: 0.85rem; }
   .site-header__actions { gap: 0.4rem; }
   .theme-switch svg { width: 1rem; height: 1rem; }
+}
+
+/* Encabezado flotante de vidrio (página principal): una barra transparente con borde fino,
+   separada de los bordes, que deja ver la foto del inicio. Al bajar, el vidrio toma un poco de color. */
+.site-header--floating {
+  position: fixed;
+  inset: 0 0 auto;
+  padding: 0.75rem var(--gutter) 0;
+  background: none;
+  border: 0;
+  pointer-events: none;
+}
+@supports (backdrop-filter: blur(8px)) {
+  .site-header--floating { background: none; backdrop-filter: none; }
+}
+.site-header--floating .site-header__inner {
+  pointer-events: auto;
+  max-width: var(--container);
+  min-height: 3.5rem;
+  margin-inline: auto;
+  padding-inline: 1rem 0.5rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 0.9rem;
+  background: var(--color-header-glass);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: blur(16px) saturate(140%);
+  box-shadow: inset 0 1px 0 var(--glass-highlight), 0 10px 30px -18px rgb(59 35 48 / 0.55);
+  transition: background-color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+}
+/* Sobre la foto: vidrio casi transparente, borde blanco fino y textos claros */
+.site-header--floating.is-over-hero .site-header__inner {
+  border-color: rgb(255 255 255 / 0.45);
+  background: rgb(255 255 255 / 0.07);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18);
+}
+.site-header--floating.is-over-hero .brand { color: #fff; }
+.site-header--floating.is-over-hero .brand:hover { color: var(--color-logo-on-photo); }
+.site-header--floating.is-over-hero .nav-links a { color: #fff; }
+.site-header--floating.is-over-hero .nav-links a:hover { color: var(--color-logo-on-photo); }
+.site-header--floating.is-over-hero .theme-switch { border-color: rgb(255 255 255 / 0.4); background: rgb(255 255 255 / 0.1); }
+.site-header--floating.is-over-hero .theme-switch button:not([aria-checked="true"]) { color: rgb(255 255 255 / 0.85); }
+/* la foto del inicio arranca detrás del encabezado */
+.site-header--floating ~ main .hero { padding-top: calc(var(--header-h) + 1rem); }
+@media (max-width: 26em) {
+  .site-header--floating { padding-inline: 0.6rem; }
+  .site-header--floating .site-header__inner { padding-inline: 0.75rem 0.4rem; }
+  .site-header--floating .brand { width: 4.75rem; }
 }
 
 /* Hero
