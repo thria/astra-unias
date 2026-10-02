@@ -50,6 +50,8 @@
   --glass-highlight: rgb(255 255 255 / 0.6);
   --pill-bg: rgb(255 255 255 / 0.92);
   --pill-fg: #2A1A22;
+  /* Globos de títulos: degradé rosa (igual en ambos temas) para que se despeguen del fondo */
+  --pill-gradient: linear-gradient(135deg, #FFE6EF 0%, #FBC3D5 45%, #F29BBB 100%);
   --pill-ring: rgb(255 255 255 / 0.38);
   --color-card: rgb(255 255 255 / 0.82);  /* tarjeta de "Hola, soy Rena" */
   --color-card-border: rgb(255 255 255 / 0.9);
@@ -643,17 +645,17 @@ html.no-intro .intro { display: none !important; }
 }
 .section__head h2 { font-size: var(--step-2); }
 
-/* Títulos en "pill": pastilla blanca con aro de vidrio esmerilado (estilo widget) */
+/* Títulos en "pill": pastilla con degradé rosa y aro de vidrio esmerilado (estilo widget) */
 .section__head h2,
 .local h2 {
   justify-self: start;
   width: fit-content;
   padding: 0.28em 0.75em;
   border-radius: 1.2em;
-  background: var(--pill-bg);
+  background: var(--pill-gradient);
   color: var(--pill-fg);
   border: 1px solid var(--glass-border);
-  box-shadow: 0 0 0 0.28rem var(--pill-ring), 0 10px 26px -14px rgb(59 35 48 / 0.55);
+  box-shadow: 0 0 0 0.28rem var(--pill-ring), 0 10px 26px -14px rgb(176 63 102 / 0.6), inset 0 1px 0 rgb(255 255 255 / 0.7);
 }
 .local h2 { justify-self: center; }
 
@@ -666,10 +668,10 @@ html.no-intro .intro { display: none !important; }
   width: fit-content;
   padding: 0.28em 0.85em;
   border-radius: 999px;
-  background: var(--pill-bg);
+  background: var(--pill-gradient);
   color: var(--pill-fg);
   border: 1px solid var(--glass-border);
-  box-shadow: 0 0 0 0.28rem var(--pill-ring), 0 10px 26px -14px rgb(59 35 48 / 0.55);
+  box-shadow: 0 0 0 0.28rem var(--pill-ring), 0 10px 26px -14px rgb(176 63 102 / 0.6), inset 0 1px 0 rgb(255 255 255 / 0.7);
 }
 
 /* Centrado exacto del texto en los globos: recorta el espacio sobrante de la tipografía
@@ -976,7 +978,7 @@ html.no-intro .intro { display: none !important; }
   transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 .segmented__btn[aria-pressed="true"] {
-  background: var(--pill-bg);
+  background: var(--pill-gradient);
   color: var(--pill-fg);
   box-shadow: 0 4px 12px -6px rgb(59 35 48 / 0.45);
 }
