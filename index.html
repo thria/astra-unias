@@ -13,8 +13,10 @@
     try { var t = localStorage.getItem('astra-theme'); if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t; } catch (e) {}
     // Cinemática de apertura: al entrar y al recargar, nunca con "reducir movimiento"
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('no-intro');
+    else document.documentElement.classList.add('intro-hold'); // la cinemática arranca cuando la página está lista
   </script>
   <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="img/logo-astra.png" as="image" crossorigin="anonymous">
 
   <meta property="og:type" content="website">
   <meta property="og:locale" content="es_AR">
@@ -28,14 +30,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Pinyon+Script&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=62">
+  <link rel="stylesheet" href="css/styles.css?v=63">
   <script src="js/theme.js?v=5" defer></script>
   <script src="js/map.js?v=3" defer></script>
   <script src="js/carousel.js?v=2" defer></script>
   <script src="js/agenda.js?v=5" defer></script>
   <script src="js/nails3d.js?v=17" defer></script>
   <script src="js/effects.js?v=7" defer></script>
-  <script src="js/mascot.js?v=4" defer></script>
+  <script src="js/mascot.js?v=5" defer></script>
 
   <script type="application/ld+json">
   {
@@ -73,16 +75,37 @@
     <p class="intro__skip">Tocá para saltar</p>
   </div>
   <script>
-    // Saltar la cinemática con un clic, un toque o cualquier tecla; después se quita del documento
+    // La cinemática espera a que la página esté lista (logo cargado y la web terminada de cargar, como mucho 3 s)
+    // para verse completa y fluida incluso en celulares lentos. Mientras tanto se ve solo el fondo suave.
+    // Se saltea con un clic, un toque o cualquier tecla; al terminar se quita del documento.
     (function () {
       var intro = document.querySelector('.intro'), root = document.documentElement;
       if (!intro || root.classList.contains('no-intro')) return;
-      function skip() { root.classList.add('intro-skip'); off(); }
+      var started = false, logoReady = false, pageReady = false;
+      function start() {
+        if (started) return;
+        started = true;
+        // dos cuadros de espera: el navegador ya pintó todo antes de arrancar las animaciones
+        requestAnimationFrame(function () { requestAnimationFrame(function () { root.classList.remove('intro-hold'); }); });
+      }
+      function check() { if (logoReady && pageReady) start(); }
+      var logo = new Image();
+      logo.onload = logo.onerror = function () {
+        if (logo.decode) logo.decode().then(go, go); else go();
+        function go() { logoReady = true; check(); }
+      };
+      logo.src = 'img/logo-astra.png';
+      if (document.readyState === 'complete') pageReady = true;
+      else window.addEventListener('load', function () { pageReady = true; check(); });
+      setTimeout(start, 3000); // tope: nunca hace esperar más de 3 s
+      check();
+
+      function skip() { started = true; root.classList.remove('intro-hold'); root.classList.add('intro-skip'); off(); }
       function off() { intro.removeEventListener('click', skip); document.removeEventListener('keydown', skip); }
       intro.addEventListener('click', skip);
       document.addEventListener('keydown', skip);
       intro.addEventListener('animationend', function (e) {
-        if (e.target === intro) { off(); intro.remove(); }
+        if (e.target === intro) { off(); intro.remove(); document.dispatchEvent(new Event('astra:intro-end')); }
       });
     })();
   </script>

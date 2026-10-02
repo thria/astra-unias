@@ -571,6 +571,12 @@ html.no-intro .intro { display: none !important; }
     animation: intro-out 0.55s 2.05s ease forwards;
   }
   html.intro-skip .intro { animation: intro-out 0.3s ease forwards; }
+  /* Mientras la página carga, todo queda en pausa (solo se ve el fondo); arranca junto cuando está lista */
+  html.intro-hold .intro *,
+  html.intro-hold .intro *::before,
+  html.intro-hold .intro,
+  html.intro-hold .hero__content,
+  html.intro-hold .hero__wordmark { animation-play-state: paused !important; }
 
   /* Bruma: tres nubes de color que giran y se expanden */
   .intro__mist { position: absolute; inset: 0; } /* capa de fondo: no ocupa lugar en la grilla */
@@ -582,9 +588,9 @@ html.no-intro .intro { display: none !important; }
     height: 62vmin;
     margin: -31vmin 0 0 -31vmin;
     border-radius: 50%;
-    background: var(--c);
-    filter: blur(48px);
+    background: radial-gradient(circle, var(--c) 0%, transparent 68%); /* nube suave sin filtro de desenfoque: liviano en celulares */
     opacity: 0;
+    will-change: transform, opacity;
     animation: intro-mist 2.6s cubic-bezier(0.2, 0.6, 0.3, 1) forwards;
   }
   @keyframes intro-mist {
@@ -612,8 +618,8 @@ html.no-intro .intro { display: none !important; }
     background: conic-gradient(from 0deg, transparent 0 62%, rgb(255 232 170 / 0) 64%, #FFE3A3 84%, #F7A8C4 95%, #FFFFFF 99%, transparent 100%);
     -webkit-mask: radial-gradient(closest-side, transparent 93%, #000 95.5%, #000 97.5%, transparent 100%);
     mask: radial-gradient(closest-side, transparent 93%, #000 95.5%, #000 97.5%, transparent 100%);
-    filter: drop-shadow(0 0 6px rgb(255 214 150 / 0.9));
     opacity: 0;
+    will-change: transform, opacity;
     animation: intro-orbit 1.9s 0.2s cubic-bezier(0.45, 0.05, 0.35, 1) forwards;
   }
   @keyframes intro-orbit {

@@ -5,7 +5,7 @@
 // - Con "reducir movimiento" no se anima, pero sigue funcionando.
 (function () {
   var STORAGE_KEY = 'astra-mascot-hidden';
-  var FIRST_DELAY = 3000;   // aparece (callada) cuando termina la cinemática de apertura
+  var FIRST_DELAY = 800;    // sin cinemática: aparece (callada) casi enseguida
   var BUBBLE_TIME = 12000;  // cuánto queda visible cada mensaje
 
   var GREETING = '¡Hola! Soy Mizu, el gatito de Astra. Tocame y te cuento tips para tus uñas.';
@@ -125,7 +125,13 @@
   });
 
   // Aparece callada después de la animación de entrada: habla solo cuando la tocan
-  setTimeout(function () { root.classList.add('is-in'); }, reduceMotion ? 800 : FIRST_DELAY);
+  // (si la cinemática sigue en pantalla, por ejemplo en un celular lento, espera a que termine)
+  function appear() { root.classList.add('is-in'); }
+  if (document.querySelector('.intro') && !document.documentElement.classList.contains('no-intro')) {
+    document.addEventListener('astra:intro-end', function () { setTimeout(appear, 500); }, { once: true });
+  } else {
+    setTimeout(appear, FIRST_DELAY);
+  }
 
   // Recuerda qué sección se está mirando, para comentarla si la tocan
   if ('IntersectionObserver' in window) {
