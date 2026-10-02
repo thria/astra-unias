@@ -1,12 +1,12 @@
 // Mizu: el gatito de Astra (personaje propio, silueta negra estilo chibi) que aparece abajo a la derecha
-// con un globo de diálogo, al estilo de Clippy. Da tips de uñas y comenta la sección que se está mirando.
-// - Tocarla: muestra otro tip.  - "Ocultar": la achica y deja de hablar sola (se recuerda en este navegador).
+// con un globo de diálogo, al estilo de Clippy. Solo habla cuando la tocan: nunca habla sola.
+// - Tocarla: la primera vez saluda; después comenta la sección que se está mirando o tira un tip.
+// - "Ocultar": la achica (se recuerda en este navegador).
 // - Con "reducir movimiento" no se anima, pero sigue funcionando.
 (function () {
   var STORAGE_KEY = 'astra-mascot-hidden';
-  var FIRST_DELAY = 4500;   // espera a que termine la animación de entrada
-  var BUBBLE_TIME = 9000;   // cuánto queda visible cada mensaje
-  var IDLE_TIP_EVERY = 35000;
+  var FIRST_DELAY = 4500;   // aparece (callada) cuando termina la animación de entrada
+  var BUBBLE_TIME = 12000;  // cuánto queda visible cada mensaje
 
   var GREETING = '¡Hola! Soy Mizu, el gatito de Astra. Tocame y te cuento tips para tus uñas.';
 
@@ -22,13 +22,13 @@
     'Los días con puntitos en la agenda todavía tienen turnos libres.'
   ];
 
-  // Lo que dice al llegar a cada sección (una sola vez por visita)
+  // Lo que comenta de cada sección si la tocan mientras se mira esa parte (una vez cada una)
   var SECTION_TIPS = {
     'sobre-mi': 'Rena hace 4 años que se dedica a las uñas. ¡Estás en buenas manos!',
     trabajos: 'Tocá cualquier foto para verla en Instagram. Hay más de 280 trabajos.',
     'local-titulo': 'El estudio está por Plaza Belgrano, en La Plata. La dirección exacta te la pasa al reservar.',
-    servicios: '¿No sabés cuál elegir? Mirá «¿Cuál me conviene?». ¡Y girá las uñas 3D!',
-    opiniones: 'Pasá el mouse por las opiniones para frenarlas y leerlas tranquila.',
+    servicios: 'Arrastrá las uñas 3D para girarlas y verlas de cerca.',
+    opiniones: 'Estas son algunas opiniones de clientas de Astra. ¡Gracias por tanto amor!',
     agenda: 'Elegí un día con puntitos y tocá un horario libre para pedir tu turno.'
   };
 
@@ -76,7 +76,6 @@
   var catButton = root.querySelector('.mascot__button');
   var tipIndex = Math.floor(Math.random() * TIPS.length);
   var hideTimer = null;
-  var lastSpoke = 0;
 
   function say(message, stay) {
     text.textContent = message;
@@ -84,14 +83,28 @@
     root.classList.remove('is-talking');
     void root.offsetWidth; // reinicia la animación del globo
     root.classList.add('is-talking');
-    lastSpoke = Date.now();
     clearTimeout(hideTimer);
     if (!stay) hideTimer = setTimeout(function () { bubble.hidden = true; root.classList.remove('is-talking'); }, BUBBLE_TIME);
   }
 
-  function nextTip(stay) {
+  function nextTip() {
     tipIndex = (tipIndex + 1) % TIPS.length;
-    say(TIPS[tipIndex], stay);
+    say(TIPS[tipIndex]);
+  }
+
+  var greeted = false;
+  var spoken = {};
+  var currentSection = null; // sección que pasa por el centro de la pantalla
+
+  // Al tocarla: la primera vez saluda; después comenta la sección que se está mirando o tira un tip
+  function talk() {
+    if (!greeted) { greeted = true; say(GREETING); return; }
+    if (currentSection && SECTION_TIPS[currentSection] && !spoken[currentSection]) {
+      spoken[currentSection] = true;
+      say(SECTION_TIPS[currentSection]);
+      return;
+    }
+    nextTip();
   }
 
   catButton.addEventListener('click', function () {
@@ -99,12 +112,10 @@
       hidden = false;
       root.classList.remove('is-hidden');
       try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
-      say(GREETING, true);
-      return;
     }
-    nextTip(true);
+    talk();
   });
-  root.querySelector('.mascot__more').addEventListener('click', function () { nextTip(true); });
+  root.querySelector('.mascot__more').addEventListener('click', function () { nextTip(); });
   root.querySelector('.mascot__close').addEventListener('click', function () {
     hidden = true;
     bubble.hidden = true;
@@ -113,34 +124,17 @@
     catButton.focus();
   });
 
-  // Aparece después de la animación de entrada y saluda (si no estaba oculta)
-  setTimeout(function () {
-    root.classList.add('is-in');
-    if (!hidden) say(GREETING);
-  }, reduceMotion ? 800 : FIRST_DELAY);
+  // Aparece callada después de la animación de entrada: habla solo cuando la tocan
+  setTimeout(function () { root.classList.add('is-in'); }, reduceMotion ? 800 : FIRST_DELAY);
 
-  // Comentarios según la sección que se está mirando (una vez cada una)
+  // Recuerda qué sección se está mirando, para comentarla si la tocan
   if ('IntersectionObserver' in window) {
-    var spoken = {};
     var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting || hidden || !root.classList.contains('is-in')) return;
-        var id = entry.target.id;
-        if (spoken[id] || !SECTION_TIPS[id]) return;
-        if (Date.now() - lastSpoke < 4000) return; // no pisar un mensaje recién dicho
-        spoken[id] = true;
-        say(SECTION_TIPS[id]);
-      });
+      entries.forEach(function (entry) { if (entry.isIntersecting) currentSection = entry.target.id; });
     }, { rootMargin: '-40% 0px -40% 0px' }); // cuenta cuando la sección pasa por el centro de la pantalla
     Object.keys(SECTION_TIPS).forEach(function (id) {
       var el = document.getElementById(id);
       if (el) io.observe(el);
     });
   }
-
-  // Cada tanto, si no habló hace rato, tira un tip
-  setInterval(function () {
-    if (hidden || document.hidden || !bubble.hidden) return;
-    if (Date.now() - lastSpoke > IDLE_TIP_EVERY) nextTip(false);
-  }, 5000);
 })();
