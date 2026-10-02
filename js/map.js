@@ -8,16 +8,16 @@
   var MAPLIBRE = 'https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl';
   var PLAZA = [-57.96654, -34.91255]; // Plaza Manuel Belgrano (lon, lat)
 
-  // Paletas de la maqueta, en la estética minimalista: neutros cálidos (marfil y espresso),
-  // plazas en verde salvia suave y la zona marcada con el rosa empolvado de la página.
+  // Paletas de la maqueta: alegres pero armónicas con la página. Manzanas rosadas, plazas verde menta,
+  // agua lila, edificios color crema manteca y la zona marcada en rosa.
   var PALETTES = {
     dark: {
-      ground: '#24201E', blocks: '#2C2724', park: '#30362E', parkEdge: '#3C443A', water: '#232A30',
-      road: '#3B3431', roadEdge: '#4A413C', building: '#342E2B', label: '#EEE7E0', zone: '#D8A6AF'
+      ground: '#2A2124', blocks: '#3A2930', park: '#2D4034', parkEdge: '#40594A', water: '#302C48',
+      road: '#4C3A42', roadEdge: '#634A55', building: '#4D3E35', label: '#F3DDE2', zone: '#F0A3B5'
     },
     light: {
-      ground: '#FBF8F4', blocks: '#F2ECE5', park: '#DFE4D7', parkEdge: '#C8D0BE', water: '#DCE3E8',
-      road: '#FFFFFF', roadEdge: '#E1D6CB', building: '#ECE4DB', label: '#2A2321', zone: '#A86A77'
+      ground: '#FDF6F3', blocks: '#F9E1E6', park: '#C4EACB', parkEdge: '#A3D6AE', water: '#DCD5F3',
+      road: '#FFFFFF', roadEdge: '#EFC3CD', building: '#FFF0D6', label: '#8C5361', zone: '#D9748A'
     }
   };
   var systemDark = window.matchMedia('(prefers-color-scheme: dark)');
