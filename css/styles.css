@@ -633,8 +633,20 @@ html.no-intro .intro { display: none !important; }
   /* el plano flota despacio y los cuadraditos de la grilla se encienden por turnos */
   .hero__plane { will-change: transform; animation: hero-float 14s ease-in-out infinite alternate; }
   .hero__grid span { animation: grid-glow 6.4s var(--d) ease-in-out infinite; }
-  .hero__content { animation: hero-fade 0.9s 0.2s ease-out both; }
-  .hero__wordmark { animation: logo-write 1.3s 0.2s cubic-bezier(0.6, 0, 0.3, 1) both; }
+  /* Entrada de la portada ("revelado de foto" + frase palabra por palabra). --t0 = cuándo arranca:
+     enseguida si no hay cinemática, o justo cuando la cinemática se va. */
+  .hero { --t0: 0.2s; }
+  html:not(.no-intro) .hero { --t0: 2s; }
+  html.intro-skip .hero { --t0: 0s; }
+  /* la foto arranca desenfocada y más cerca, y hace foco como una cámara */
+  .hero__stage { animation: hero-focus 1.6s calc(var(--t0) - 0.25s) cubic-bezier(0.2, 0.7, 0.2, 1) backwards; }
+  .hero__wordmark { animation: hero-logo-in 0.7s var(--t0) ease-out backwards; }
+  /* cada palabra sube desde abajo, una detrás de otra */
+  .hero__word { display: inline-block; animation: hero-word 0.7s calc(var(--t0) + 0.35s + var(--i) * 0.13s) cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
+  .hero__lead { animation: hero-fade 0.8s calc(var(--t0) + 0.95s) ease-out backwards; }
+  /* los botones entran al final con un pequeño rebote */
+  .hero__actions > * { animation: hero-pop 0.7s calc(var(--t0) + 1.15s) cubic-bezier(0.3, 1.5, 0.5, 1) backwards; }
+  .hero__actions > :nth-child(2) { animation-delay: calc(var(--t0) + 1.27s); }
 
   /* Cinemática de apertura (index.html), 2,6 s en total:
      0,0 s  una bruma rosa y amarilla se dispersa girando, como un perfume en el aire
@@ -658,8 +670,8 @@ html.no-intro .intro { display: none !important; }
   html.intro-hold .intro *,
   html.intro-hold .intro *::before,
   html.intro-hold .intro,
-  html.intro-hold .hero__content,
-  html.intro-hold .hero__wordmark { animation-play-state: paused !important; }
+  html.intro-hold .hero,
+  html.intro-hold .hero * { animation-play-state: paused !important; }
 
   /* Bruma: tres nubes de color que giran y se expanden */
   .intro__mist { position: absolute; inset: 0; } /* capa de fondo: no ocupa lugar en la grilla */
@@ -782,10 +794,6 @@ html.no-intro .intro { display: none !important; }
   @keyframes intro-hint { to { opacity: 0.7; } }
 
   /* El logo del inicio aparece justo cuando se va la pantalla, en el mismo lugar: es lo último y lo primero */
-  html:not(.no-intro) .hero__content { animation-delay: 2.15s; }
-  html:not(.no-intro) .hero__wordmark { animation: hero-logo-in 0.6s 2.05s ease-out both; }
-  html.intro-skip .hero__content,
-  html.intro-skip .hero__wordmark { animation-delay: 0s; }
   @keyframes hero-logo-in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
 
   @keyframes logo-write {
@@ -807,6 +815,18 @@ html.no-intro .intro { display: none !important; }
   @keyframes hero-fade {
     from { opacity: 0; transform: translateY(0.75rem); }
     to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes hero-focus {
+    from { filter: blur(18px) brightness(0.6); transform: scale(1.14); }
+    to { filter: none; transform: none; }
+  }
+  @keyframes hero-word {
+    from { opacity: 0; transform: translateY(0.7em); filter: blur(6px); }
+    to { opacity: 1; transform: none; filter: none; }
+  }
+  @keyframes hero-pop {
+    from { opacity: 0; transform: translateY(0.9rem) scale(0.86); }
+    to { opacity: 1; transform: none; }
   }
 }
 
