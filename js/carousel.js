@@ -131,15 +131,42 @@
       shown = (i + photos.length) % photos.length;
       var src = photos[shown].querySelector('img'), link = photos[shown].querySelector('a');
       bigImg.classList.remove('is-in');
-      bigImg.onload = function () { bigImg.classList.add('is-in'); };
+      var reveal = function () { // al abrir: la foto crece desde la miniatura tocada; al cambiar: aparece suave
+        if (flipThumb) { flipFrom(flipThumb); flipThumb = null; } else bigImg.classList.add('is-in');
+      };
+      bigImg.onload = reveal;
       bigImg.src = largest(src);
       bigImg.alt = src.alt;
-      if (bigImg.complete) requestAnimationFrame(function () { bigImg.classList.add('is-in'); });
+      if (bigImg.complete) requestAnimationFrame(reveal);
       count.textContent = pad(shown + 1) + '/' + pad(photos.length);
       igLink.href = link ? link.href : 'https://www.instagram.com/astra.unias/';
     }
+    // Técnica FLIP: la foto grande arranca con el tamaño y el lugar de la miniatura y se agranda hasta su lugar
+    var flipThumb = null, FLIP_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
+    function flipFrom(thumb) {
+      var a = thumb.getBoundingClientRect();
+      bigImg.style.transition = 'none';
+      bigImg.classList.add('is-in');
+      var b = bigImg.getBoundingClientRect();
+      if (!b.width || !a.width) { bigImg.style.transition = ''; return; }
+      bigImg.style.transformOrigin = '0 0';
+      bigImg.style.transform = 'translate(' + (a.left - b.left) + 'px,' + (a.top - b.top) + 'px) scale(' + (a.width / b.width) + ',' + (a.height / b.height) + ')';
+      bigImg.getBoundingClientRect(); // fija el punto de partida
+      bigImg.style.transition = 'transform 0.6s ' + FLIP_EASE;
+      bigImg.style.transform = '';
+      setTimeout(function () { bigImg.style.transition = ''; bigImg.style.transformOrigin = ''; }, 650);
+    }
+    function flipBack(thumb) { // al cerrar: la foto vuelve achicándose a su miniatura
+      var a = thumb.getBoundingClientRect(), b = bigImg.getBoundingClientRect();
+      if (!b.width || !a.width || a.bottom < 0 || a.top > window.innerHeight) return false;
+      bigImg.style.transformOrigin = '0 0';
+      bigImg.style.transition = 'transform 0.45s ' + FLIP_EASE;
+      bigImg.style.transform = 'translate(' + (a.left - b.left) + 'px,' + (a.top - b.top) + 'px) scale(' + (a.width / b.width) + ',' + (a.height / b.height) + ')';
+      return true;
+    }
     function open(i) {
       opener = document.activeElement;
+      if (!reduceMotion) flipThumb = photos[(i + photos.length) % photos.length].querySelector('img');
       show(i);
       box.hidden = false;
       void box.offsetWidth;
@@ -148,9 +175,13 @@
       box.querySelector('.lightbox__close').focus({ preventScroll: true });
     }
     function close() {
+      var flew = !reduceMotion && flipBack(photos[shown].querySelector('img'));
       box.classList.remove('is-open');
       document.documentElement.classList.remove('has-lightbox');
-      setTimeout(function () { box.hidden = true; }, reduceMotion ? 0 : 300);
+      setTimeout(function () {
+        box.hidden = true;
+        bigImg.style.transition = ''; bigImg.style.transform = ''; bigImg.style.transformOrigin = '';
+      }, reduceMotion ? 0 : (flew ? 450 : 300));
       if (opener) opener.focus({ preventScroll: true });
     }
     photos.forEach(function (it, i) {

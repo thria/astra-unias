@@ -3,6 +3,10 @@
 //  2. Secciones que aparecen con un movimiento suave al bajar.
 //  3. Opiniones tipo historias de Instagram (barra de progreso, pasan solas).
 //  4. El iPad del mapa se endereza mientras bajás.
+//  5. Portada con profundidad (inclinación al mouse y parallax).
+//  6. Opiniones que se escriben palabra por palabra.
+//  7. Línea que une los pasos para pedir turno.
+//  8. Botón de turno magnético.
 (function () {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
@@ -167,5 +171,78 @@
     window.addEventListener('scroll', function () { if (!ipadQueued) { ipadQueued = true; requestAnimationFrame(tiltIpad); } }, { passive: true });
     window.addEventListener('resize', tiltIpad);
     tiltIpad();
+  }
+
+  // ---- 5. Portada con profundidad ----
+  // En compu, la foto se inclina hasta 2° hacia el mouse; al bajar, la foto se queda un poco atrás
+  // (va más lenta que el texto, que ya sube con la cortina). Solo transform, con frenado suave.
+  var heroEl = document.querySelector('.hero');
+  var heroStage = document.querySelector('.hero__stage');
+  if (heroEl && heroStage) {
+    var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    var tX = 0, tY = 0, cX = 0, cY = 0, heroQueued = false;
+    var heroFrame = function () {
+      heroQueued = false;
+      cX += (tX - cX) * 0.08; cY += (tY - cY) * 0.08; // se acerca de a poco: nunca brusco
+      var y = Math.min(window.scrollY, window.innerHeight);
+      heroStage.style.transform = 'translate3d(0,' + (y * 0.12).toFixed(1) + 'px,0) rotateX(' + cY.toFixed(3) + 'deg) rotateY(' + cX.toFixed(3) + 'deg)';
+      if (Math.abs(tX - cX) > 0.005 || Math.abs(tY - cY) > 0.005) heroRequest();
+    };
+    var heroRequest = function () { if (!heroQueued) { heroQueued = true; requestAnimationFrame(heroFrame); } };
+    if (fine) {
+      heroEl.addEventListener('mousemove', function (e) {
+        tX = (e.clientX / window.innerWidth - 0.5) * 4;   // ±2°
+        tY = (e.clientY / window.innerHeight - 0.5) * -4;
+        heroRequest();
+      });
+      heroEl.addEventListener('mouseleave', function () { tX = 0; tY = 0; heroRequest(); });
+    }
+    // empieza recién cuando terminó el "foco" de la entrada, para no pisar esa animación
+    heroStage.addEventListener('animationend', function () {
+      window.addEventListener('scroll', heroRequest, { passive: true });
+      heroRequest();
+    }, { once: true });
+  }
+
+  // ---- 6. Opiniones: la opinión activa se escribe palabra por palabra ----
+  // (el CSS anima las palabras y llena las estrellas cuando la tarjeta pasa a ser la activa)
+  Array.prototype.forEach.call(document.querySelectorAll('.review blockquote p'), function (p) {
+    p.innerHTML = p.textContent.trim().split(/\s+/).map(function (w, i) {
+      return '<span class="rw" style="--i:' + i + '">' + w.replace(/[&<>"]/g, function (c) { return '&#' + c.charCodeAt(0) + ';'; }) + '</span>';
+    }).join(' ');
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.review__stars'), function (s) {
+    Array.prototype.forEach.call(s.children, function (star, n) { star.style.setProperty('--n', n); });
+  });
+
+  // ---- 7. Cómo pedir tu turno: una línea fina une los pasos al aparecer ----
+  var stepsList = document.querySelector('.steps');
+  var measureSteps = function () { // largo de la línea: del primer número al último (vertical en celular, horizontal en compu)
+    var lis = stepsList.children, first = lis[0], last = lis[lis.length - 1];
+    var row = last.offsetTop === first.offsetTop;
+    stepsList.classList.toggle('is-row', row);
+    stepsList.style.setProperty('--line-len', (row ? last.offsetLeft - first.offsetLeft : last.offsetTop - first.offsetTop) + 'px');
+  };
+  if (stepsList && stepsList.children.length > 1) { measureSteps(); window.addEventListener('resize', measureSteps); }
+  if (stepsList && 'IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries, io) {
+      if (!entries[0].isIntersecting) return;
+      stepsList.classList.add('is-drawn');
+      io.disconnect();
+    }, { threshold: 0.35 }).observe(stepsList);
+  }
+
+  // ---- 8. Botón "Pedir turno por Instagram" magnético (solo compu) ----
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    Array.prototype.forEach.call(document.querySelectorAll('.booking__cta'), function (b) {
+      b.classList.add('is-magnetic');
+      b.addEventListener('mousemove', function (e) {
+        var r = b.getBoundingClientRect();
+        var x = Math.max(-8, Math.min(8, (e.clientX - r.left - r.width / 2) * 0.2));
+        var y = Math.max(-6, Math.min(6, (e.clientY - r.top - r.height / 2) * 0.3));
+        b.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)';
+      });
+      b.addEventListener('mouseleave', function () { b.style.transform = ''; });
+    });
   }
 })();

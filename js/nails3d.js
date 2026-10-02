@@ -762,7 +762,21 @@
     canvas.style.touchAction = 'pan-y';
 
     var viewer = { container: container, renderer: renderer, scene: scene, camera: camera, controls: controls, pivot: pivot,
-      visible: false, phase: index * 1.3, interacting: false };
+      visible: false, phase: index * 1.3, interacting: false,
+      introAt: 0,                      // cuándo apareció por primera vez (para llegar girando)
+      hover: false, hx: 0, hy: 0, mix: 0 // mouse sobre la tarjeta: la uña mira hacia el cursor
+    };
+    // en compu: al pasar el mouse por la tarjeta, la uña gira hacia el cursor
+    var card = container.closest('.service-card') || container;
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      card.addEventListener('mousemove', function (e) {
+        var r = container.getBoundingClientRect();
+        viewer.hover = true;
+        viewer.hx = Math.max(-1, Math.min(1, (e.clientX - r.left) / r.width * 2 - 1));
+        viewer.hy = Math.max(-1, Math.min(1, (e.clientY - r.top) / r.height * 2 - 1));
+      });
+      card.addEventListener('mouseleave', function () { viewer.hover = false; });
+    }
     controls.addEventListener('start', function () { viewer.interacting = true; });
     controls.addEventListener('end', function () { viewer.interacting = false; });
 
@@ -789,9 +803,14 @@
       viewers.forEach(function (v) {
         if (!v.visible) return;
         if (!reduceMotion && !v.interacting) {
-          // balanceo suave de lado a lado y un leve flotar
-          v.pivot.rotation.y = Math.sin(t * 0.7 + v.phase) * 0.55;
-          v.pivot.rotation.x = Math.sin(t * 0.5 + v.phase) * 0.08;
+          if (!v.introAt) v.introAt = time;
+          // al aparecer por primera vez llega girando desde un costado (1,2 s, frena suave)
+          var k = Math.min(1, (time - v.introAt) / 1200), intro = Math.pow(1 - k, 3) * -0.9;
+          // con el mouse encima, mezcla el balanceo con la mirada hacia el cursor
+          v.mix += ((v.hover ? 1 : 0) - v.mix) * 0.08;
+          var swayY = Math.sin(t * 0.7 + v.phase) * 0.55, swayX = Math.sin(t * 0.5 + v.phase) * 0.08;
+          v.pivot.rotation.y = swayY * (1 - v.mix) + v.hx * 0.6 * v.mix + intro;
+          v.pivot.rotation.x = swayX * (1 - v.mix) + v.hy * 0.25 * v.mix;
           v.pivot.position.y = Math.sin(t * 1.1 + v.phase) * 0.04;
         }
         v.controls.update();
