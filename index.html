@@ -31,13 +31,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Pinyon+Script&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=56">
+  <link rel="stylesheet" href="css/styles.css?v=57">
   <script src="js/theme.js?v=3" defer></script>
   <script src="js/map.js?v=3" defer></script>
   <script src="js/carousel.js?v=2" defer></script>
   <script src="js/agenda.js?v=5" defer></script>
   <script src="js/nails3d.js?v=17" defer></script>
-  <script src="js/effects.js?v=6" defer></script>
+  <script src="js/effects.js?v=7" defer></script>
   <script src="js/mascot.js?v=3" defer></script>
 
   <script type="application/ld+json">
@@ -285,8 +285,9 @@
           <a class="local__link" href="https://www.google.com/maps/search/?api=1&amp;query=Plaza+Manuel+Belgrano%2C+La+Plata" target="_blank" rel="noopener">Abrir la zona en Google Maps</a>
         </div>
         <!-- Mapa interactivo (MapLibre + OpenFreeMap). Se carga al llegar a esta sección: js/map.js -->
-        <div class="filete filete--map">
-          <svg class="filete__corner filete__corner--tl" aria-hidden="true"><use href="#filete-esquina"/></svg><svg class="filete__corner filete__corner--tr" aria-hidden="true"><use href="#filete-esquina"/></svg><svg class="filete__corner filete__corner--bl" aria-hidden="true"><use href="#filete-esquina"/></svg><svg class="filete__corner filete__corner--br" aria-hidden="true"><use href="#filete-esquina"/></svg><svg class="filete__side filete__side--l" aria-hidden="true"><use href="#filete-lado"/></svg><svg class="filete__side filete__side--r" aria-hidden="true"><use href="#filete-lado"/></svg>
+        <!-- Marco estilo iPad: bisel negro, borde plateado, camarita y botones -->
+        <div class="ipad">
+          <span class="ipad__camera" aria-hidden="true"></span>
         <div class="local__map" id="mapa-zona" role="region" aria-label="Mapa de la zona de Plaza Belgrano, La Plata">
           <p class="local__map-fallback">Cargando el mapa de la zona…</p>
         </div>

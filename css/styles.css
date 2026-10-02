@@ -672,8 +672,44 @@ html.no-intro .intro { display: none !important; }
 .filete__punto { fill: var(--color-rose); }
 .filete__flor { fill: var(--color-petal); stroke: var(--color-rose); stroke-width: 1.4; }
 
-.filete--map { margin-top: var(--space-m); }
-.filete--map .maplibregl-ctrl-top-right { top: 0.6rem; right: 0.6rem; }
+/* Marco estilo iPad alrededor del mapa */
+.ipad {
+  --bezel: clamp(0.7rem, 0.4rem + 1.4vw, 1.35rem);
+  position: relative;
+  width: 100%;
+  margin-top: var(--space-m);
+  padding: var(--bezel);
+  border-radius: calc(var(--bezel) + 1rem);
+  background: #0b0b0d;
+  box-shadow:
+    0 0 0 2px #c4c7cf,                 /* canto plateado */
+    0 0 0 3.5px #74777f,               /* sombra del canto */
+    inset 0 0 0 1px rgb(255 255 255 / 0.06),
+    0 34px 70px -30px rgb(0 0 0 / 0.65);
+}
+/* botones de volumen arriba a la izquierda y de encendido al costado */
+.ipad::before,
+.ipad::after {
+  content: "";
+  position: absolute;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #d8dae0, #8d9098);
+}
+.ipad::before { top: -6px; left: 9%; width: 2.2rem; height: 3px; box-shadow: 2.8rem 0 0 #b3b6be; }
+.ipad::after { top: 12%; left: -6px; width: 3px; height: 2.4rem; }
+.ipad__camera {
+  position: absolute;
+  top: calc(var(--bezel) / 2 - 3.5px);
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  margin-left: -3.5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #3a4a6e 0 25%, #121520 60%);
+  box-shadow: 0 0 0 1.5px #1d1f26;
+}
+.ipad .local__map { border: 0; border-radius: 1rem; } /* radio interior = exterior menos el bisel */
+.ipad .maplibregl-ctrl-top-right { top: 0.6rem; right: 0.6rem; }
 
 @media (min-width: 48em) {
   .filete { --filete-corner: 4.75rem; --filete-pad: 1.4rem; }
@@ -1532,7 +1568,7 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
   .local__text { justify-items: start; gap: var(--space-s); }
   .local h2 { justify-self: start; }
   .local__map { height: clamp(24rem, 33vw, 32rem); }
-  .filete--map { margin-top: 0; }
+  .ipad { margin-top: 0; }
 
   .services { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: var(--space-xl); }
   .site-footer__inner { grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr)); column-gap: var(--space-xl); }
