@@ -31,12 +31,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Pinyon+Script&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=43">
+  <link rel="stylesheet" href="css/styles.css?v=44">
   <script src="js/theme.js?v=3" defer></script>
-  <script src="js/map.js?v=2" defer></script>
+  <script src="js/map.js?v=3" defer></script>
   <script src="js/carousel.js?v=2" defer></script>
   <script src="js/agenda.js?v=4" defer></script>
-  <script src="js/nails3d.js?v=7" defer></script>
+  <script src="js/nails3d.js?v=8" defer></script>
   <script src="js/effects.js?v=4" defer></script>
   <script src="js/mascot.js?v=2" defer></script>
 
@@ -62,7 +62,40 @@
 </head>
 <body>
   <!-- Pantalla de entrada: el logo se escribe y la pantalla se desvanece (solo CSS) -->
-  <div class="intro" aria-hidden="true"><span class="logo-mark intro__logo"></span></div>
+  <!-- Pantalla de entrada: el logo se "escribe" con pincel siguiendo el trazo de cada letra -->
+  <div class="intro" aria-hidden="true">
+    <svg class="intro__logo" viewBox="0 0 817 237" focusable="false">
+      <defs>
+        <filter id="intro-pincel" x="-5%" y="-10%" width="110%" height="120%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="3"/>
+          <feDisplacementMap in="SourceGraphic" scale="7"/>
+        </filter>
+        <mask id="intro-forma" maskUnits="userSpaceOnUse" x="0" y="0" width="817" height="237">
+          <image href="img/logo-astra.png" width="817" height="237"/>
+        </mask>
+        <mask id="intro-trazo" maskUnits="userSpaceOnUse" x="0" y="0" width="817" height="237">
+          <g class="intro__trazos" filter="url(#intro-pincel)" fill="none" stroke="#fff" stroke-width="30" stroke-linecap="round" stroke-linejoin="round">
+            <path pathLength="1" style="--t:.1s;--d:.5s" d="M48,150 C30,130 5,165 15,185 C30,215 90,222 150,212 C250,195 330,150 400,95 C480,40 560,15 612,8"/>
+            <path pathLength="1" style="--t:.55s;--d:.47s" d="M345,8 C330,40 315,62 295,75 C250,100 180,135 120,130 C70,125 70,85 110,60 C170,35 250,40 295,75 C330,100 345,140 350,190"/>
+            <path pathLength="1" style="--t:.98s;--d:.1s" d="M320,222 L395,165"/>
+            <path pathLength="1" style="--t:1.06s;--d:.14s" d="M385,200 C430,150 500,75 560,32"/>
+            <path pathLength="1" style="--t:1.17s;--d:.24s" d="M497,112 C470,140 475,180 460,210 C450,225 400,225 385,205 C380,190 400,180 410,190"/>
+            <path pathLength="1" style="--t:1.38s;--d:.14s" d="M410,218 C480,195 570,150 645,112"/>
+            <path pathLength="1" style="--t:1.45s;--d:.12s" d="M490,220 C540,205 600,175 650,138"/>
+            <path pathLength="1" style="--t:1.49s;--d:.19s" d="M457,82 C500,65 560,80 610,92 C640,105 680,105 742,78"/>
+            <path pathLength="1" style="--t:1.66s;--d:.15s" d="M655,65 L600,222 C610,225 635,200 660,170"/>
+            <path pathLength="1" style="--t:1.79s;--d:.15s" d="M675,100 L635,222 C670,200 700,170 735,150"/>
+            <path pathLength="1" style="--t:1.91s;--d:.27s" d="M806,136 C760,140 715,165 700,200 C695,230 740,190 806,137 L735,222 C760,220 790,195 808,177"/>
+          </g>
+          <rect class="intro__relleno" width="817" height="237" fill="#fff"/>
+        </mask>
+      </defs>
+      <g mask="url(#intro-trazo)">
+        <rect width="817" height="237" fill="currentColor" mask="url(#intro-forma)"/>
+      </g>
+    </svg>
+  </div>
+
   <!-- Adorno de fileteado (esquina superior izquierda). Se reutiliza girado en cada esquina de los marcos .filete -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <symbol id="filete-esquina" viewBox="0 0 80 80">

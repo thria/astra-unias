@@ -8,19 +8,24 @@
   var MAPLIBRE = 'https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl';
   var PLAZA = [-57.96654, -34.91255]; // Plaza Manuel Belgrano (lon, lat)
 
-  // Paleta rosa de la maqueta (igual en tema claro y oscuro)
-  var C = {
-    ground: '#FBE4EB',
-    blocks: '#F5CDD9',
-    park: '#EE9FBB',
-    parkEdge: '#E48FAD',
-    water: '#E6D3F0',
-    road: '#FFFFFF',
-    roadEdge: '#E7B1C4',
-    building: '#F9DDE6',
-    label: '#8E2E50',
-    zone: '#B03F66'
+  // Paletas de la maqueta. En tema oscuro: manzanas rosas y calles blancas.
+  // En tema claro se invierte (manzanas blancas y calles rosas) para que el mapa
+  // se distinga del fondo rosado de la sección.
+  var PALETTES = {
+    dark: {
+      ground: '#FBE4EB', blocks: '#F5CDD9', park: '#EE9FBB', parkEdge: '#E48FAD', water: '#E6D3F0',
+      road: '#FFFFFF', roadEdge: '#E7B1C4', building: '#F9DDE6', label: '#8E2E50', zone: '#B03F66'
+    },
+    light: {
+      ground: '#FFFFFF', blocks: '#FFF6F8', park: '#F7B9CD', parkEdge: '#E48FAD', water: '#E6D3F0',
+      road: '#F2A7C0', roadEdge: '#E07FA2', building: '#FFFFFF', label: '#8E2E50', zone: '#B03F66'
+    }
   };
+  var systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+  function currentTheme() {
+    return document.documentElement.dataset.theme || (systemDark.matches ? 'dark' : 'light');
+  }
+  var C = PALETTES[currentTheme()];
 
   function showFallback(text) {
     container.innerHTML = '<p class="local__map-fallback">' + text + '</p>';
@@ -115,7 +120,7 @@
           'text-size': 11,
           'text-letter-spacing': 0.02
         },
-        paint: { 'text-color': C.label, 'text-halo-color': C.road, 'text-halo-width': 1.5 } }
+        paint: { 'text-color': C.label, 'text-halo-color': C.ground, 'text-halo-width': 1.5 } }
     ]
   };
 
@@ -159,6 +164,23 @@
 
     new maplibregl.Marker({ element: makeMarker(), anchor: 'bottom' }).setLngLat(PLAZA).addTo(map);
 
+    // Al cambiar de tema, cambian los colores sin recargar el mapa
+    var PAINT = [
+      ['fondo', 'background-color', 'ground'], ['manzanas', 'fill-color', 'blocks'],
+      ['verde', 'fill-color', 'park'], ['plazas', 'fill-color', 'park'],
+      ['calles-borde', 'line-color', 'roadEdge'], ['calles', 'line-color', 'road'],
+      ['avenidas-borde', 'line-color', 'roadEdge'], ['avenidas', 'line-color', 'road'],
+      ['edificios', 'fill-extrusion-color', 'building'], ['nombres-calles', 'text-halo-color', 'ground']
+    ];
+    function applyTheme() {
+      var p = PALETTES[currentTheme()];
+      if (p === C || !map.isStyleLoaded()) return;
+      C = p;
+      PAINT.forEach(function (x) { map.setPaintProperty(x[0], x[1], p[x[2]]); });
+    }
+    new MutationObserver(applyTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    systemDark.addEventListener('change', applyTheme);
+    map.on('load', applyTheme);
 
     map.on('error', function (e) {
       if (e && e.error && /tiles|style|Failed to fetch/i.test(String(e.error.message))) {

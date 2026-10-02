@@ -1,7 +1,7 @@
 // Uñas en 3D para la sección Servicios (Three.js r128 + OrbitControls).
 // - Las librerías se descargan recién cuando la sección está por aparecer.
 // - Cada tarjeta con [data-model] recibe su modelo: semi, capping, softgel o presson.
-// - Las uñas van sobre la punta de un dedo (o, en press on, sobre una bandejita) para que se lean como uñas reales.
+// - Las uñas van sobre la punta de un dedo (en press on, un set en abanico) para que se lean como uñas reales.
 // - El modelo se balancea suave (no gira 360°, así nunca queda de canto). También se puede girar a mano.
 // - Mouse: arrastrar para girar, Ctrl + rueda para acercar (la rueda sola sigue bajando la página).
 // - Celular: un dedo baja la página normal; dos dedos giran y acercan.
@@ -175,42 +175,36 @@
       return fingerWithNail([new window.THREE.Mesh(geo, gel({ vertexColors: true, roughness: 0.15 }))]);
     },
 
-    // Press on: set de 5 uñas apoyadas en abanico sobre una bandejita rosa, como vienen en la caja
+    // Press on: set de 5 uñas almendra en abanico, flotando (sin bandeja, para que se luzcan las uñas)
     presson: function () {
       var THREE = window.THREE;
       var group = new THREE.Group();
-
-      var trayShape = new THREE.Shape();
-      var tw = 1.9, th = 1.25, r = 0.35;
-      trayShape.moveTo(-tw + r, -th);
-      trayShape.lineTo(tw - r, -th); trayShape.quadraticCurveTo(tw, -th, tw, -th + r);
-      trayShape.lineTo(tw, th - r); trayShape.quadraticCurveTo(tw, th, tw - r, th);
-      trayShape.lineTo(-tw + r, th); trayShape.quadraticCurveTo(-tw, th, -tw, th - r);
-      trayShape.lineTo(-tw, -th + r); trayShape.quadraticCurveTo(-tw, -th, -tw + r, -th);
-      var tray = new THREE.Mesh(
-        new THREE.ExtrudeGeometry(trayShape, { depth: 0.12, bevelEnabled: true, bevelThickness: 0.04, bevelSize: 0.04, bevelSegments: 4 }),
-        new THREE.MeshPhysicalMaterial({ color: srgb('#efb9cb'), roughness: 0.8, clearcoat: 0, envMapIntensity: 0.25 })
-      );
-      tray.position.z = -0.2;
-      group.add(tray);
-
-      var colors = ['#f4a7c0', '#fde9ef', '#e2558d', '#fde9ef', '#f4a7c0'];
-      var sizes = [[1.0, 0.6], [1.22, 0.68], [1.36, 0.76], [1.22, 0.68], [1.06, 0.62]];
+      // Cada uña: [largo, ancho, colores de la base a la punta]
+      var set = [
+        [1.5, 0.62, [[0, '#f48fb1'], [1, '#ec6f9c']]],
+        [1.7, 0.68, [[0, '#f5b3c6'], [0.7, '#f2a2b9'], [0.78, '#c2185b'], [1, '#c2185b']]], // francesita rosa
+        [1.95, 0.76, [[0, '#c2185b'], [1, '#e2558d']]],
+        [1.7, 0.68, [[0, '#f5b3c6'], [0.7, '#f2a2b9'], [0.78, '#c2185b'], [1, '#c2185b']]],
+        [1.5, 0.62, [[0, '#f48fb1'], [1, '#ec6f9c']]]
+      ];
       for (var i = 0; i < 5; i++) {
-        var angle = (i - 2) * 0.3;
+        var angle = (i - 2) * 0.42;
+        var o = set[i];
         var nail = new THREE.Mesh(
-          nailGeometry({ length: sizes[i][0], width: sizes[i][1], roundness: 0.5, thickness: 0.045, bend: 0.5, freeEdgeFrom: 99 }),
-          gel({ color: colors[i] })
+          paintGradient(nailGeometry({ length: o[0], width: o[1], roundness: 0.35, thickness: 0.05, bend: 0.55, freeEdgeFrom: 99 }), o[2]),
+          gel({ vertexColors: true, roughness: 0.18, envMapIntensity: 0.45 })
         );
-        nail.position.set(Math.sin(angle) * 1.15, Math.cos(angle) * 1.15 - 1.55, 0.05);
+        nail.position.set(Math.sin(angle) * 1.25, Math.cos(angle) * 1.25 - 2.0, Math.abs(i - 2) * -0.06);
         nail.rotation.z = -angle;
         group.add(nail);
       }
-      var s = strass(0.07);
-      s.position.set(0, -0.25, 0.17);
-      group.add(s);
-
-      group.rotation.x = -0.55;
+      // strass en la uña del medio
+      [[0, -0.15, 0.09], [-0.12, 0.08, 0.06], [0.12, 0.08, 0.06]].forEach(function (p) {
+        var s = strass(p[2]);
+        s.position.set(p[0], p[1], 0.14);
+        group.add(s);
+      });
+      group.rotation.x = -0.2;
       return group;
     }
   };
@@ -235,7 +229,7 @@
   // Un visor por tarjeta
   // ---------------------------------------------------------------------------
   var viewers = [];
-  var CAMERA = { semi: 5.4, capping: 5.4, softgel: 6.2, presson: 5.6 };
+  var CAMERA = { semi: 5.4, capping: 5.4, softgel: 6.2, presson: 6.2 };
 
   function createViewer(container, index) {
     var THREE = window.THREE;

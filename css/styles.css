@@ -44,14 +44,18 @@
   --color-logo: #E2558D;      /* rosa del logo de Astra */
   --color-logo-on-photo: #FF8DB8; /* logo sobre la foto del inicio (igual en ambos temas) */
   --color-petal-strong: #EFB5C6;
+  --color-pill: #F2A7C0;       /* globos de títulos: más fuertes que el fondo */
+  --color-section: #FADCE6;    /* secciones alternadas */
+  --color-model-a: #FCE3EB;    /* fondo de los modelos 3D */
+  --color-model-b: #EEB4C7;
   --color-header: rgb(255 247 249 / 0.85);
   --color-footer-bg: #3B2330;
   --color-footer-fg: #F6E4EA;
   --color-footer-muted: #CDB3BE;
   --color-footer-accent: #F4C6D4; /* el footer es oscuro en ambos temas */
   --color-carousel-btn: rgb(28 18 23 / 0.72); /* flechas del carrusel, sobre fotos */
-  /* Mapa maqueta: rosa en ambos temas */
-  --color-map-ground: #FBE4EB;
+  /* Mapa maqueta: blanco con calles rosas en tema claro, rosa en tema oscuro */
+  --color-map-ground: #FFFFFF;
   --color-map-label: #8E2E50;
   /* Hero sobre foto: iguales en ambos temas */
   --color-hero-fg: #FFF7F9;
@@ -101,6 +105,11 @@
     --color-on-rose: #2A1520;
     --color-logo: #F78FB8;
     --color-petal-strong: #633649;
+    --color-map-ground: #FBE4EB;
+    --color-pill: #4E2A3A;
+    --color-section: #26181F;
+    --color-model-a: #1C1217;
+    --color-model-b: #26181F;
     --color-header: rgb(28 18 23 / 0.85);
     --color-footer-bg: #130C10;
     color-scheme: dark;
@@ -118,6 +127,11 @@
   --color-on-rose: #2A1520;
   --color-logo: #F78FB8;
   --color-petal-strong: #633649;
+  --color-map-ground: #FBE4EB;
+  --color-pill: #4E2A3A;
+  --color-section: #26181F;
+  --color-model-a: #1C1217;
+  --color-model-b: #26181F;
   --color-header: rgb(28 18 23 / 0.85);
   --color-footer-bg: #130C10;
   color-scheme: dark;
@@ -369,7 +383,7 @@ html.no-intro .intro { display: none !important; }
   .hero__content { animation: hero-fade 0.9s 0.2s ease-out both; }
   .hero__wordmark { animation: logo-write 1.3s 0.2s cubic-bezier(0.6, 0, 0.3, 1) both; }
 
-  /* Pantalla de entrada (index.html): el logo se escribe de izquierda a derecha y la pantalla se va */
+  /* Pantalla de entrada (index.html): el logo se escribe con pincel, letra por letra, y la pantalla se va */
   .intro {
     position: fixed;
     inset: 0;
@@ -378,16 +392,32 @@ html.no-intro .intro { display: none !important; }
     place-items: center;
     background: var(--color-bg);
     pointer-events: none;
-    animation: intro-out 0.6s 1.65s ease forwards;
+    animation: intro-out 0.6s 2.4s ease forwards;
   }
   .intro__logo {
+    display: block;
     width: min(72vw, 28rem);
+    height: auto;
     color: var(--color-logo);
-    animation: logo-write 1.3s 0.15s cubic-bezier(0.6, 0, 0.3, 1) both;
+    overflow: visible;
   }
+  /* Cada trazo se pinta en orden (--t: cuándo empieza, --d: cuánto tarda) */
+  .intro__trazos path {
+    stroke-dasharray: 1 1;
+    stroke-dashoffset: 1;
+    visibility: hidden; /* sin el puntito del extremo redondeado antes de empezar */
+    animation: intro-trazo var(--d) var(--t) cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards;
+  }
+  /* Al final se completa el logo para que no quede ningún detalle sin pintar */
+  .intro__relleno { opacity: 0; animation: intro-relleno 0.3s 2.05s ease forwards; }
+  @keyframes intro-trazo {
+    from { stroke-dashoffset: 1; visibility: visible; }
+    to { stroke-dashoffset: 0; visibility: visible; }
+  }
+  @keyframes intro-relleno { to { opacity: 1; } }
   /* Con pantalla de entrada, el inicio aparece cuando ella se va */
-  html:not(.no-intro) .hero__content { animation-delay: 2s; }
-  html:not(.no-intro) .hero__wordmark { animation-delay: 2s; }
+  html:not(.no-intro) .hero__content { animation-delay: 2.75s; }
+  html:not(.no-intro) .hero__wordmark { animation-delay: 2.75s; }
 
   @keyframes logo-write {
     from { clip-path: inset(-10% 100% -10% 0); }
@@ -411,7 +441,7 @@ html.no-intro .intro { display: none !important; }
    ------------------------------------------------------------------------ */
 .local {
   padding-block: var(--space-l);
-  background: var(--color-blush);
+  background: var(--color-section);
   border-bottom: 1px solid var(--color-line);
 }
 .local__inner {
@@ -550,7 +580,7 @@ html.no-intro .intro { display: none !important; }
 /* Secciones
    ------------------------------------------------------------------------ */
 .section { padding-block: var(--space-xl); }
-.section--tinted { background: var(--color-blush); }
+.section--tinted { background: var(--color-section); }
 
 .section__head {
   display: grid;
@@ -568,7 +598,7 @@ html.no-intro .intro { display: none !important; }
   width: fit-content;
   padding: 0.28em 0.75em;
   border-radius: 1.2em;
-  background: var(--color-petal);
+  background: var(--color-pill);
 }
 .local h2 { justify-self: center; }
 
@@ -581,7 +611,7 @@ html.no-intro .intro { display: none !important; }
   width: fit-content;
   padding: 0.28em 0.85em;
   border-radius: 999px;
-  background: var(--color-petal);
+  background: var(--color-pill);
 }
 
 /* Centrado exacto del texto en los globos: recorta el espacio sobrante de la tipografía
@@ -764,7 +794,7 @@ html.no-intro .intro { display: none !important; }
   aspect-ratio: 4 / 3;
   margin-bottom: var(--space-xs);
   border-radius: 14px;
-  background: radial-gradient(circle at 50% 40%, var(--color-bg) 0%, var(--color-blush) 75%);
+  background: radial-gradient(circle at 50% 40%, var(--color-model-a) 0%, var(--color-model-b) 80%);
   overflow: hidden;
   cursor: grab;
 }
