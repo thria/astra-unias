@@ -31,13 +31,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Pinyon+Script&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=36">
+  <link rel="stylesheet" href="css/styles.css?v=37">
   <script src="js/theme.js?v=3" defer></script>
   <script src="js/map.js?v=2" defer></script>
   <script src="js/carousel.js?v=2" defer></script>
   <script src="js/agenda.js?v=2" defer></script>
-  <script src="js/nails3d.js?v=4" defer></script>
-  <script src="js/effects.js?v=2" defer></script>
+  <script src="js/nails3d.js?v=7" defer></script>
+  <script src="js/effects.js?v=3" defer></script>
 
   <script type="application/ld+json">
   {
@@ -250,10 +250,37 @@
 
     <section class="section" id="servicios" aria-labelledby="servicios-titulo">
       <div class="container services">
-        <div class="section__head">
-          <h2 id="servicios-titulo">Servicios</h2>
-          <p>Todos se pueden combinar con diseño: cromados, strass, dibujos a mano y apliques en 3D.</p>
-          <p class="services__price">Los precios están en el catálogo. <a href="https://ig.me/m/astra.unias" target="_blank" rel="noopener">Pedímelo por mensaje</a>.</p>
+        <!-- Columna izquierda: queda fija mientras pasan las tarjetas (en pantallas grandes) -->
+        <div class="services__aside">
+          <div class="section__head">
+            <h2 id="servicios-titulo">Servicios</h2>
+            <p>Todos se pueden combinar con diseño: cromados, strass, dibujos a mano y apliques en 3D.</p>
+            <p class="services__price">Los precios están en el catálogo. <a href="https://ig.me/m/astra.unias" target="_blank" rel="noopener">Pedímelo por mensaje</a>.</p>
+          </div>
+
+          <div class="services__guide">
+            <h3 class="services__subtitle">¿Cuál me conviene?</h3>
+            <dl class="guide-list">
+              <div><dt>Semipermanente</dt><dd>Si querés color en tu uña natural, sin alargarla.</dd></div>
+              <div><dt>Capping</dt><dd>Si tus uñas son débiles o querés que crezcan más fuertes.</dd></div>
+              <div><dt>Soft gel</dt><dd>Si querés sumar largo y elegir la forma.</dd></div>
+              <div><dt>Press on</dt><dd>Si te gusta cambiar seguido o tenés un evento.</dd></div>
+            </dl>
+          </div>
+
+          <div class="services__extras">
+            <h3 class="services__subtitle">Diseños que podés sumar</h3>
+            <ul class="chips" role="list">
+              <li>Cromados</li>
+              <li>Strass</li>
+              <li>Aura</li>
+              <li>Ojo de gato</li>
+              <li>Francesita</li>
+              <li>Dibujos a mano</li>
+              <li>Apliques 3D</li>
+              <li>Lunares</li>
+            </ul>
+          </div>
         </div>
         <div class="services__models">
         <!-- Cada tarjeta tiene un modelo 3D (js/nails3d.js) que se puede girar y acercar.
