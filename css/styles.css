@@ -1902,6 +1902,36 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
 .mascot__tongue { fill: #F28DAE; }
 .mascot__fang { fill: #FFFFFF; }
 /* Caras de Mizu: una sola a la vez, según el ánimo (data-mood, js/mascot.js) */
+/* Mizu monstruito: plano, con la paleta de la página (js/mascot.js) */
+.mascot { --mzm-ink: #2A2321; }
+.mzm-body { fill: #D9A9B3; }          /* rosa empolvado */
+.mzm-shade { fill: #B98390; }         /* sombra suave del pelo */
+.mzm-horn { fill: #F3CDD1; }          /* cuernos: uña almendra nude rosada */
+.mzm-cuticle { fill: #E7B3BC; }
+.mzm-gel { fill: none; stroke: #FFFFFF; stroke-width: 2.2; stroke-linecap: round; opacity: 0.85; }
+.mzm-shoe { fill: #2A2321; }          /* zapatillas espresso con suela marfil */
+.mzm-sole { fill: #F8F4EF; }
+.mzm-lace { fill: none; stroke: #A86A77; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.mzm-white { fill: #FFFFFF; }
+.mzm-ink { fill: var(--mzm-ink); }
+.mzm-line { fill: none; stroke: var(--mzm-ink); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.mzm-line.mzm-thick { stroke-width: 3.2; }
+.mzm-tongue { fill: #E58BA3; }
+.mzm-blush { fill: #E58BA3; opacity: 0.55; }
+.mzm-heart { fill: #A86A77; }
+.mzm-tear { fill: none; stroke: #A9DDF7; stroke-width: 3.4; stroke-linecap: round; }
+.mzm-drop { fill: #A9DDF7; }
+.mzm-glass { fill: none; stroke: var(--mzm-ink); stroke-width: 2; }
+.mzm-mark { fill: none; stroke: #A86A77; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.mzm-mark.mzm-thin { stroke-width: 2.4; }
+.mzm-dot { fill: #A86A77; }
+:root[data-theme="dark"] .mascot .mzm-mark, :root[data-theme="dark"] .mascot .mzm-dot, :root[data-theme="dark"] .mascot .mzm-heart { stroke: #D8A6AF; }
+:root[data-theme="dark"] .mascot .mzm-dot, :root[data-theme="dark"] .mascot .mzm-heart { fill: #D8A6AF; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .mascot .mzm-mark { stroke: #D8A6AF; }
+  :root:not([data-theme="light"]) .mascot .mzm-dot,
+  :root:not([data-theme="light"]) .mascot .mzm-heart { fill: #D8A6AF; }
+}
 /* Mizu dibujado a mano: relleno blanco, trazo de tinta grueso (el filtro mzi-ink lo hace temblar) */
 .mascot { --mzi-ink: #141012; --mzi-mark: #141012; }
 :root[data-theme="dark"] .mascot { --mzi-mark: #F6EEE8; }
