@@ -1903,6 +1903,69 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
 }
 .reveal-on .reveal.is-visible { opacity: 1; translate: 0 0; }
 
+/* "Hola, soy Rena": entrada en capas, lenta y armoniosa.
+   1. la foto se descubre de abajo hacia arriba como una cortina, mientras la imagen se acomoda (zoom suave hacia atrás)
+   2. la tarjeta sube y aparece, apenas después
+   3. adentro, el título, el rol, cada párrafo y los botones aparecen uno detrás de otro
+   4. una línea fina rosa se dibuja debajo del rol */
+/* (el recorte va en la imagen: si fuera en el contenedor, el detector de "aparecer al bajar" no lo vería) */
+.reveal-on .about__photo.reveal {
+  opacity: 1;
+  translate: none;
+  background: transparent;
+  box-shadow: none;
+  transition: box-shadow 1.2s ease 0.9s;
+}
+.reveal-on .about__photo.reveal img {
+  clip-path: inset(100% 0 0 0);
+  scale: 1.18;
+  transition: clip-path 1.5s cubic-bezier(0.65, 0, 0.2, 1), scale 2.2s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.reveal-on .about__photo.reveal.is-visible { box-shadow: 0 24px 48px -28px rgb(59 35 48 / 0.55); }
+.reveal-on .about__photo.reveal.is-visible img { clip-path: inset(0 0 0 0); scale: 1; }
+
+.reveal-on .about__copy.reveal {
+  translate: 0 2.5rem;
+  transition: opacity 1.1s ease 0.45s, translate 1.3s cubic-bezier(0.2, 0.8, 0.2, 1) 0.45s;
+}
+.reveal-on .about__copy.reveal > * {
+  opacity: 0;
+  translate: 0 0.9rem;
+  transition: opacity 0.9s ease, translate 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.reveal-on .about__copy.reveal.is-visible > * { opacity: 1; translate: none; }
+.reveal-on .about__copy.reveal > :nth-child(1) { transition-delay: 0.75s; }
+.reveal-on .about__copy.reveal > :nth-child(2) { transition-delay: 0.9s; }
+.reveal-on .about__copy.reveal > :nth-child(3) { transition-delay: 1.05s; }
+.reveal-on .about__copy.reveal > :nth-child(4) { transition-delay: 1.2s; }
+.reveal-on .about__copy.reveal > :nth-child(5) { transition-delay: 1.35s; }
+/* los botones redondos aparecen de a uno, con un mínimo crecimiento */
+.reveal-on .about__copy.reveal .about__links li {
+  opacity: 0;
+  scale: 0.8;
+  transition: opacity 0.7s ease, scale 0.8s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+.reveal-on .about__copy.reveal.is-visible .about__links li { opacity: 1; scale: 1; }
+.reveal-on .about__copy.reveal .about__links li:nth-child(1) { transition-delay: 1.5s; }
+.reveal-on .about__copy.reveal .about__links li:nth-child(2) { transition-delay: 1.6s; }
+.reveal-on .about__copy.reveal .about__links li:nth-child(3) { transition-delay: 1.7s; }
+.reveal-on .about__copy.reveal .about__links li:nth-child(4) { transition-delay: 1.8s; }
+/* línea fina debajo del rol, que se dibuja de izquierda a derecha */
+.about__role { position: relative; padding-bottom: 0.6rem; }
+.about__role::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 2.5rem;
+  height: 1px;
+  background: var(--color-rose);
+  opacity: 0.7;
+  transform-origin: left;
+}
+.reveal-on .about__copy.reveal .about__role::after { transform: scaleX(0); transition: transform 1s cubic-bezier(0.65, 0, 0.2, 1) 1.15s; }
+.reveal-on .about__copy.reveal.is-visible .about__role::after { transform: scaleX(1); }
+
 /* Carrusel: en vez de subir entero, sus fotos entran desde la izquierda una por una */
 .reveal-on .carousel.reveal { opacity: 1; translate: none; }
 .reveal-on .carousel.reveal .carousel__track > * {
