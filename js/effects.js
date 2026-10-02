@@ -7,6 +7,7 @@
 //  6. Opiniones que se escriben palabra por palabra.
 //  7. Línea que une los pasos para pedir turno.
 //  8. Botón de turno magnético.
+//  9. Logo gigante del pie que se descubre al final.
 (function () {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
@@ -244,5 +245,17 @@
       });
       b.addEventListener('mouseleave', function () { b.style.transform = ''; });
     });
+  }
+
+  // ---- 9. Logo gigante del pie: se descubre al llegar al final ----
+  var wordmark = document.querySelector('.footer-wordmark');
+  if (wordmark && 'IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries, io) {
+      if (!entries[0].isIntersecting) return;
+      wordmark.classList.add('is-visible');
+      io.disconnect();
+    }, { threshold: 0.4 }).observe(wordmark);
+  } else if (wordmark) {
+    wordmark.classList.add('is-visible');
   }
 })();

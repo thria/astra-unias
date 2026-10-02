@@ -2476,3 +2476,24 @@ button.almanac__day.is-selected:hover { background: var(--color-ink); color: var
 /* en fila (compu): el número va arriba del título, así la línea une solo los números */
 .steps.is-row li { grid-template-columns: 1fr; }
 .steps.is-row li::before { grid-row: auto; margin-bottom: 0.4rem; }
+
+/* Galería: cada foto se revela de izquierda a derecha mientras se acomoda de un leve zoom
+   (una detrás de otra; reemplaza la entrada deslizada) */
+.reveal-on .carousel.reveal .carousel__track > * {
+  opacity: 1;
+  translate: none;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 1.05s cubic-bezier(0.65, 0, 0.2, 1) var(--enter-delay, 0s), scale 0.45s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease;
+}
+.reveal-on .carousel.reveal.is-visible .carousel__track > * { opacity: 1; translate: none; clip-path: inset(-3rem); } /* margen negativo: no recorta la sombra ni el zoom del hover */
+.reveal-on .carousel.reveal .gallery__item img { scale: 1.1; transition: scale 1.5s cubic-bezier(0.22, 1, 0.36, 1) var(--enter-delay, 0s); }
+.reveal-on .carousel.reveal.is-visible .gallery__item img { scale: 1; }
+
+/* Pie: logo gigante de Astra que ocupa todo el ancho y se descubre de abajo hacia arriba */
+.footer-wordmark { display: block; width: 100%; margin-top: 2.5rem; color: var(--color-footer-accent); text-decoration: none; transition: color 0.4s ease; }
+.footer-wordmark:hover { color: var(--color-footer-fg); }
+.footer-wordmark .logo-mark { width: 100%; }
+@media (prefers-reduced-motion: no-preference) {
+  .footer-wordmark .logo-mark { clip-path: inset(100% 0 -10% 0); translate: 0 12%; transition: clip-path 1.4s cubic-bezier(0.65, 0, 0.2, 1), translate 1.6s cubic-bezier(0.22, 1, 0.36, 1); }
+  .footer-wordmark.is-visible .logo-mark { clip-path: inset(-10% 0 -10% 0); translate: 0 0; }
+}
