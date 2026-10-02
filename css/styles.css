@@ -1778,13 +1778,10 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
    ------------------------------------------------------------------------ */
 .mascot {
   /* colores del personaje: iguales en tema claro y oscuro */
-  --mascot-cream: #FFF3E3;
-  --mascot-cream-light: #FFFBF5;
-  --mascot-yellow: #F8DD9E;
+  --mascot-black: #1B1216;
+  --mascot-cream: #FFF3E8;
   --mascot-pink: #F6A9C2;
-  --mascot-gold: #EFC255;
-  --mascot-line: #A9817B;   /* contorno fino color moca */
-  --mascot-eye: #3A2230;
+  --mascot-glow: rgb(255 247 249 / 0.7); /* contorno claro para que se vea sobre fondos oscuros y la foto */
   position: fixed;
   right: 1rem;
   bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
@@ -1812,30 +1809,20 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
 }
 .mascot__button:focus-visible { outline: 2px solid var(--color-rose); outline-offset: 4px; border-radius: 50%; }
 .mascot.is-hidden .mascot__button { width: 3rem; opacity: 0.85; }
-.mascot__cat { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 6px 10px rgb(59 35 48 / 0.28)); }
-/* Mizu: crema con manchas amarillas, rosa en orejas, mejillas y moño, contorno fino color moca */
-.mascot__body { fill: var(--mascot-cream); stroke: var(--mascot-line); stroke-width: 1.6; }
-.mascot__ear-patch { fill: var(--mascot-yellow); }
-.mascot__chest { fill: var(--mascot-cream-light); }
-.mascot__toe { fill: none; stroke: var(--mascot-line); stroke-width: 1.1; stroke-linecap: round; opacity: 0.7; }
-.mascot__ear-in { fill: url(#mz-ear); }
-.mascot__patch { fill: var(--mascot-yellow); }
-.mascot__head-line { fill: none; stroke: var(--mascot-line); stroke-width: 1.6; }
+.mascot__cat { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 0 1.2px var(--mascot-glow)) drop-shadow(0 0 1.2px var(--mascot-glow)); }
+/* Mizu: silueta negra, ojos crema, rosa solo en orejas, nariz y collar */
+.mascot__body { fill: var(--mascot-black); }
+.mascot__ear-in { fill: var(--mascot-pink); }
 .mascot__star { fill: var(--mascot-pink); }
-.mascot__blush { fill: var(--mascot-pink); opacity: 0.5; }
-.mascot__whisker { fill: none; stroke: var(--mascot-line); stroke-width: 1; stroke-linecap: round; opacity: 0.85; }
-.mascot__eye { fill: url(#mz-iris); }
-.mascot__eye-glow { fill: #E9A3C3; opacity: 0.45; }
+.mascot__whisker { fill: none; stroke: var(--mascot-cream); stroke-width: 0.9; stroke-linecap: round; opacity: 0.55; }
+.mascot__eye-ring { fill: var(--mascot-cream); }
+.mascot__eye { fill: var(--mascot-black); }
 .mascot__shine { fill: #FFFFFF; }
-.mascot__lash { fill: none; stroke: var(--mascot-eye); stroke-width: 2; stroke-linecap: round; }
-.mascot__nose { fill: #EE8FAF; }
-.mascot__mouth { fill: none; stroke: var(--mascot-line); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
-.mascot__ribbon { fill: none; stroke: var(--mascot-pink); stroke-width: 3.6; stroke-linecap: round; }
-.mascot__bow { fill: var(--mascot-pink); stroke: #D97E9E; stroke-width: 0.8; }
-.mascot__bell { fill: var(--mascot-gold); stroke: #C9972E; stroke-width: 0.8; }
-.mascot__tail path { fill: none; stroke-linecap: round; }
-.mascot__tail-line { stroke: var(--mascot-line); stroke-width: 13; }
-.mascot__tail-fill { stroke: var(--mascot-cream); stroke-width: 9.8; }
+.mascot__nose { fill: var(--mascot-pink); }
+.mascot__ribbon { fill: none; stroke: var(--mascot-pink); stroke-width: 2.2; stroke-linecap: round; }
+.mascot__tail { fill: none; stroke: var(--mascot-black); stroke-width: 11; stroke-linecap: round; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .mascot { --mascot-glow: rgb(255 235 243 / 0.9); } }
+:root[data-theme="dark"] .mascot { --mascot-glow: rgb(255 235 243 / 0.9); }
 
 /* Globo de diálogo */
 .mascot__bubble {
