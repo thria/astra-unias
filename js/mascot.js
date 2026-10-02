@@ -1,4 +1,4 @@
-// Mizu: el monstruito de Astra (bolita peluda negra, petisa y simpática, con 6 caras según lo que pasa) que aparece abajo a la derecha
+// Mizu: el gatito de Astra (personaje propio: una mancha negra con forma de gato y ojos que lo dicen todo) que aparece abajo a la derecha
 // con un globo de diálogo, al estilo de Clippy. Solo habla cuando la tocan: nunca habla sola.
 // - Tocarla: la primera vez saluda; después comenta la sección que se está mirando o tira un tip.
 // - "Ocultar": la achica (se recuerda en este navegador).
@@ -36,77 +36,60 @@
   var hidden = false;
   try { hidden = localStorage.getItem(STORAGE_KEY) === '1'; } catch (e) {}
 
-  // Mizu: monstruito de peluche. Cuerpo rechoncho en forma de huevo, pelo negro suave (textura y borde
-  // esponjoso con un filtro SVG), carita y pancita color crema, orejas de felpa rosa, bracitos y patitas
-  // acolchados, ojitos de botón y cachetes rosados. Volumen con luces suaves, sin contornos.
+  // Mizu: una mancha negra con forma de gato (caricatura simple, plana). Todo lo expresan los ojos,
+  // con símbolos estilo manga japonés alrededor (!!, ♡, ?, ♪, gotita, Zz) en rosa.
   // Caras (data-mood en .mascot): idle · wow · shy · gossip · love · think · sleep
   var HEART = function (x, y, s) { // corazón centrado en (x, y), de tamaño s
     return 'M' + x + ' ' + (y + s * 0.55) + 'C' + (x - s * 1.1) + ' ' + (y - s * 0.1) + ' ' + (x - s * 0.55) + ' ' + (y - s * 0.95) + ' ' + x + ' ' + (y - s * 0.35) +
       'C' + (x + s * 0.55) + ' ' + (y - s * 0.95) + ' ' + (x + s * 1.1) + ' ' + (y - s * 0.1) + ' ' + x + ' ' + (y + s * 0.55) + 'Z';
   };
-  var EYES = function (dy, rx, ry, dx) { // ojitos de botón con brillo
-    dx = dx || 0;
-    return '<ellipse class="mzp-eye" cx="' + (49 + dx) + '" cy="' + (57 + dy) + '" rx="' + rx + '" ry="' + ry + '"/>' +
-      '<ellipse class="mzp-eye" cx="' + (71 + dx) + '" cy="' + (57 + dy) + '" rx="' + rx + '" ry="' + ry + '"/>' +
-      '<circle class="mzp-shine" cx="' + (50.3 + dx) + '" cy="' + (55.3 + dy) + '" r="1.25"/><circle class="mzp-shine" cx="' + (72.3 + dx) + '" cy="' + (55.3 + dy) + '" r="1.25"/>';
+  var SPARK = function (x, y, r) { // destellito de 4 puntas
+    return 'M' + x + ' ' + (y - r) + 'Q' + x + ' ' + y + ' ' + (x + r) + ' ' + y + 'Q' + x + ' ' + y + ' ' + x + ' ' + (y + r) + 'Q' + x + ' ' + y + ' ' + (x - r) + ' ' + y + 'Q' + x + ' ' + y + ' ' + x + ' ' + (y - r) + 'Z';
+  };
+  // ojos: blanco + pupila (dx, dy corren la mirada) + brillito
+  var EYES = function (o) {
+    o = o || {};
+    var rx = o.rx || 12, ry = o.ry || 13, pr = o.pr || 6.5, dx = o.dx || 0, dy = o.dy || 0, s = '';
+    [45, 75].forEach(function (cx, i) {
+      var px = cx + (i ? -2 : 2) + dx, py = 73 + dy;
+      s += '<ellipse class="mzc-white" cx="' + cx + '" cy="72" rx="' + rx + '" ry="' + ry + '"/>' +
+        '<ellipse class="mzc-ink" cx="' + px + '" cy="' + py + '" rx="' + pr + '" ry="' + (pr * 1.12) + '"/>' +
+        '<circle class="mzc-white" cx="' + (px + pr * 0.35) + '" cy="' + (py - pr * 0.45) + '" r="' + (pr * 0.3) + '"/>';
+    });
+    return s;
   };
   var FACES = {
-    idle: '<g class="mascot__eyes">' + EYES(0, 3.6, 4.4) + '</g><path class="mzp-line" d="M56 64.5q4 3.6 8 0"/>',
-    wow: EYES(-0.5, 4, 5) + '<ellipse class="mzp-eye" cx="60" cy="67" rx="2.4" ry="3"/>' +
-      '<path class="mzp-mark" d="M14 13v10"/><circle class="mzp-mark-dot" cx="14" cy="28.5" r="1.9"/>',
-    shy: EYES(2.5, 3.1, 3.7) + '<path class="mzp-line" d="M57 66q3 2.2 6 0"/>' +
-      '<path class="mzp-blush-line" d="M39 66l-1.6 3M42.5 66l-1.6 3M77.5 66l1.6 3M81 66l1.6 3"/>',
-    gossip: '<path class="mzp-eye" d="M45.5 57a3.6 3.6 0 0 0 7.2 0Z"/><path class="mzp-eye" d="M67.5 56a3.6 3.6 0 0 0 7.2 0Z"/>' +
-      '<path class="mzp-line" d="M44.5 57h9M66.5 54q4.5-2.2 9 0"/><path class="mzp-line" d="M55 64.5q6 3.5 10.5-2"/>',
-    love: '<path class="mzp-line mzp-thick" d="M45 58q4-5 8 0M67 58q4-5 8 0"/>' +
-      '<path class="mzp-eye" d="M55 62.5q5 7.5 10 0Z"/><ellipse class="mzp-tongue" cx="60" cy="66.2" rx="2.6" ry="1.5"/>' +
-      '<path class="mzp-heart" d="' + HEART(14, 22, 6) + '"/>',
-    think: EYES(-2.5, 3.4, 4.2, -1.5) + '<path class="mzp-line" d="M56 66q2-2 4 0t4 0"/>' +
-      '<path class="mzp-mark" d="M9 16q0-6 6-6t6 5q0 4-6 6v3"/><circle class="mzp-mark-dot" cx="15" cy="29" r="1.9"/>',
-    sleep: '<path class="mzp-line mzp-thick" d="M45 57q4 4 8 0M67 57q4 4 8 0"/><ellipse class="mzp-eye" cx="60" cy="66" rx="1.8" ry="2.2"/>' +
-      '<path class="mzp-mark mzp-z" d="M8 24h6l-6 6h6M16 13h4.5l-4.5 4.5h4.5"/>'
+    idle: '<g class="mascot__eyes">' + EYES() + '</g>',
+    wow: EYES({ rx: 13.5, ry: 14.5, pr: 3.4 }) +
+      '<path class="mzc-mark" d="M101 12v11M110 9v11"/><circle class="mzc-dot" cx="101" cy="29" r="2"/><circle class="mzc-dot" cx="110" cy="26" r="2"/>',
+    shy: EYES({ pr: 5.2, dx: -3, dy: 5 }) +
+      '<ellipse class="mzc-blush" cx="36" cy="88" rx="6" ry="3.2"/><ellipse class="mzc-blush" cx="84" cy="88" rx="6" ry="3.2"/>' +
+      '<path class="mzc-blush-line" d="M33 86.5l-1.5 3M37 86.5l-1.5 3M81 86.5l1.5 3M85 86.5l1.5 3"/>' +
+      '<path class="mzc-drop" d="M106 14c-3.5 6-5 8.5-5 11a5 5 0 0 0 10 0c0-2.5-1.5-5-5-11Z"/>',
+    gossip: EYES({ pr: 5.6, dx: 5, dy: 3 }) +
+      '<path class="mzc-lid" d="M31 72.5Q45 70 59 72.5V56H31ZM61 72.5Q75 70 89 72.5V56H61Z"/>' +
+      '<path class="mzc-mark" d="M103 28V12l8-2v14"/><circle class="mzc-dot" cx="100.5" cy="28.5" r="3"/><circle class="mzc-dot" cx="108.5" cy="24.5" r="3"/>',
+    love: '<ellipse class="mzc-white" cx="45" cy="72" rx="12" ry="13"/><ellipse class="mzc-white" cx="75" cy="72" rx="12" ry="13"/>' +
+      '<path class="mzc-heart" d="' + HEART(46, 73, 10) + '"/><path class="mzc-heart" d="' + HEART(74, 73, 10) + '"/>' +
+      '<path class="mzc-heart" d="' + HEART(106, 18, 7) + '"/><path class="mzc-dot" d="' + SPARK(96, 8, 4.5) + '"/>',
+    think: EYES({ pr: 5.8, dx: -3, dy: -5 }) +
+      '<path class="mzc-mark" d="M101 13q0-6 6-6t6 5q0 4-6 6v3"/><circle class="mzc-dot" cx="107" cy="27" r="2"/>' +
+      '<circle class="mzc-dot" cx="94" cy="34" r="1.6"/><circle class="mzc-dot" cx="99" cy="36" r="1.6"/>',
+    sleep: '<path class="mzc-shut" d="M36 72q9 8 18 0M66 72q9 8 18 0"/>' +
+      '<path class="mzc-mark mzc-thin" d="M99 20h7l-7 8h7M108 8h5l-5 6h5"/>'
   };
   var FACES_SVG = Object.keys(FACES).map(function (k) { return '<g class="mz-face" data-face="' + k + '">' + FACES[k] + '</g>'; }).join('');
 
   var CAT_SVG =
     '<svg class="mascot__cat" viewBox="0 0 120 132" aria-hidden="true">' +
-      '<defs>' +
-        // pelo de peluche: borde apenas desparejo + pelusitas claras encima
-        '<filter id="mzp-plush" x="-10%" y="-10%" width="120%" height="120%">' +
-          '<feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="3" result="n"/>' +
-          '<feDisplacementMap in="SourceGraphic" in2="n" scale="2.2" xChannelSelector="R" yChannelSelector="G" result="d"/>' +
-          '<feTurbulence type="fractalNoise" baseFrequency="1.1 1.4" numOctaves="2" seed="8" result="g"/>' +
-          '<feColorMatrix in="g" type="matrix" values="0 0 0 0 1  0 0 0 0 0.92  0 0 0 0 0.95  0.4 0 0 0 -0.2" result="gw"/>' +
-          '<feComposite in="gw" in2="d" operator="in" result="tex"/>' +
-          '<feMerge><feMergeNode in="d"/><feMergeNode in="tex"/></feMerge>' +
-        '</filter>' +
-        '<radialGradient id="mzp-fur" cx="36%" cy="28%" r="80%"><stop offset="0" stop-color="#4A3B44"/><stop offset=".55" stop-color="#261C22"/><stop offset="1" stop-color="#140E12"/></radialGradient>' +
-        '<radialGradient id="mzp-cream" cx="45%" cy="35%" r="75%"><stop offset="0" stop-color="#FFF6EE"/><stop offset="1" stop-color="#EBD3C4"/></radialGradient>' +
-        '<radialGradient id="mzp-felt" cx="50%" cy="70%" r="80%"><stop offset="0" stop-color="#F9B7CB"/><stop offset="1" stop-color="#E890AE"/></radialGradient>' +
-      '</defs>' +
-      '<ellipse class="mzp-shadow" cx="60" cy="126.5" rx="34" ry="3.8"/>' +
-      '<g filter="url(#mzp-plush)">' +
-        '<ellipse class="mzp-fur" cx="44" cy="118" rx="12.5" ry="8"/><ellipse class="mzp-fur" cx="76" cy="118" rx="12.5" ry="8"/>' +
-        '<ellipse class="mzp-pad" cx="44" cy="120" rx="6" ry="3.4"/><ellipse class="mzp-pad" cx="76" cy="120" rx="6" ry="3.4"/>' +
-      '</g>' +
       '<g class="mascot__head">' +
-        '<g filter="url(#mzp-plush)">' +
-          '<path class="mzp-fur" d="M27 42C23 23 28 10 36 9c6 0 12 9 16 17Z"/><path class="mzp-fur" d="M93 42c4-19-1-32-9-33-6 0-12 9-16 17Z"/>' +
-          '<path class="mzp-felt" d="M31 35c-2-11 1-18 5-19 4 0 7 5 10 10Z"/><path class="mzp-felt" d="M89 35c2-11-1-18-5-19-4 0-7 5-10 10Z"/>' +
-          '<path class="mzp-fur" d="M60 19C89 19 103 44 103 71c0 28-17 48-43 48S17 99 17 71C17 44 31 19 60 19Z"/>' +
-          '<path class="mzp-fur" d="M53 23q3-7 7-1 3-7 7 0"/>' +
-          '<ellipse class="mzp-cream" cx="60" cy="59" rx="25.5" ry="20.5"/>' +
-          '<ellipse class="mzp-cream" cx="60" cy="98" rx="17" ry="14"/>' +
-        '</g>' +
-        '<ellipse class="mzp-rim" cx="60" cy="59" rx="25.5" ry="20.5"/>' +
-        '<ellipse class="mzp-blush" cx="41.5" cy="65" rx="5" ry="3"/><ellipse class="mzp-blush" cx="78.5" cy="65" rx="5" ry="3"/>' +
-        '<path class="mascot__star" d="M103 8c.5 3.6 2.6 5.8 6.5 6.5-3.9.7-6 2.9-6.5 6.5-.5-3.6-2.6-5.8-6.5-6.5 3.9-.7 6-2.9 6.5-6.5Z"/>' +
+        '<path class="mzc-body mzc-tail" d="M99 103C113 104 105 87 114 80"/>' +
+        '<path class="mzc-body" d="M24 52Q22 24 29 14q4-3 9 1l17 18Z"/><path class="mzc-body" d="M96 52q2-28-5-38-4-3-9 1L65 33Z"/>' +
+        '<ellipse class="mzc-body" cx="60" cy="74" rx="46" ry="42"/>' +
+        '<path class="mzc-gloss" d="M24 66q3-15 15-23M47 37q6-2 12-1.5"/>' +
+        '<path class="mzc-nose" d="M57.5 87.5h5l-2.5 3Z"/>' +
         FACES_SVG +
       '</g>' +
-      '<g class="mascot__arm--l"><g filter="url(#mzp-plush)"><ellipse class="mzp-fur" cx="22" cy="84" rx="8.5" ry="12.5" transform="rotate(22 22 84)"/>' +
-        '<ellipse class="mzp-pad" cx="19" cy="93" rx="4.2" ry="3.2" transform="rotate(22 19 93)"/></g></g>' +
-      '<g class="mascot__arm--wave"><g filter="url(#mzp-plush)"><ellipse class="mzp-fur" cx="98" cy="84" rx="8.5" ry="12.5" transform="rotate(-22 98 84)"/>' +
-        '<ellipse class="mzp-pad" cx="101" cy="93" rx="4.2" ry="3.2" transform="rotate(-22 101 93)"/></g></g>' +
     '</svg>';
 
 

@@ -1902,6 +1902,22 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
 .mascot__tongue { fill: #F28DAE; }
 .mascot__fang { fill: #FFFFFF; }
 /* Caras de Mizu: una sola a la vez, según el ánimo (data-mood, js/mascot.js) */
+/* Mizu caricatura: mancha negra plana con forma de gato; símbolos estilo manga en rosa (js/mascot.js) */
+.mzc-body { fill: #141012; }
+.mzc-tail { fill: none; stroke: #141012; stroke-width: 9; stroke-linecap: round; }
+.mzc-gloss { fill: none; stroke: #FFFFFF; stroke-width: 4; stroke-linecap: round; opacity: 0.9; }
+.mzc-white { fill: #FFFFFF; }
+.mzc-ink { fill: #141012; }
+.mzc-nose { fill: #F6A9C2; stroke: #F6A9C2; stroke-width: 1.5; stroke-linejoin: round; }
+.mzc-lid { fill: #141012; }
+.mzc-heart { fill: #F48FB1; }
+.mzc-blush { fill: #F48FB1; opacity: 0.75; }
+.mzc-blush-line { fill: none; stroke: #FFFFFF; stroke-width: 1.3; stroke-linecap: round; opacity: 0.85; }
+.mzc-drop { fill: #BFE3F5; stroke: #141012; stroke-width: 1.5; }
+.mzc-mark { fill: none; stroke: #F48FB1; stroke-width: 3.4; stroke-linecap: round; stroke-linejoin: round; }
+.mzc-mark.mzc-thin { stroke-width: 2.6; }
+.mzc-dot { fill: #F48FB1; }
+.mzc-shut { fill: none; stroke: #FFFFFF; stroke-width: 3.6; stroke-linecap: round; }
 /* Mizu de peluche: pelo negro suave, carita y pancita crema, felpa rosa (js/mascot.js) */
 .mzp-fur { fill: url(#mzp-fur); }
 .mzp-cream { fill: url(#mzp-cream); }
