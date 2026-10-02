@@ -1916,6 +1916,15 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
 .mzi-tear { fill: none; stroke: #9FD3EE; stroke-width: 3; stroke-linecap: round; }
 .mzi-tongue { fill: #F48FB1; stroke: var(--mzi-ink); stroke-width: 3; stroke-linejoin: round; }
 .mzi-heart { fill: #F48FB1; stroke: var(--mzi-ink); stroke-width: 2.4; stroke-linejoin: round; }
+/* ojos de anime (nítidos) */
+.mzi-sclera { fill: #FFFFFF; stroke: var(--mzi-ink); stroke-width: 3; }
+.mzi-iris { fill: url(#mzi-iris-g); }
+.mzi-pupil { fill: #0A0608; }
+.mzi-gloss { fill: none; stroke: #FFFFFF; stroke-width: 1.6; stroke-linecap: round; opacity: 0.55; }
+.mzi-lash { fill: none; stroke: var(--mzi-ink); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.mzi-pool { fill: #A9DDF7; opacity: 0.62; }
+.mzi-wave { fill: none; stroke: #FFFFFF; stroke-width: 1.5; stroke-linecap: round; opacity: 0.9; }
+.mzi-drop { fill: #A9DDF7; stroke: var(--mzi-ink); stroke-width: 1.2; }
 /* símbolos fuera de la cabeza (!!, |||, zzz, estrellas, venita): en tema oscuro van claros */
 .mzi-out.mzi-line { stroke: var(--mzi-mark); }
 .mzi-out.mzi-ink { fill: var(--mzi-mark); }
