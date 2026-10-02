@@ -54,6 +54,11 @@
       if (index > 0) el.style.transitionDelay = (index * 0.09) + 's';
       io.observe(el);
     });
+
+    // En el carrusel las fotos entran de izquierda a derecha, una detrás de la otra
+    Array.prototype.forEach.call(document.querySelectorAll('.carousel__track > *'), function (item, i) {
+      item.style.setProperty('--enter-delay', (i * 0.12) + 's');
+    });
   }
 
   // ---- 3. Opiniones que pasan solas ----
