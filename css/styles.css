@@ -383,6 +383,9 @@ html.no-intro .intro { display: none !important; }
   inset: -8% -6%;
   transform: rotateX(24deg) rotateY(-7deg) rotateZ(-5deg) scale(0.9);
   transform-style: preserve-3d;
+  /* los bordes de la foto se desvanecen en el fondo oscuro */
+  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 52%, transparent 100%);
+  mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 52%, transparent 100%);
 }
 .hero__media,
 .hero__media img {
