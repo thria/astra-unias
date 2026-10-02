@@ -1,4 +1,4 @@
-// Estrellita: la gatita de Astra (personaje propio, estilo kawaii) que aparece abajo a la derecha
+// Mizu: el gatito de Astra (personaje propio, silueta negra estilo chibi) que aparece abajo a la derecha
 // con un globo de diálogo, al estilo de Clippy. Da tips de uñas y comenta la sección que se está mirando.
 // - Tocarla: muestra otro tip.  - "Ocultar": la achica y deja de hablar sola (se recuerda en este navegador).
 // - Con "reducir movimiento" no se anima, pero sigue funcionando.
@@ -8,7 +8,7 @@
   var BUBBLE_TIME = 9000;   // cuánto queda visible cada mensaje
   var IDLE_TIP_EVERY = 35000;
 
-  var GREETING = '¡Hola! Soy Estrellita, la gatita de Astra. Tocame y te cuento tips para tus uñas.';
+  var GREETING = '¡Hola! Soy Mizu, el gatito de Astra. Tocame y te cuento tips para tus uñas.';
 
   var TIPS = [
     'Usá aceite de cutículas todas las noches: ayuda a que la uña crezca más sana.',
@@ -36,33 +36,27 @@
   var hidden = false;
   try { hidden = localStorage.getItem(STORAGE_KEY) === '1'; } catch (e) {}
 
-  // ---- Dibujo de la gatita (SVG) ----
+  // Mizu: silueta negra estilo chibi, ojos grandes con aro blanco y la estrellita rosa de Astra en la oreja
   var CAT_SVG =
-    '<svg class="mascot__cat" viewBox="0 0 120 124" aria-hidden="true">' +
-      '<g class="mascot__tail"><path class="mascot__tail-line" d="M88 104c14-2 22-10 20-22-1-7-8-8-9-2"/>' +
-        '<path class="mascot__tail-fill" d="M88 104c14-2 22-10 20-22-1-7-8-8-9-2"/></g>' +
-      '<ellipse class="mascot__fur" cx="60" cy="100" rx="29" ry="20"/>' +
-      '<ellipse class="mascot__fur" cx="45" cy="117" rx="9" ry="5"/>' +
-      '<ellipse class="mascot__fur" cx="75" cy="117" rx="9" ry="5"/>' +
+    '<svg class="mascot__cat" viewBox="0 0 120 132" aria-hidden="true">' +
+      '<path class="mascot__tail" d="M76 116c22 4 34-8 30-24-3-11-14-12-17-4"/>' +
+      '<ellipse class="mascot__body" cx="54" cy="100" rx="25" ry="23"/>' +
+      '<ellipse class="mascot__body mascot__paw" cx="42" cy="121" rx="8.5" ry="6.5"/>' +
+      '<ellipse class="mascot__body mascot__paw" cx="60" cy="123" rx="8.5" ry="6.5"/>' +
       '<g class="mascot__head">' +
-        '<path class="mascot__fur" d="M22 46 26 12 48 30Z"/>' +
-        '<path class="mascot__fur" d="M98 46 94 12 72 30Z"/>' +
-        '<path class="mascot__ear-in" d="M28 36 30 20 40 29Z"/>' +
-        '<path class="mascot__ear-in" d="M92 36 90 20 80 29Z"/>' +
-        '<ellipse class="mascot__fur" cx="60" cy="56" rx="41" ry="32"/>' +
-        '<path class="mascot__star" d="M90 10c.6 4.4 3.2 7.1 8 8-4.8.9-7.4 3.6-8 8-.6-4.4-3.2-7.1-8-8 4.8-.9 7.4-3.6 8-8Z"/>' +
-        '<g class="mascot__eyes"><ellipse cx="45" cy="56" rx="4" ry="5.5"/><ellipse cx="75" cy="56" rx="4" ry="5.5"/>' +
-          '<circle class="mascot__shine" cx="46.4" cy="54" r="1.4"/><circle class="mascot__shine" cx="76.4" cy="54" r="1.4"/></g>' +
-        '<ellipse class="mascot__cheek" cx="34" cy="67" rx="7" ry="4"/><ellipse class="mascot__cheek" cx="86" cy="67" rx="7" ry="4"/>' +
-        '<ellipse class="mascot__nose" cx="60" cy="64" rx="3" ry="2.2"/>' +
-        '<path class="mascot__line" d="M55 68q2.5 3 5 0q2.5 3 5 0"/>' +
-        '<path class="mascot__line" d="M14 58h12M13 65l13-2M98 63l13 2M94 58h12"/>' +
+        '<path class="mascot__body" d="M20 40 24 6 52 24Z"/>' +
+        '<path class="mascot__body" d="M80 22 108 12 100 48Z"/>' +
+        '<path class="mascot__ear-in" d="M88 25 102 20 98 39Z"/>' +
+        '<ellipse class="mascot__body" cx="56" cy="56" rx="44" ry="38" transform="rotate(-10 56 56)"/>' +
+        '<path class="mascot__star" d="M100 4c.6 4.4 3.2 7.1 8 8-4.8.9-7.4 3.6-8 8-.6-4.4-3.2-7.1-8-8 4.8-.9 7.4-3.6 8-8Z"/>' +
+        '<g class="mascot__eyes">' +
+          '<ellipse class="mascot__eye-ring" cx="36" cy="58" rx="15" ry="17"/><ellipse class="mascot__eye" cx="37" cy="59" rx="10.5" ry="12.5"/>' +
+          '<ellipse class="mascot__eye-ring" cx="71" cy="60" rx="16" ry="18"/><ellipse class="mascot__eye" cx="72" cy="61" rx="11.5" ry="13.5"/>' +
+          '<circle class="mascot__shine" cx="40" cy="54" r="2.6"/><circle class="mascot__shine" cx="76" cy="56" r="2.8"/>' +
+        '</g>' +
       '</g>' +
-      // patita con un frasquito de esmalte
-      '<rect class="mascot__polish" x="80" y="88" width="13" height="16" rx="3"/>' +
-      '<rect class="mascot__polish-cap" x="83" y="80" width="7" height="9" rx="1.5"/>' +
-      '<ellipse class="mascot__fur" cx="82" cy="98" rx="7" ry="6"/>' +
     '</svg>';
+
 
   var root = document.createElement('div');
   root.className = 'mascot' + (hidden ? ' is-hidden' : '');
@@ -74,7 +68,7 @@
         '<button type="button" class="mascot__close">Ocultar</button>' +
       '</div>' +
     '</div>' +
-    '<button type="button" class="mascot__button" aria-label="Estrellita, la gatita de Astra: tocala para un tip de uñas">' + CAT_SVG + '</button>';
+    '<button type="button" class="mascot__button" aria-label="Mizu, el gatito de Astra: tocalo para un tip de uñas">' + CAT_SVG + '</button>';
   document.body.appendChild(root);
 
   var bubble = root.querySelector('.mascot__bubble');

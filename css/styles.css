@@ -1113,14 +1113,14 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
 }
 .site-footer__legal a { color: var(--color-footer-muted); }
 
-/* Estrellita, la gatita de Astra (js/mascot.js)
+/* Mizu, el gatito de Astra (js/mascot.js)
    ------------------------------------------------------------------------ */
 .mascot {
   /* colores del personaje: iguales en tema claro y oscuro */
-  --mascot-fur: #FFFDFE;
-  --mascot-ink: #3B2330;
-  --mascot-pink: #E2558D;
-  --mascot-blush: #F7A1BC;
+  --mascot-black: #1B1216;
+  --mascot-white: #FFFDFE;
+  --mascot-pink: #F48FB1;
+  --mascot-glow: rgb(255 247 249 / 0.7); /* contorno claro para que se vea sobre fondos oscuros y la foto */
   position: fixed;
   right: 1rem;
   bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
@@ -1150,18 +1150,17 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
 .mascot.is-hidden .mascot__button { width: 3rem; opacity: 0.85; }
 .mascot__cat { display: block; width: 100%; height: auto; overflow: visible; }
 
-.mascot__fur { fill: var(--mascot-fur); stroke: var(--mascot-ink); stroke-width: 2.5; stroke-linejoin: round; }
-.mascot__ear-in { fill: var(--mascot-blush); }
-.mascot__star { fill: var(--mascot-pink); stroke: var(--mascot-ink); stroke-width: 1.5; stroke-linejoin: round; }
-.mascot__eyes ellipse { fill: var(--mascot-ink); }
-.mascot__shine { fill: var(--mascot-fur); }
-.mascot__cheek { fill: var(--mascot-blush); opacity: 0.65; }
-.mascot__nose { fill: var(--mascot-pink); }
-.mascot__line { fill: none; stroke: var(--mascot-ink); stroke-width: 2; stroke-linecap: round; }
-.mascot__tail-line { fill: none; stroke: var(--mascot-ink); stroke-width: 11; stroke-linecap: round; }
-.mascot__tail-fill { fill: none; stroke: var(--mascot-fur); stroke-width: 6; stroke-linecap: round; }
-.mascot__polish { fill: var(--mascot-pink); stroke: var(--mascot-ink); stroke-width: 2; }
-.mascot__polish-cap { fill: var(--mascot-ink); }
+.mascot__body { fill: var(--mascot-black); }
+.mascot__paw { stroke: none; }
+.mascot__ear-in { fill: var(--mascot-pink); }
+.mascot__star { fill: var(--mascot-pink); }
+.mascot__eye-ring { fill: var(--mascot-white); }
+.mascot__eye { fill: var(--mascot-black); }
+.mascot__shine { fill: var(--mascot-white); }
+.mascot__tail { fill: none; stroke: var(--mascot-black); stroke-width: 12; stroke-linecap: round; }
+.mascot__cat { filter: drop-shadow(0 0 1.2px var(--mascot-glow)) drop-shadow(0 0 1.2px var(--mascot-glow)); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .mascot { --mascot-glow: rgb(255 235 243 / 0.9); } }
+:root[data-theme="dark"] .mascot { --mascot-glow: rgb(255 235 243 / 0.9); }
 
 /* Globo de diálogo */
 .mascot__bubble {
