@@ -269,11 +269,51 @@
         return new THREE.Mesh(puffy(s, 0.004, r * 0.22), chrome);
       }
 
-      // 1. Negra con grietas cromadas en relieve
-      [[[0.2, 0.22], [0.36, 0.36], [0.3, 0.5], [0.46, 0.62], [0.43, 0.78]],
-       [[0.36, 0.36], [0.58, 0.42], [0.7, 0.55]],
-       [[0.46, 0.62], [0.62, 0.67], [0.58, 0.8], [0.52, 0.88]],
-       [[0.3, 0.5], [0.14, 0.57]]].forEach(function (pts) { ridge(nails[0], pts, 0.019, chrome); });
+      // 1. Negra con venas cromadas: líneas orgánicas en relieve que se ramifican y arman celditas,
+      //    gruesas en el medio y finitas en las puntas (como cromo líquido)
+      function vein(nail, pts, rMax) {
+        var curve = new THREE.CatmullRomCurve3(pts.map(function (q) { var p = uv(nail, q[0], q[1]); return surface(p[0], p[1], 0); }), false, 'centripetal');
+        var seg = pts.length * 16, radial = 12;
+        var geo = new THREE.TubeGeometry(curve, seg, rMax, radial, false);
+        var pos = geo.attributes.position, center = new THREE.Vector3(), v = new THREE.Vector3();
+        for (var i = 0; i <= seg; i++) {
+          var t = i / seg;
+          var k = 0.55 + 0.45 * Math.pow(Math.sin(Math.PI * t), 0.6) * (0.85 + 0.15 * Math.sin(t * 13)); // afinado y con leve ondulación
+          curve.getPointAt(t, center);
+          for (var j = 0; j <= radial; j++) {
+            var idx = i * (radial + 1) + j;
+            v.fromBufferAttribute(pos, idx).sub(center).multiplyScalar(k);
+            v.z *= 0.7;                       // apenas aplastado, como un hilo de gel cromado
+            v.add(center);
+            v.z += rMax * k * 0.45;           // apoyado sobre la uña, no hundido
+            pos.setXYZ(idx, v.x, v.y, v.z);
+          }
+        }
+        geo.computeVertexNormals();
+        nail.add(new THREE.Mesh(geo, chrome));
+      }
+      function knot(nail, u, v, r) { // uniones redondeadas donde se juntan las venas
+        var s = new THREE.Mesh(new THREE.SphereGeometry(r, 16, 12), chrome);
+        s.scale.z = 0.7;
+        place(nail, s, u, v, r * 0.35);
+      }
+      // Red de grietas: nodos (u, v) y uniones entre ellos con una leve curva, que arman celditas cerradas
+      var N = {
+        a: [0.22, 0.14], b: [0.36, 0.29], c: [0.62, 0.27], d: [0.88, 0.33], e: [0.29, 0.49], f: [0.55, 0.46],
+        g: [0.77, 0.54], h: [0.14, 0.62], i: [0.43, 0.65], j: [0.64, 0.71], k: [0.37, 0.81], l: [0.53, 0.89],
+        m: [0.86, 0.48], n: [0.12, 0.4]
+      };
+      [['a', 'b', 0.03], ['b', 'c', -0.04], ['c', 'd', 0.03], ['b', 'e', 0.04], ['c', 'f', -0.03], ['e', 'f', 0.03],
+       ['f', 'g', -0.03], ['g', 'm', 0.02], ['e', 'h', -0.03], ['n', 'e', 0.02], ['e', 'i', -0.03], ['f', 'i', 0.03],
+       ['i', 'j', -0.03], ['j', 'g', 0.03], ['i', 'k', 0.03], ['k', 'l', -0.02], ['j', 'l', 0.03]
+      ].forEach(function (s) {
+        var p = N[s[0]], q = N[s[1]];
+        var mx = (p[0] + q[0]) / 2, my = (p[1] + q[1]) / 2, dx = q[0] - p[0], dy = q[1] - p[1], len = Math.hypot(dx, dy);
+        vein(nails[0], [p, [mx - dy / len * s[2], my + dx / len * s[2]], q], 0.017);
+      });
+      ['b', 'c', 'e', 'f', 'g', 'i', 'j', 'k', 'l'].forEach(function (id) { knot(nails[0], N[id][0], N[id][1], 0.019); });
+
+
 
       // 2. Nude con dos bandas cromadas y una cruz gótica
       function band(v, bow, u0, u1) { var pts = []; for (var k = 0; k <= 8; k++) { var f = k / 8; pts.push([u0 + (u1 - u0) * f, v + Math.sin(f * Math.PI) * bow]); } return pts; }
