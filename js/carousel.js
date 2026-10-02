@@ -3,12 +3,10 @@
 // - Flechas, teclado (← →), puntitos de abajo y deslizar con el dedo. Al llegar a un extremo se queda ahí
 //   y la flecha de ese lado se apaga.
 // - Desplazamiento propio y suave (0,7 s, frena largo al final); el dedo usa el scroll nativo con "snap".
-// - Parallax sutil con el mouse (solo compu): las fotos se corren apenas hacia el lado contrario.
 // - Al tocar una foto se abre en grande (lightbox) con flechas, contador "02/05" y link a Instagram.
 // Para sumar fotos: copiá un <li class="gallery__item"> en index.html (ver el comentario ahí).
 (function () {
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   var DURATION = 700;
   function easeOut(t) { var c = 1 - t; return 1 - c * c * c; } // rápido al empezar, frena suave
 
@@ -99,23 +97,6 @@
     window.addEventListener('load', update);
     update();
 
-    // ---- Parallax con el mouse (solo compu): micro desplazamiento opuesto al cursor ----
-    if (finePointer && !reduceMotion) {
-      var target = 0, current = 0, running = false, MAX = 16;
-      var loop = function () {
-        current += (target - current) * 0.08; // se acerca de a poco: nunca brusco
-        track.style.setProperty('--px', current.toFixed(2) + 'px');
-        if (Math.abs(target - current) > 0.05) requestAnimationFrame(loop); else running = false;
-      };
-      var kick = function () { if (!running) { running = true; requestAnimationFrame(loop); } };
-      carousel.addEventListener('mousemove', function (e) {
-        var r = carousel.getBoundingClientRect();
-        target = -((e.clientX - r.left) / r.width - 0.5) * 2 * MAX;
-        kick();
-      });
-      carousel.addEventListener('mouseleave', function () { target = 0; kick(); });
-    }
-
     // ---- Lightbox ----
     var photos = items.filter(function (it) { return it.querySelector('img'); });
     if (!photos.length) return;
@@ -137,13 +118,21 @@
     var igLink = box.querySelector('.lightbox__ig');
     var shown = 0, opener = null;
     var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+    function largest(img) { // la versión más grande del srcset, para que se vea nítida en grande
+      var best = img.getAttribute('src'), bestW = 0;
+      (img.getAttribute('srcset') || '').split(',').forEach(function (part) {
+        var bits = part.trim().split(/\s+/), w = parseInt(bits[1], 10) || 0;
+        if (w > bestW) { bestW = w; best = bits[0]; }
+      });
+      return best;
+    }
 
     function show(i) {
       shown = (i + photos.length) % photos.length;
       var src = photos[shown].querySelector('img'), link = photos[shown].querySelector('a');
       bigImg.classList.remove('is-in');
       bigImg.onload = function () { bigImg.classList.add('is-in'); };
-      bigImg.src = src.getAttribute('src'); // la versión de 960 px
+      bigImg.src = largest(src);
       bigImg.alt = src.alt;
       if (bigImg.complete) requestAnimationFrame(function () { bigImg.classList.add('is-in'); });
       count.textContent = pad(shown + 1) + '/' + pad(photos.length);

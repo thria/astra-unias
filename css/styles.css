@@ -1070,6 +1070,7 @@ html.no-intro .intro { display: none !important; }
   display: flex;
   gap: var(--gap);
   overflow-x: auto;
+  overflow-y: hidden; /* solo se desliza de costado, nunca hacia arriba o abajo */
   overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
@@ -1159,13 +1160,8 @@ html.no-intro .intro { display: none !important; }
   height: 100%;
   object-fit: cover;
 }
-/* parallax: la imagen es apenas más grande que su marco y se corre con el mouse (--px, js/carousel.js) */
-@media (hover: hover) and (pointer: fine) {
-  .gallery__link img { scale: 1.1; translate: var(--px, 0px) 0; }
-}
 
-/* Cada foto se abre en grande al tocarla.
-   Con mouse: el aviso sube desde abajo al pasar el cursor. En pantallas táctiles queda visible. */
+/* Cada foto se abre en grande al tocarla (se muestra completa, sin moverse dentro del marco) */
 .gallery__link {
   position: relative;
   display: block;
@@ -1175,42 +1171,6 @@ html.no-intro .intro { display: none !important; }
   color: var(--color-hero-fg);
   text-decoration: none;
   cursor: zoom-in;
-}
-
-.gallery__cta {
-  position: absolute;
-  inset: auto 0 0 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  padding: 0.85rem 0.75rem;
-  background: linear-gradient(0deg, var(--color-hero-scrim-bottom), var(--color-hero-scrim-top));
-  color: var(--color-hero-fg);
-  font-size: var(--step--1);
-  font-weight: 600;
-  text-align: center;
-  transform: translateY(101%);
-  transition: transform 0.3s ease;
-}
-.gallery__cta svg {
-  flex: none;
-  width: 1.1rem;
-  height: 1.1rem;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: var(--icon-stroke);
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.gallery__cta .gallery__cta-dot { fill: currentColor; stroke: none; }
-
-.gallery__link:hover .gallery__cta,
-.gallery__link:focus-visible .gallery__cta { transform: translateY(0); }
-.gallery__link:focus-visible { outline-offset: -3px; }
-
-@media (hover: none) {
-  .gallery__cta { transform: translateY(0); padding-block: 0.6rem; }
 }
 
 .gallery__item--more a {
