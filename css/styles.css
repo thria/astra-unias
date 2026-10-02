@@ -830,14 +830,6 @@ html.no-intro .intro { display: none !important; }
 
 .agenda { display: grid; gap: var(--space-m); }
 
-.agenda__bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-s);
-  max-width: 32rem;
-}
-.agenda__week { font-weight: 600; text-align: center; }
 .agenda__nav {
   display: grid;
   place-items: center;
@@ -856,36 +848,112 @@ html.no-intro .intro { display: none !important; }
 .agenda__nav:disabled { opacity: 0.35; cursor: default; }
 .agenda__nav svg { width: 1.125rem; height: 1.125rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-.agenda__days { display: grid; gap: var(--space-s); }
-.agenda__day {
-  display: grid;
-  gap: 0.75rem;
-  padding: var(--space-s) var(--space-s) 1.1rem;
-  border-radius: 14px;
+/* Almanaque: hoja mensual con espiral, cabecera de color y grilla de días */
+.agenda__layout { display: grid; gap: var(--space-l); align-items: start; }
+
+.almanac {
+  position: relative;
+  padding: 0 var(--space-s) var(--space-m);
+  border: 1px solid var(--color-line);
+  border-radius: 18px;
+  background: var(--color-bg);
+  box-shadow: 0 10px 30px -18px rgb(142 46 80 / 0.45);
+}
+.almanac__rings {
+  position: absolute;
+  top: -0.7rem;
+  left: 12%;
+  right: 12%;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+.almanac__rings span {
+  width: 0.7rem;
+  height: 1.6rem;
+  border: 3px solid var(--color-ink-soft);
+  border-radius: 999px;
   background: var(--color-blush);
 }
-.agenda__empty {
-  grid-column: 1 / -1;
-  padding: var(--space-m);
-  border-radius: 14px;
-  background: var(--color-blush);
-  color: var(--color-ink-soft);
-}
-.agenda__day-name {
+.almanac__head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-xs);
-  font-size: var(--step-1);
+  gap: var(--space-s);
+  margin: 0 calc(var(--space-s) * -1) var(--space-xs);
+  padding: 1.6rem var(--space-s) 0.9rem;
+  border-radius: 17px 17px 0 0;
+  background: var(--color-rose);
+  color: var(--color-on-rose);
 }
-.agenda__tag {
-  padding: 0.2em 0.7em;
-  border-radius: 999px;
-  background: var(--color-petal);
-  font-family: var(--font-body);
-  font-size: 0.75rem;
+.almanac__month { font-family: var(--font-display); font-size: var(--step-2); line-height: 1.1; text-align: center; }
+.almanac__head .agenda__nav {
+  border-color: color-mix(in srgb, var(--color-on-rose) 45%, transparent);
+  background: transparent;
+  color: var(--color-on-rose);
+}
+.almanac__head .agenda__nav:hover:not(:disabled) {
+  border-color: var(--color-on-rose);
+  background: color-mix(in srgb, var(--color-on-rose) 15%, transparent);
+}
+.almanac__weekdays,
+.almanac__grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.3rem; }
+.almanac__weekdays {
+  padding-block: 0.5rem;
+  border-bottom: 1px solid var(--color-line);
+  color: var(--color-ink-soft);
+  font-size: var(--step--1);
   font-weight: 600;
+  text-align: center;
 }
+.almanac__grid { margin-top: 0.5rem; }
+.almanac__day {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.2rem;
+  aspect-ratio: 1;
+  min-width: 0;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--color-ink);
+  font: inherit;
+}
+.almanac__num { font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1; }
+button.almanac__day {
+  border-color: var(--color-line);
+  background: var(--color-blush);
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+button.almanac__day:hover { border-color: var(--color-rose); }
+.almanac__dots { display: flex; gap: 2px; }
+.almanac__dots i { width: 4px; height: 4px; border-radius: 50%; background: var(--color-rose); }
+.almanac__day.is-full .almanac__num { color: var(--color-ink-soft); text-decoration: line-through 2px var(--color-rose); }
+.almanac__day.is-closed,
+.almanac__day.is-past,
+.almanac__day.is-out { color: var(--color-ink-soft); opacity: 0.45; }
+.almanac__day.is-today { box-shadow: inset 0 0 0 2px var(--color-petal); }
+.almanac__day.is-selected { border-color: var(--color-rose); background: var(--color-rose); color: var(--color-on-rose); }
+.almanac__day.is-selected .almanac__dots i { background: var(--color-on-rose); }
+.almanac__day.is-selected.is-full .almanac__num { color: var(--color-on-rose); text-decoration-color: var(--color-on-rose); }
+
+/* Horarios del día elegido */
+.agenda__detail {
+  display: grid;
+  align-content: start;
+  gap: 0.75rem;
+  padding: var(--space-m);
+  border-radius: 18px;
+  background: var(--color-blush);
+}
+.agenda__detail-kicker { color: var(--color-rose); font-weight: 600; }
+.agenda__detail-title { font-size: var(--step-2); margin-bottom: var(--space-xs); }
+.agenda__detail-note,
+.agenda__detail-empty { color: var(--color-ink-soft); font-size: var(--step--1); }
 
 .agenda__slots { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .slot {
@@ -980,11 +1048,13 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
   background: var(--color-blush);
 }
 
-@media (min-width: 40em) {
-  .agenda__days { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 30em) {
+  .almanac { padding-inline: var(--space-m); }
+  .almanac__head { margin-inline: calc(var(--space-m) * -1); padding-inline: var(--space-m); }
+  .almanac__weekdays, .almanac__grid { gap: 0.45rem; }
 }
 @media (min-width: 64em) {
-  .agenda__days { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .agenda__layout { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); }
 }
 
 /* Turnos: secuencia real, por eso numerada */

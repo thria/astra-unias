@@ -1,7 +1,8 @@
-// Agenda de turnos: próximas 4 semanas, de lunes a sábado, en hora de Argentina.
+// Agenda de turnos con forma de almanaque: hoja mensual (lunes a domingo) con las próximas 4 semanas.
+// Cada día muestra si le quedan turnos libres; al tocarlo se ven sus horarios.
 // Modo público (index.html): los horarios libres llevan a Instagram y los reservados se ven tachados.
 // Modo panel (admin.html, data-agenda-mode="admin"): la dueña toca un horario para reservarlo o liberarlo.
-// Los datos se guardan con /api/agenda (ver api/agenda.js).
+// Los datos se guardan con /api/agenda (ver api/agenda.js). Todo se calcula en hora de Argentina.
 (function () {
   var root = document.querySelector('[data-agenda]');
   if (!root) return;
@@ -10,7 +11,7 @@
   var CONFIG = {
     slotHours: [10, 12, 14, 16, 18], // hora de inicio de cada turno
     workDays: [1, 2, 3, 4, 5, 6],    // 0 = domingo … 6 = sábado
-    weeks: 4,
+    weeks: 4,                        // cuántas semanas hacia adelante se pueden ver
     bookingUrl: 'https://ig.me/m/astra.unias'
   };
 
@@ -20,113 +21,179 @@
   var DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
   var MONTHS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
 
-  var daysList = root.querySelector('[data-agenda-days]');
-  var weekLabel = root.querySelector('[data-agenda-week]');
+  var grid = root.querySelector('[data-agenda-grid]');
+  var detail = root.querySelector('[data-agenda-detail]');
+  var monthLabel = root.querySelector('[data-agenda-week]');
   var prevBtn = root.querySelector('[data-agenda-prev]');
   var nextBtn = root.querySelector('[data-agenda-next]');
+  var layout = root.querySelector('.agenda__layout');
   var message = root.querySelector('[data-agenda-message]');
   var messageText = root.querySelector('[data-agenda-message-text]');
   var status = root.querySelector('[data-agenda-status]');
 
   var busy = new Set();
-  var week = 0;
+  var months = [];      // meses que abarca el rango visible: [{ y, m }]
+  var monthIndex = 0;
+  var selected = null;  // inicio del día elegido (ms UTC)
 
   // "Fecha de pared" en Argentina: un Date cuyos getters UTC dan la hora local de AR
   function arWall(utcMs) { return new Date(utcMs - AR_OFFSET); }
   function arToUtc(y, m, d, h) { return Date.UTC(y, m, d, h || 0) + AR_OFFSET; }
   function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
   function slotKey(wall, hour) {
     return wall.getUTCFullYear() + '-' + pad(wall.getUTCMonth() + 1) + '-' + pad(wall.getUTCDate()) + 'T' + pad(hour);
   }
 
-  function firstMonday() {
-    var today = arWall(Date.now());
-    var dow = today.getUTCDay();
-    var diff = dow === 0 ? 1 : 1 - dow; // el domingo ya muestra la semana que empieza
-    return arToUtc(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() + diff);
+  function todayStart() {
+    var w = arWall(Date.now());
+    return arToUtc(w.getUTCFullYear(), w.getUTCMonth(), w.getUTCDate());
+  }
+  function rangeEnd() { return todayStart() + CONFIG.weeks * 7 * DAY; }
+
+  // Estado de un día: horarios, cuántos libres y si se puede elegir
+  function dayInfo(dayStart) {
+    var wall = arWall(dayStart);
+    var now = Date.now();
+    var info = { start: dayStart, wall: wall, slots: [], free: 0, open: 0, kind: 'free' };
+    if (dayStart < todayStart() || dayStart >= rangeEnd()) { info.kind = 'out'; return info; }
+    if (CONFIG.workDays.indexOf(wall.getUTCDay()) < 0) { info.kind = 'closed'; return info; }
+    CONFIG.slotHours.forEach(function (hour) {
+      var key = slotKey(wall, hour);
+      var past = arToUtc(wall.getUTCFullYear(), wall.getUTCMonth(), wall.getUTCDate(), hour) <= now;
+      var taken = busy.has(key);
+      info.slots.push({ key: key, time: pad(hour) + ':00', past: past, taken: taken });
+      if (!past) { info.open++; if (!taken) info.free++; }
+    });
+    if (!info.open) info.kind = 'past';
+    else if (!info.free) info.kind = 'full';
+    return info;
   }
 
-  function weekText(firstUtc, lastUtc) {
-    var a = arWall(firstUtc), b = arWall(lastUtc);
-    var sameMonth = a.getUTCMonth() === b.getUTCMonth();
-    return 'Semana del ' + a.getUTCDate() + (sameMonth ? '' : ' de ' + MONTHS[a.getUTCMonth()]) +
-      ' al ' + b.getUTCDate() + ' de ' + MONTHS[b.getUTCMonth()];
+  function fullDate(wall) {
+    return DAY_NAMES[wall.getUTCDay()] + ' ' + wall.getUTCDate() + ' de ' + MONTHS[wall.getUTCMonth()];
   }
 
-  function slotHtml(key, time, fullDate, past) {
-    var taken = busy.has(key);
-    if (past) return '<li><span class="slot slot--past" aria-label="' + time + ', ya pasó">' + time + '</span></li>';
+  // ---- Hoja del mes ----
+  function renderGrid() {
+    var mo = months[monthIndex];
+    var firstDow = (new Date(Date.UTC(mo.y, mo.m, 1)).getUTCDay() + 6) % 7; // lunes = 0
+    var daysInMonth = new Date(Date.UTC(mo.y, mo.m + 1, 0)).getUTCDate();
+    var today = todayStart();
+    var html = '';
 
-    if (isAdmin) {
-      return '<li><button type="button" class="slot ' + (taken ? 'slot--busy' : 'slot--free') + '" data-slot="' + key + '"' +
-        ' aria-pressed="' + taken + '" aria-label="' + fullDate + ', ' + time + ': ' + (taken ? 'reservado, tocá para liberar' : 'libre, tocá para reservar') + '">' +
-        (taken ? '<s>' + time + '</s>' : time) + '</button></li>';
+    for (var b = 0; b < firstDow; b++) html += '<span class="almanac__day almanac__day--blank" aria-hidden="true"></span>';
+
+    for (var d = 1; d <= daysInMonth; d++) {
+      var info = dayInfo(arToUtc(mo.y, mo.m, d));
+      var classes = 'almanac__day is-' + info.kind +
+        (info.start === today ? ' is-today' : '') + (info.start === selected ? ' is-selected' : '');
+      var selectable = info.kind === 'free' || info.kind === 'full';
+      var label = fullDate(info.wall) + ': ' + ({
+        free: info.free + (info.free === 1 ? ' turno libre' : ' turnos libres'),
+        full: 'completo', closed: 'no se atiende', past: 'ya pasó', out: 'fuera de la agenda'
+      })[info.kind];
+      var dots = info.kind === 'free' ? '<span class="almanac__dots" aria-hidden="true">' + new Array(info.free + 1).join('<i></i>') + '</span>' : '';
+
+      html += selectable
+        ? '<button type="button" class="' + classes + '" data-day="' + info.start + '" aria-pressed="' + (info.start === selected) + '" aria-label="' + label + '">' +
+          '<span class="almanac__num">' + d + '</span>' + dots + '</button>'
+        : '<span class="' + classes + '" aria-label="' + label + '"><span class="almanac__num">' + d + '</span></span>';
     }
 
-    if (taken) return '<li><span class="slot slot--busy"><s>' + time + '</s><span class="sr-only"> reservado</span></span></li>';
+    grid.innerHTML = html;
+    monthLabel.textContent = cap(MONTHS[mo.m]) + ' ' + mo.y;
+    prevBtn.disabled = monthIndex === 0;
+    nextBtn.disabled = monthIndex === months.length - 1;
+  }
+
+  // ---- Horarios del día elegido ----
+  function slotHtml(slot, dateText) {
+    if (slot.past) return '<li><span class="slot slot--past" aria-label="' + slot.time + ', ya pasó">' + slot.time + '</span></li>';
+    if (isAdmin) {
+      return '<li><button type="button" class="slot ' + (slot.taken ? 'slot--busy' : 'slot--free') + '" data-slot="' + slot.key + '"' +
+        ' aria-pressed="' + slot.taken + '" aria-label="' + dateText + ', ' + slot.time + ': ' +
+        (slot.taken ? 'reservado, tocá para liberar' : 'libre, tocá para reservar') + '">' +
+        (slot.taken ? '<s>' + slot.time + '</s>' : slot.time) + '</button></li>';
+    }
+    if (slot.taken) return '<li><span class="slot slot--busy"><s>' + slot.time + '</s><span class="sr-only"> reservado</span></span></li>';
     return '<li><a class="slot slot--free" href="' + CONFIG.bookingUrl + '" target="_blank" rel="noopener" aria-label="' +
-      fullDate + ', ' + time + ': libre. Pedir este turno por Instagram">' + time + '</a></li>';
+      dateText + ', ' + slot.time + ': libre. Pedir este turno por Instagram">' + slot.time + '</a></li>';
+  }
+
+  function renderDetail() {
+    if (selected == null) {
+      detail.innerHTML = '<p class="agenda__detail-empty">Elegí un día del almanaque para ver sus horarios.</p>';
+      return;
+    }
+    var info = dayInfo(selected);
+    var dateText = fullDate(info.wall);
+    var openKeys = info.slots.filter(function (s) { return !s.past; }).map(function (s) { return s.key; });
+    var note = isAdmin
+      ? (info.kind === 'full' ? '<p class="agenda__detail-note">Día completo.</p>' : '')
+      : info.kind === 'full'
+        ? '<p class="agenda__detail-note">Este día ya está completo. Elegí otro o escribime y te aviso si se libera un lugar.</p>'
+        : '<p class="agenda__detail-note">Tocá un horario libre para pedirlo por Instagram.</p>';
+    var dayAction = isAdmin && openKeys.length
+      ? '<button type="button" class="agenda__day-action" data-day-slots="' + openKeys.join(',') + '" data-day-busy="' + (info.free > 0) + '">' +
+        (info.free > 0 ? 'Reservar día completo' : 'Liberar día') + '</button>'
+      : '';
+
+    detail.innerHTML =
+      '<p class="agenda__detail-kicker">' + DAY_NAMES[info.wall.getUTCDay()] + '</p>' +
+      '<h3 class="agenda__detail-title">' + info.wall.getUTCDate() + ' de ' + MONTHS[info.wall.getUTCMonth()] + '</h3>' +
+      '<ul class="agenda__slots" role="list">' + info.slots.map(function (s) { return slotHtml(s, dateText); }).join('') + '</ul>' +
+      note + dayAction;
   }
 
   function render() {
-    var now = Date.now();
-    var monday = firstMonday() + week * 7 * DAY;
-    var html = '';
-    var shownDays = [];
-
-    for (var d = 0; d < 7; d++) {
-      var dayStart = monday + d * DAY;
-      var wall = arWall(dayStart);
-      if (CONFIG.workDays.indexOf(wall.getUTCDay()) < 0) continue;
-      shownDays.push(dayStart);
-
-      var fullDate = DAY_NAMES[wall.getUTCDay()] + ' ' + wall.getUTCDate() + ' de ' + MONTHS[wall.getUTCMonth()];
-      var slots = '';
-      var open = [];   // turnos que todavía no pasaron
-      var free = 0;
-
-      CONFIG.slotHours.forEach(function (hour) {
-        var key = slotKey(wall, hour);
-        var past = arToUtc(wall.getUTCFullYear(), wall.getUTCMonth(), wall.getUTCDate(), hour) <= now;
-        if (!past) { open.push(key); if (!busy.has(key)) free++; }
-        slots += slotHtml(key, pad(hour) + ':00', fullDate, past);
-      });
-
-      if (!open.length) continue; // los días que ya pasaron no se muestran
-
-      var tag = free === 0 ? '<span class="agenda__tag">Completo</span>' : '';
-      var dayAction = isAdmin
-        ? '<button type="button" class="agenda__day-action" data-day="' + open.join(',') + '" data-day-busy="' + (free > 0) + '">' +
-          (free > 0 ? 'Reservar día completo' : 'Liberar día') + '</button>'
-        : '';
-
-      html += '<li class="agenda__day">' +
-        '<h3 class="agenda__day-name">' + DAY_NAMES[wall.getUTCDay()] + ' ' + wall.getUTCDate() + tag + '</h3>' +
-        '<ul class="agenda__slots" role="list">' + slots + '</ul>' + dayAction + '</li>';
-    }
-
-    if (!html) html = '<li class="agenda__empty">Esta semana ya no quedan turnos. Mirá la semana siguiente.</li>';
-
     message.hidden = true;
-    daysList.innerHTML = html;
-    weekLabel.textContent = weekText(shownDays[0], shownDays[shownDays.length - 1]);
-    prevBtn.disabled = week === 0;
-    nextBtn.disabled = week === CONFIG.weeks - 1;
+    if (layout) layout.hidden = false;
+    renderGrid();
+    renderDetail();
   }
 
   function showMessage(text) {
-    weekLabel.textContent = 'Agenda';
-    daysList.innerHTML = '';
+    if (layout) layout.hidden = true;
     messageText.textContent = text;
     message.hidden = false;
-    prevBtn.disabled = true;
-    nextBtn.disabled = true;
   }
 
   function announce(text) { if (status) status.textContent = text; }
 
-  prevBtn.addEventListener('click', function () { if (week > 0) { week--; render(); } });
-  nextBtn.addEventListener('click', function () { if (week < CONFIG.weeks - 1) { week++; render(); } });
+  // ---- Rango y día inicial ----
+  function setupRange() {
+    var start = arWall(todayStart()), end = arWall(rangeEnd() - DAY);
+    months = [{ y: start.getUTCFullYear(), m: start.getUTCMonth() }];
+    if (end.getUTCMonth() !== start.getUTCMonth() || end.getUTCFullYear() !== start.getUTCFullYear()) {
+      months.push({ y: end.getUTCFullYear(), m: end.getUTCMonth() });
+    }
+    // Arranca en el primer día con turnos libres (o el primero que se pueda ver)
+    selected = null;
+    for (var t = todayStart(); t < rangeEnd(); t += DAY) {
+      var k = dayInfo(t).kind;
+      if (k === 'free') { selected = t; break; }
+      if (k === 'full' && selected == null) selected = t;
+    }
+    if (selected != null) {
+      var w = arWall(selected);
+      monthIndex = Math.max(0, months.findIndex(function (mo) { return mo.y === w.getUTCFullYear() && mo.m === w.getUTCMonth(); }));
+    }
+  }
+
+  // ---- Eventos ----
+  prevBtn.addEventListener('click', function () { if (monthIndex > 0) { monthIndex--; renderGrid(); } });
+  nextBtn.addEventListener('click', function () { if (monthIndex < months.length - 1) { monthIndex++; renderGrid(); } });
+
+  grid.addEventListener('click', function (event) {
+    var btn = event.target.closest('[data-day]');
+    if (!btn) return;
+    selected = Number(btn.getAttribute('data-day'));
+    renderGrid();
+    renderDetail();
+    // en el celular, llevar la vista a los horarios
+    if (window.matchMedia('(max-width: 63.99em)').matches) detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
 
   // ---- Panel de la dueña: tocar para reservar o liberar ----
   function save(slots, makeBusy) {
@@ -149,15 +216,15 @@
   }
 
   if (isAdmin) {
-    daysList.addEventListener('click', function (event) {
+    detail.addEventListener('click', function (event) {
       var slotBtn = event.target.closest('[data-slot]');
       if (slotBtn) {
         var key = slotBtn.getAttribute('data-slot');
         save([key], !busy.has(key));
         return;
       }
-      var dayBtn = event.target.closest('[data-day]');
-      if (dayBtn) save(dayBtn.getAttribute('data-day').split(','), dayBtn.getAttribute('data-day-busy') === 'true');
+      var dayBtn = event.target.closest('[data-day-slots]');
+      if (dayBtn) save(dayBtn.getAttribute('data-day-slots').split(','), dayBtn.getAttribute('data-day-busy') === 'true');
     });
   }
 
@@ -174,6 +241,7 @@
         }
         if (data.error) throw new Error(data.error);
         busy = new Set(data.busy || []);
+        setupRange();
         render();
       })
       .catch(function () {
