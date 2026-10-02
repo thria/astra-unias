@@ -2387,3 +2387,20 @@ button.almanac__day.is-selected:hover { background: var(--color-ink); color: var
 }
 :root[data-theme="dark"] .section--tinted::before,
 :root[data-theme="dark"] .local::before { mix-blend-mode: screen; filter: invert(1); --fabric: 0.07; }
+
+/* Página legal (legal.html): texto cómodo de leer, secciones separadas por líneas finas */
+.legal__inner { max-width: 46rem; }
+.legal .section__head h1 { font-size: clamp(2.5rem, 1.7rem + 3.4vw, 4rem); line-height: 1; }
+.legal__index { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; margin-bottom: var(--space-l); font-size: var(--step--1); }
+.legal section { margin-top: var(--space-l); padding-top: var(--space-l); border-top: 1px solid var(--color-line); scroll-margin-top: 5rem; }
+.legal h2 { margin-bottom: var(--space-s); font-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.25rem); }
+.legal p, .legal li { color: var(--color-ink-soft); line-height: 1.7; }
+.legal p + p, .legal p + ul, .legal ul + p { margin-top: 0.75rem; }
+.legal ul { display: grid; gap: 0.5rem; margin: 0; padding-left: 1.2rem; }
+.legal strong { color: var(--color-ink); font-weight: 600; }
+.site-footer__legal a { color: var(--color-footer-muted); }
+.site-footer__legal a:hover { color: var(--color-footer-accent); }
+/* encabezado fijo de las páginas secundarias (legal, admin) en la paleta minimalista */
+:root { --color-header: rgb(248 244 239 / 0.88); }
+:root[data-theme="dark"] { --color-header: rgb(21 18 17 / 0.88); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --color-header: rgb(21 18 17 / 0.88); } }

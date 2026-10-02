@@ -15,10 +15,16 @@
   var CONTROLS_URL = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js';
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // Huella de cada librería: si el archivo del CDN fuera alterado, el navegador no lo ejecuta
+  var INTEGRITY = {};
+  INTEGRITY[THREE_URL] = 'sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu';
+  INTEGRITY[CONTROLS_URL] = 'sha384-wagZhIFgY4hD+7awjQjR4e2E294y6J2HSnd8eTNc15ZubTeQeVRZwhQJ+W6hnBsf';
+
   function loadScript(src) {
     return new Promise(function (resolve, reject) {
       var s = document.createElement('script');
       s.src = src;
+      if (INTEGRITY[src]) { s.integrity = INTEGRITY[src]; s.crossOrigin = 'anonymous'; }
       s.onload = resolve;
       s.onerror = reject;
       document.head.appendChild(s);

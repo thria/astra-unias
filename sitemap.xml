@@ -4,4 +4,9 @@
     <loc>https://astra-unias.vercel.app/</loc>
     <lastmod>2026-09-30</lastmod>
   </url>
+  <url>
+    <loc>https://astra-unias.vercel.app/legal</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
 </urlset>

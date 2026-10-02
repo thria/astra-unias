@@ -35,10 +35,14 @@
     var css = document.createElement('link');
     css.rel = 'stylesheet';
     css.href = MAPLIBRE + '.css';
+    css.integrity = 'sha384-MinO0mNliZ3vwppuPOUnGa+iq619pfMhLVUXfC4LHwSCvF9H+6P/KO4Q7qBOYV5V'; // si el archivo del CDN cambia, no se usa
+    css.crossOrigin = 'anonymous';
     document.head.appendChild(css);
 
     var script = document.createElement('script');
     script.src = MAPLIBRE + '.js';
+    script.integrity = 'sha384-SYKAG6cglRMN0RVvhNeBY0r3FYKNOJtznwA0v7B5Vp9tr31xAHsZC0DqkQ/pZDmj';
+    script.crossOrigin = 'anonymous';
     script.onload = done;
     script.onerror = function () {
       showFallback('No se pudo cargar el mapa. Podés ver la zona con el enlace de Google Maps.');
