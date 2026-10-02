@@ -175,38 +175,139 @@
       return fingerWithNail([new window.THREE.Mesh(geo, gel({ vertexColors: true, roughness: 0.15 }))]);
     },
 
-    // Press on: set de 5 uñas almendra en abanico, flotando (sin bandeja, para que se luzcan las uñas)
+    // Press on: set de 5 uñas almendra en abanico con diseños negros y nude con detalles plateados
+    // (líneas cromadas, cruz, sombras negras con estrellita, tachas y cruz de puntitos).
     presson: function () {
       var THREE = window.THREE;
       var group = new THREE.Group();
-      // Cada uña: [largo, ancho, colores de la base a la punta]
-      var set = [
-        [1.5, 0.62, [[0, '#f48fb1'], [1, '#ec6f9c']]],
-        [1.7, 0.68, [[0, '#f5b3c6'], [0.7, '#f2a2b9'], [0.78, '#c2185b'], [1, '#c2185b']]], // francesita rosa
-        [1.95, 0.76, [[0, '#c2185b'], [1, '#e2558d']]],
-        [1.7, 0.68, [[0, '#f5b3c6'], [0.7, '#f2a2b9'], [0.78, '#c2185b'], [1, '#c2185b']]],
-        [1.5, 0.62, [[0, '#f48fb1'], [1, '#ec6f9c']]]
-      ];
-      for (var i = 0; i < 5; i++) {
-        var angle = (i - 2) * 0.42;
-        var o = set[i];
-        var nail = new THREE.Mesh(
-          paintGradient(nailGeometry({ length: o[0], width: o[1], roundness: 0.35, thickness: 0.05, bend: 0.55, freeEdgeFrom: 99 }), o[2]),
-          gel({ vertexColors: true, roughness: 0.18, envMapIntensity: 0.45 })
-        );
-        nail.position.set(Math.sin(angle) * 1.25, Math.cos(angle) * 1.25 - 2.0, Math.abs(i - 2) * -0.06);
-        nail.rotation.z = -angle;
-        group.add(nail);
+      var NUDE = '#d9bfb0', BLACK = '#141013', SILVER = '#f4f4f8';
+      var T = 0.05, BEND = 0.55;
+
+      // Lienzo del diseño: u (0 = borde izq, 1 = borde der) y v (0 = cutícula, 1 = punta)
+      function design(draw) {
+        var c = document.createElement('canvas');
+        c.width = 256; c.height = 512;
+        var g = c.getContext('2d');
+        var P = function (u, v) { return [u * 256, (1 - v) * 512]; };
+        draw(g, P);
+        var tex = new THREE.CanvasTexture(c);
+        tex.encoding = THREE.sRGBEncoding;
+        return tex;
       }
-      // strass en la uña del medio
-      [[0, -0.15, 0.09], [-0.12, 0.08, 0.06], [0.12, 0.08, 0.06]].forEach(function (p) {
-        var s = strass(p[2]);
-        s.position.set(p[0], p[1], 0.14);
-        group.add(s);
+      function fill(g, color) { g.fillStyle = color; g.fillRect(0, 0, 256, 512); }
+      function line(g, P, pts, width, color) {
+        g.strokeStyle = color; g.lineWidth = width; g.lineCap = 'round'; g.lineJoin = 'round';
+        g.beginPath();
+        pts.forEach(function (p, i) { var q = P(p[0], p[1]); i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); });
+        g.stroke();
+      }
+      function blob(g, P, u, v, r) { // sombra negra difuminada (efecto aura)
+        var q = P(u, v);
+        var grad = g.createRadialGradient(q[0], q[1], 0, q[0], q[1], r);
+        grad.addColorStop(0, 'rgba(20,16,19,0.95)'); grad.addColorStop(0.45, 'rgba(20,16,19,0.75)'); grad.addColorStop(1, 'rgba(20,16,19,0)');
+        g.fillStyle = grad; g.beginPath(); g.arc(q[0], q[1], r, 0, Math.PI * 2); g.fill();
+      }
+
+      var designs = [
+        // 1. Negra con grietas plateadas
+        design(function (g, P) {
+          fill(g, BLACK);
+          [[[0.2, 0.25], [0.35, 0.38], [0.3, 0.5], [0.45, 0.62], [0.42, 0.78]],
+           [[0.35, 0.38], [0.6, 0.42], [0.72, 0.55]],
+           [[0.45, 0.62], [0.62, 0.66], [0.6, 0.8], [0.52, 0.9]],
+           [[0.3, 0.5], [0.12, 0.58]]].forEach(function (pts) {
+            line(g, P, pts, 9, '#8a8a94'); line(g, P, pts, 4, SILVER);
+          });
+        }),
+        // 2. Nude con bandas cromadas (y una cruz plateada en 3D)
+        design(function (g, P) {
+          fill(g, NUDE);
+          var arc = function (v, bow) { var pts = []; for (var i = 0; i <= 12; i++) { var u = i / 12; pts.push([u, v + Math.sin(u * Math.PI) * bow]); } return pts; };
+          [arc(0.2, 0.06), arc(0.72, -0.08)].forEach(function (pts) { line(g, P, pts, 16, '#9a9aa4'); line(g, P, pts, 8, SILVER); });
+        }),
+        // 3. Nude con sombras negras difuminadas (y una estrellita plateada en 3D)
+        design(function (g, P) {
+          fill(g, NUDE);
+          blob(g, P, 0.1, 0.62, 52); blob(g, P, 0.9, 0.46, 56); blob(g, P, 0.3, 0.88, 40);
+          blob(g, P, 0.8, 0.8, 38); blob(g, P, 0.16, 0.28, 34);
+        }),
+        // 4. Negra con tachas plateadas en 3D
+        design(function (g) { fill(g, BLACK); }),
+        // 5. Nude con cruz de puntitos negros
+        design(function (g, P) {
+          fill(g, NUDE);
+          g.fillStyle = BLACK;
+          var dot = function (u, v) { var q = P(u, v); g.beginPath(); g.arc(q[0], q[1], 11, 0, Math.PI * 2); g.fill(); };
+          for (var v = 0.12; v <= 0.9; v += 0.075) dot(0.5, v);
+          for (var u = 0.12; u <= 0.9; u += 0.13) if (Math.abs(u - 0.5) > 0.05) dot(u, 0.6);
+        })
+      ];
+
+      var silver = new THREE.MeshStandardMaterial({ color: srgb(SILVER), metalness: 1, roughness: 0.08, envMapIntensity: 2 });
+      // Altura de la superficie de la uña en (x, y) para apoyar los adornos
+      function onNail(mesh, obj, x, y) {
+        obj.position.set(x, y, 1.7 * T - (x * x) / (2 * BEND) + 0.012);
+        obj.rotation.y = Math.atan(x / BEND);
+        mesh.add(obj);
+      }
+
+      var sizes = [[1.5, 0.62], [1.72, 0.68], [1.95, 0.76], [1.72, 0.68], [1.55, 0.64]];
+      var nails = sizes.map(function (s, i) {
+        var len = s[0], w = s[1];
+        var tex = designs[i];
+        tex.repeat.set(1 / w, 1 / len);   // del contorno de la uña (x, y) a la imagen (u, v)
+        tex.offset.set(0.5, 0);
+        var mesh = new THREE.Mesh(
+          nailGeometry({ length: len, width: w, roundness: 0.3, thickness: T, bend: BEND, freeEdgeFrom: 99 }),
+          gel({ color: '#ffffff', map: tex, roughness: 0.12, envMapIntensity: 0.6 })
+        );
+        var angle = (i - 2) * 0.42;
+        mesh.position.set(Math.sin(angle) * 1.25, Math.cos(angle) * 1.25 - 2.0, Math.abs(i - 2) * -0.06);
+        mesh.rotation.z = -angle;
+        group.add(mesh);
+        return mesh;
       });
+
+      // Cruz plateada
+      var cross = new THREE.Group();
+      cross.add(new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.42, 0.04), silver));
+      var bar = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.06, 0.04), silver);
+      bar.position.y = 0.07;
+      cross.add(bar);
+      [[0, 0.21], [0, -0.21], [0.13, 0.07], [-0.13, 0.07]].forEach(function (p) {
+        var ball = new THREE.Mesh(new THREE.SphereGeometry(0.04, 16, 12), silver);
+        ball.position.set(p[0], p[1], 0);
+        cross.add(ball);
+      });
+      onNail(nails[1], cross, 0, 0.78);
+
+      // Estrellita de 4 puntas
+      var star = new THREE.Shape();
+      for (var k = 0; k < 8; k++) {
+        var r = k % 2 ? 0.045 : 0.15, a = k * Math.PI / 4 + Math.PI / 2;
+        var px = Math.cos(a) * r, py = Math.sin(a) * r;
+        k ? star.lineTo(px, py) : star.moveTo(px, py);
+      }
+      var starMesh = new THREE.Mesh(
+        new THREE.ExtrudeGeometry(star, { depth: 0.02, bevelEnabled: true, bevelThickness: 0.015, bevelSize: 0.012, bevelSegments: 3 }),
+        silver
+      );
+      onNail(nails[2], starMesh, 0.02, 0.85);
+
+      // Tachas: triángulo de puntitos que se abre hacia la punta
+      var stud = new THREE.SphereGeometry(0.032, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2);
+      stud.rotateX(Math.PI / 2);
+      [[0.35, 1], [0.52, 2], [0.69, 3], [0.86, 4], [1.03, 4], [1.2, 3]].forEach(function (row) {
+        for (var j = 0; j < row[1]; j++) {
+          var x = (j - (row[1] - 1) / 2) * 0.11;
+          onNail(nails[3], new THREE.Mesh(stud, silver), x, row[0]);
+        }
+      });
+
       group.rotation.x = -0.2;
       return group;
     }
+
   };
 
   // Ambiente de estudio: paneles de luz blancos para los reflejos del brillo
