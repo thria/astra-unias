@@ -75,7 +75,7 @@
         '<ellipse class="mascot__tongue" cx="60.5" cy="80.6" rx="3.6" ry="2.2"/>' +
         '<path class="mascot__fang" d="M55.6 73.9l1.5 3.2 1.4-3.1Z"/>' +
       '</g>' +
-      '<ellipse class="mascot__arm" cx="11" cy="82" rx="6.5" ry="10.5" transform="rotate(28 11 82)"/>' +
+      '<g class="mascot__arm--l"><ellipse class="mascot__arm" cx="11" cy="82" rx="6.5" ry="10.5" transform="rotate(28 11 82)"/></g>' +
       '<g class="mascot__arm--wave"><ellipse class="mascot__arm" cx="109" cy="82" rx="6.5" ry="10.5" transform="rotate(-28 109 82)"/></g>' +
     '</svg>';
 

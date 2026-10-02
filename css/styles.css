@@ -1863,13 +1863,28 @@ button.slot--busy:hover { border-color: var(--color-rose); color: var(--color-in
 @media (prefers-reduced-motion: no-preference) {
   .mascot.is-in .mascot__cat { animation: mascot-bob 3.2s ease-in-out infinite; }
   .mascot__eyes { transform-box: fill-box; transform-origin: center; animation: mascot-blink 5s infinite; }
-  .mascot__arm--wave { transform-box: fill-box; transform-origin: 50% 90%; animation: mascot-tail 1.6s ease-in-out infinite alternate; }
+  /* bracitos: el izquierdo se balancea; el derecho cada tanto saluda "hola" */
+  .mascot__arm--l, .mascot__arm--wave { transform-box: fill-box; }
+  .mascot__arm--l { transform-origin: 85% 12%; animation: mz-arm-sway 1.8s ease-in-out infinite alternate; }
+  .mascot__arm--wave { transform-origin: 15% 12%; animation: mz-hello 4.6s ease-in-out infinite; }
+  /* al pasar el mouse o mientras habla: salta contento y agita los dos bracitos */
+  .mascot__button:hover .mascot__cat { animation: mz-hop 0.6s ease-in-out infinite; }
+  .mascot__button:hover .mascot__arm--l, .mascot.is-talking .mascot__arm--l { animation: mz-arm-happy 0.32s ease-in-out infinite alternate; }
+  .mascot__button:hover .mascot__arm--wave, .mascot.is-talking .mascot__arm--wave { animation: mz-wave-fast 0.32s ease-in-out infinite alternate; }
   .mascot.is-talking .mascot__head { transform-box: fill-box; transform-origin: center bottom; animation: mascot-tilt 0.7s ease; }
   .mascot.is-talking .mascot__bubble { animation: mascot-pop 0.3s cubic-bezier(0.2, 0.8, 0.2, 1.3); transform-origin: bottom right; }
 
   @keyframes mascot-bob { 50% { translate: 0 -4px; } }
   @keyframes mascot-blink { 0%, 92%, 100% { scale: 1 1; } 95% { scale: 1 0.1; } }
-  @keyframes mascot-tail { from { rotate: -8deg; } to { rotate: 12deg; } }
+  @keyframes mz-arm-sway { from { rotate: -6deg; } to { rotate: 14deg; } }
+  @keyframes mz-hello {
+    0%, 52%, 100% { rotate: 0deg; }
+    60% { rotate: -62deg; } 66% { rotate: -38deg; } 72% { rotate: -64deg; } 78% { rotate: -38deg; } 84% { rotate: -60deg; }
+    92% { rotate: 0deg; }
+  }
+  @keyframes mz-arm-happy { from { rotate: 15deg; } to { rotate: 45deg; } }
+  @keyframes mz-wave-fast { from { rotate: -35deg; } to { rotate: -65deg; } }
+  @keyframes mz-hop { 0%, 100% { translate: 0 0; } 40% { translate: 0 -7px; } 60% { translate: 0 -7px; } }
   @keyframes mascot-tilt { 30% { rotate: -6deg; } 70% { rotate: 4deg; } }
   @keyframes mascot-pop { from { opacity: 0; scale: 0.85; } }
 }
