@@ -356,28 +356,72 @@ html.no-intro .intro { display: none !important; }
 
 .site-header__actions { display: flex; align-items: center; gap: var(--space-xs); }
 
-/* Botón de tema: muestra la luna en modo claro y el sol en modo oscuro */
-.theme-toggle {
-  display: inline-grid;
-  place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  padding: 0;
-  border: 1px solid var(--color-line);
-  border-radius: 50%;
-  background: transparent;
-  color: var(--color-ink);
-  cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+/* Selector de tema en cápsula de vidrio (claro · oscuro · automático): la pastilla rosa se desliza a la opción elegida */
+.theme-switch {
+  --opt: 2.25rem;
+  position: relative;
+  display: inline-flex;
+  padding: 0.2rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  background: var(--pill-ring);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+  box-shadow: inset 0 1px 0 var(--glass-highlight), 0 6px 18px -12px rgb(59 35 48 / 0.6);
 }
-.theme-toggle:hover { background: var(--color-blush); border-color: var(--color-petal); }
-.theme-toggle svg { width: 1.125rem; height: 1.125rem; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
-.theme-toggle__sun { display: none; }
-:root[data-theme="dark"] .theme-toggle__sun { display: block; }
-:root[data-theme="dark"] .theme-toggle__moon { display: none; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .theme-toggle__sun { display: block; }
-  :root:not([data-theme="light"]) .theme-toggle__moon { display: none; }
+.theme-switch button {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: var(--opt);
+  height: var(--opt);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--color-ink-soft);
+  cursor: pointer;
+  transition: color 0.25s ease;
+}
+.theme-switch button:hover { color: var(--color-ink); }
+.theme-switch button[aria-checked="true"] { color: var(--pill-fg); }
+.theme-switch svg { width: 1.1rem; height: 1.1rem; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.theme-switch__thumb {
+  position: absolute;
+  top: 0.2rem;
+  left: 0.2rem;
+  width: var(--opt);
+  height: var(--opt);
+  border: 1px solid var(--glass-border);
+  border-radius: 50%;
+  background: var(--pill-gradient);
+  box-shadow: 0 4px 12px -5px rgb(176 63 102 / 0.65), inset 0 1px 0 rgb(255 255 255 / 0.7);
+  transition: transform 0.35s cubic-bezier(0.3, 1.3, 0.5, 1);
+}
+.theme-switch[data-mode="dark"] .theme-switch__thumb { transform: translateX(100%); }
+.theme-switch[data-mode="auto"] .theme-switch__thumb { transform: translateX(200%); }
+
+/* "Pedir turno" del encabezado: misma pastilla de vidrio con degradé rosa que los títulos */
+.site-header .button--small {
+  white-space: nowrap;
+  border: 1px solid var(--glass-border);
+  background: var(--pill-gradient);
+  color: var(--pill-fg);
+  box-shadow: 0 0 0 0.22rem var(--pill-ring), 0 8px 20px -12px rgb(176 63 102 / 0.7), inset 0 1px 0 rgb(255 255 255 / 0.7);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.site-header .button--small:hover {
+  background: var(--pill-gradient);
+  color: var(--pill-fg);
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 0.22rem var(--pill-ring), 0 12px 24px -12px rgb(176 63 102 / 0.85), inset 0 1px 0 rgb(255 255 255 / 0.8);
+}
+@media (max-width: 26em) {
+  .theme-switch { --opt: 2rem; }
+  .site-header .button--small { padding-inline: 0.85rem; }
+  .site-header__actions { gap: 0.4rem; }
+  .theme-switch svg { width: 1rem; height: 1rem; }
 }
 
 /* Hero
