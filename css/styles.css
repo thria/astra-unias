@@ -2613,3 +2613,6 @@ h1 strong, h2 strong, h3 strong, .hero__claim strong { font-weight: 700; letter-
 .local__place { font-size: 1.1rem; }
 /* pasos en fila: el contenido arranca arriba (el paso con menos texto no corre su título hacia abajo) */
 .steps li { align-content: start; }
+/* sin la línea rosa arriba de los títulos (lo pidió la dueña) */
+.section__head::before,
+.local__text::before { content: none; display: none; }
