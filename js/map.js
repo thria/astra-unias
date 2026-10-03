@@ -46,6 +46,7 @@
     script.onload = done;
     script.onerror = function () {
       showFallback('No se pudo cargar el mapa. Podés ver la zona con el enlace de Google Maps.');
+      ready();
     };
     document.head.appendChild(script);
   }
@@ -137,20 +138,51 @@
     return el;
   }
 
+  // Avisa al resto de la página que el mapa terminó de cargar (las uñas 3D esperan a esto para no trabarlo)
+  function ready() {
+    if (document.documentElement.dataset.map === 'ready') return;
+    document.documentElement.dataset.map = 'ready';
+    document.dispatchEvent(new Event('astra:map-ready'));
+  }
+
+  var HOME = { center: PLAZA, zoom: 15.6, pitch: 55, bearing: 40 };
+
+  // Botones propios en el mismo estilo que los de + y −
+  function ButtonsControl(buttons) { this.buttons = buttons; }
+  ButtonsControl.prototype.onAdd = function () {
+    var box = document.createElement('div');
+    box.className = 'maplibregl-ctrl maplibregl-ctrl-group';
+    this.buttons.forEach(function (b) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'map-btn';
+      btn.setAttribute('aria-label', b.label);
+      btn.title = b.label;
+      btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + b.icon + '</svg>';
+      btn.addEventListener('click', function () { b.action(btn); });
+      box.appendChild(btn);
+    });
+    this.box = box;
+    return box;
+  };
+  ButtonsControl.prototype.onRemove = function () { this.box.remove(); };
+
   function initMap() {
-    if (!window.maplibregl) return;
+    if (!window.maplibregl) return ready();
     container.innerHTML = '';
 
     var map = new maplibregl.Map({
       container: container,
       style: style,
-      center: PLAZA,
-      zoom: 15.6,
-      pitch: 55,
-      bearing: 40,
+      center: HOME.center,
+      zoom: HOME.zoom,
+      pitch: HOME.pitch,
+      bearing: HOME.bearing,
       minZoom: 13,
       maxZoom: 18.5,
       maxPitch: 70,
+      maxBounds: [[-58.06, -34.99], [-57.87, -34.84]], // solo La Plata: no se pierde ni baja datos de más
+      fadeDuration: 0, // los nombres de las calles aparecen enseguida
       cooperativeGestures: true,
       attributionControl: false,
       locale: {
@@ -164,6 +196,62 @@
     });
 
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
+
+    // Pantalla completa propia (anda igual en iPhone, donde el modo pantalla completa del navegador no existe):
+    // el mapa se muda a una capa fija sobre la página, se mueve con un dedo y se cierra con ✕ o Escape
+    var home = container.parentNode, placeholder = document.createComment('mapa'), overlay = null, expandBtn = null;
+    var ICON_EXPAND = '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>';
+    var ICON_SHRINK = '<path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/>';
+    function setGestures(on) {
+      var h = map.cooperativeGestures;
+      if (h && h.enable) { if (on) h.enable(); else h.disable(); }
+    }
+    function onKey(e) { if (e.key === 'Escape') closeFull(); }
+    function openFull() {
+      overlay = document.createElement('div');
+      overlay.className = 'map-overlay';
+      overlay.setAttribute('role', 'dialog');
+      overlay.setAttribute('aria-modal', 'true');
+      overlay.setAttribute('aria-label', 'Mapa de la zona en pantalla completa');
+      overlay.innerHTML = '<button type="button" class="map-overlay__close">✕ Cerrar mapa</button>';
+      home.insertBefore(placeholder, container);
+      overlay.appendChild(container);
+      document.body.appendChild(overlay);
+      document.documentElement.classList.add('map-is-full');
+      overlay.querySelector('.map-overlay__close').addEventListener('click', closeFull);
+      document.addEventListener('keydown', onKey);
+      setGestures(false); // en pantalla completa se mueve con un dedo
+      setFullIcon(true);
+      map.resize();
+      overlay.querySelector('.map-overlay__close').focus();
+    }
+    function closeFull() {
+      if (!overlay) return;
+      home.insertBefore(container, placeholder);
+      placeholder.remove();
+      overlay.remove();
+      overlay = null;
+      document.documentElement.classList.remove('map-is-full');
+      document.removeEventListener('keydown', onKey);
+      setGestures(true);
+      setFullIcon(false);
+      map.resize();
+      if (expandBtn) expandBtn.focus();
+    }
+    function setFullIcon(full) {
+      if (!expandBtn) return;
+      var label = full ? 'Achicar mapa' : 'Ver mapa en pantalla completa';
+      expandBtn.setAttribute('aria-label', label);
+      expandBtn.title = label;
+      expandBtn.querySelector('svg').innerHTML = full ? ICON_SHRINK : ICON_EXPAND;
+    }
+
+    map.addControl(new ButtonsControl([
+      { label: 'Volver a la zona', icon: '<circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v4M12 17.5v4M2.5 12h4M17.5 12h4"/>',
+        action: function () { map.flyTo(Object.assign({ duration: 1200, essential: true }, HOME)); } },
+      { label: 'Ver mapa en pantalla completa', icon: ICON_EXPAND,
+        action: function (btn) { expandBtn = btn; if (overlay) closeFull(); else openFull(); } }
+    ]), 'top-right');
     map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
     // los créditos arrancan cerrados (botón "i"): abiertos tapaban medio mapa en el celular
     map.once('load', function () {
@@ -191,6 +279,9 @@
     systemDark.addEventListener('change', applyTheme);
     map.on('load', applyTheme);
 
+    map.once('idle', ready);
+    setTimeout(ready, 8000); // si la conexión es muy lenta, no hace esperar para siempre al resto
+
     map.on('error', function (e) {
       if (e && e.error && /tiles|style|Failed to fetch/i.test(String(e.error.message))) {
         console.warn('Mapa: ', e.error.message);
@@ -202,16 +293,18 @@
   function start() {
     if (started) return;
     started = true;
+    document.documentElement.dataset.map = 'loading';
     loadMapLibre(initMap);
   }
 
+  // Empieza a cargar una pantalla antes de llegar, así ya está listo cuando aparece
   if ('IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (entries) {
       if (entries.some(function (e) { return e.isIntersecting; })) {
         io.disconnect();
         start();
       }
-    }, { rootMargin: '300px 0px' });
+    }, { rootMargin: '100% 0px' });
     io.observe(container);
   } else {
     start();

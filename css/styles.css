@@ -2525,3 +2525,33 @@ button.almanac__day.is-selected:hover { background: var(--color-ink); color: var
 @media (max-width: 48em) {
   .site-footer { padding-bottom: calc(6.5rem + env(safe-area-inset-bottom, 0px)); }
 }
+
+/* Mapa: botones propios ("Volver a la zona" y pantalla completa), mismo tamaño que + y − */
+.map-btn { display: grid; place-items: center; }
+.map-btn svg { width: 17px; height: 17px; fill: none; stroke: #333; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+/* Mapa en pantalla completa: capa fija sobre toda la página (ver js/map.js) */
+html.map-is-full { overflow: hidden; }
+.map-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg);
+}
+.map-overlay .local__map { flex: 1; height: auto; min-height: 0; border: 0; border-radius: 0; }
+.map-overlay__close {
+  position: absolute;
+  z-index: 2;
+  top: calc(0.75rem + env(safe-area-inset-top, 0px));
+  left: 0.75rem;
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--color-line);
+  border-radius: 4px;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font: 600 0.875rem/1 var(--font-body);
+  cursor: pointer;
+  box-shadow: 0 6px 18px -10px rgb(0 0 0 / 0.5);
+}
+.map-overlay .maplibregl-ctrl-top-right { top: calc(0.75rem + env(safe-area-inset-top, 0px)); right: 0.75rem; }

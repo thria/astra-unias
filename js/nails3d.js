@@ -1020,6 +1020,15 @@
     requestAnimationFrame(loop);
   }
 
+  // Si el mapa de "Dónde atiendo" se está cargando, se espera a que termine: armar las uñas al mismo
+  // tiempo lo trababa (de medio segundo pasaba a 7-9 segundos). Como mucho se espera 6 s.
+  function whenMapCalm(fn) {
+    if (document.documentElement.dataset.map !== 'loading') return fn();
+    var done = false, go = function () { if (!done) { done = true; fn(); } };
+    document.addEventListener('astra:map-ready', go, { once: true });
+    setTimeout(go, 6000);
+  }
+
   function start() {
     if (!webglAvailable()) return;
     loadScript(THREE_URL)
@@ -1038,9 +1047,11 @@
             if (!entry.isIntersecting) return;
             build.unobserve(entry.target);
             var c = entry.target, i = containers.indexOf(c);
-            setTimeout(function () {
-              try { createViewer(c, i); seen.observe(c); } catch (e) { c.classList.add('is-unavailable'); }
-            }, k * 60);
+            whenMapCalm(function () {
+              setTimeout(function () {
+                try { createViewer(c, i); seen.observe(c); } catch (e) { c.classList.add('is-unavailable'); }
+              }, k * 60);
+            });
           });
         }, { rootMargin: '100% 0px' });
         containers.forEach(function (c) { build.observe(c); });
