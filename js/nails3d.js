@@ -1,7 +1,7 @@
 // Uñas en 3D para la sección Servicios (Three.js r128 + OrbitControls).
 // - Las librerías se descargan recién cuando la sección está por aparecer.
 // - Cada tarjeta con [data-model] recibe su modelo: semi, capping, softgel o presson.
-// - Las uñas van sobre la punta de un dedo (en press on, un set en abanico) para que se lean como uñas reales.
+// - Las uñas van sobre la punta de un dedo (en press on, un set stiletto en abanico) para que se lean como uñas reales.
 // - Semipermanente, capping y soft gel: uña con lúnula, cutícula y texturas PBR (color, rugosidad y relieve),
 //   en un estudio de foto oscuro con luz de 3 puntos, sombras suaves y reflejos en tira sobre el gel.
 // - El modelo se balancea suave (no gira 360°, así nunca queda de canto). También se puede girar a mano.
@@ -44,33 +44,6 @@
   // Geometrías
   // ---------------------------------------------------------------------------
 
-  // Uña simple (la usa el set de press on): contorno extruido y curvado.
-  // bend = radio de la curva a lo ancho (similar al del dedo, para que "abrace" la punta).
-  function nailGeometry(o) {
-    var THREE = window.THREE;
-    var len = o.length, w = o.width / 2, t = o.thickness;
-    var tipCtrl = w * (0.12 + 0.62 * o.roundness);
-    var shape = new THREE.Shape();
-    shape.moveTo(-w * 0.9, 0);
-    shape.quadraticCurveTo(0, -w * 0.62, w * 0.9, 0);                       // base (cutícula)
-    shape.bezierCurveTo(w * 1.04, len * 0.45, tipCtrl, len * 0.97, 0, len); // lateral derecho hasta la punta
-    shape.bezierCurveTo(-tipCtrl, len * 0.97, -w * 1.04, len * 0.45, -w * 0.9, 0);
-
-    var geo = new THREE.ExtrudeGeometry(shape, {
-      depth: t, bevelEnabled: true, bevelThickness: t * 0.7, bevelSize: t * 0.6, bevelSegments: 6, curveSegments: 48
-    });
-
-    // Curva a lo ancho que sigue al dedo, y la punta que baja apenas (como una uña de verdad)
-    var pos = geo.attributes.position;
-    for (var i = 0; i < pos.count; i++) {
-      var x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i);
-      var drop = y > o.freeEdgeFrom ? Math.pow((y - o.freeEdgeFrom) / len, 2) * 0.35 : 0;
-      pos.setZ(i, z - (x * x) / (2 * o.bend) - drop);
-    }
-    geo.computeVertexNormals();
-    return geo;
-  }
-
   // Uña realista (semipermanente, capping, soft gel). Formas: 'round', 'squoval' o 'almond'.
   // Tiene pequeñas imperfecciones a propósito (un lateral apenas más ancho, la punta corrida un pelito)
   // y UV de 0 a 1 (u: de borde a borde, v: de la cutícula a la punta) para pintarle texturas.
@@ -98,7 +71,7 @@
   // Anillos concéntricos desde el centro hasta el contorno por arriba, canto redondeado y vuelta por abajo.
   function realNail(o) {
     var THREE = window.THREE;
-    var shape = realNailShape(o), T = o.thickness * 1.7, rad = T / 2;
+    var shape = o.customShape || realNailShape(o), T = o.thickness * 1.7, rad = T / 2;
     var outline = shape.getSpacedPoints(180);
     outline.pop();
     var N = outline.length, C = new THREE.Vector2(0, o.length * 0.4);
@@ -444,188 +417,393 @@
       }));
     },
 
-    // Press on: set de 5 uñas almendra en abanico, negras y nude, con adornos en relieve como en la vida real:
-    // grietas y bandas cromadas, cruz gótica, estrellitas abombadas, tachas y puntitos de gel negro.
+    // Press on: set de 5 uñas stiletto largas, hecho a partir de una foto de referencia de press on góticos de lujo.
+    // De izquierda a derecha:
+    //  1. Blanco lechoso con dos bandas en relieve de negro cromado contorneadas con caviar plateado, y dos tachas.
+    //  2. Negro cromado con polvo plateado en el centro y una cruz de caviar.
+    //  3. Blanco lechoso con una cruz gótica en relieve de negro cromado, contorneada con caviar.
+    //  4. Blanco lechoso con aura negra, corazón en relieve contorneado y un dije de cruz plateada
+    //     (piedra negra facetada y cristalitos) que cuelga de una cadenita.
+    //  5. Azul noche cromado (efecto ojo de gato) con dos vueltas de cadenita plateada.
+    // PBR: color, rugosidad y metalizado pintados por zonas + capa de brillo (clearcoat); caviar y cadenas de
+    // plata pulida; piedras con facetas. Medidas aproximadas: 1 unidad ≈ 14 mm (caviar ≈ 0,5 mm de radio).
     presson: function () {
       var THREE = window.THREE;
       var group = new THREE.Group();
-      var NUDE = '#d9bfb0', BLACK = '#141013';
-      var T = 0.05, BEND = 0.55;
+      var T = 0.05, BEND = 0.55, TOP = 1.7 * T; // espesor, curva a lo ancho y altura de la cara de arriba
+      var TW = 512, TH = 1024;                     // resolución de las texturas de cada uña
+      var BEAD = 0.017;                            // radio del caviar
 
-      var chrome = new THREE.MeshStandardMaterial({ color: srgb('#eceef3'), metalness: 1, roughness: 0.07, envMapIntensity: 1.9 });
-      var blackGel = new THREE.MeshPhysicalMaterial({ color: srgb('#0f0c0e'), roughness: 0.15, clearcoat: 1, clearcoatRoughness: 0.03, envMapIntensity: 1 });
+      // ---- Materiales ----
+      // (todas comparten el mismo tipo de material, así la placa de video prepara menos programas al cargar)
+      var silver = new THREE.MeshPhysicalMaterial({ color: srgb('#f3f3f6'), metalness: 1, roughness: 0.12, clearcoat: 1, clearcoatRoughness: 0.02, envMapIntensity: 1.8 });
+      var blackChrome = new THREE.MeshPhysicalMaterial({ color: srgb('#3a3a40'), metalness: 1, roughness: 0.16, clearcoat: 1, clearcoatRoughness: 0.02, envMapIntensity: 1.5 });
+      var jet = new THREE.MeshPhysicalMaterial({ color: srgb('#050507'), metalness: 0, roughness: 0.02, clearcoat: 1, clearcoatRoughness: 0, reflectivity: 1, envMapIntensity: 2.4 });
+      var crystal = new THREE.MeshPhysicalMaterial({ color: srgb('#eef2ff'), metalness: 0.9, roughness: 0.02, clearcoat: 1, clearcoatRoughness: 0, envMapIntensity: 3 });
+      var sphereGeo = new THREE.SphereGeometry(1, 18, 12);
+      var linkGeo = new THREE.TorusGeometry(0.022, 0.0062, 8, 20);
+      linkGeo.scale(1.5, 1, 1); // eslabón ovalado
 
-      // Diseño pintado debajo del gel: u (0 = borde izq, 1 = borde der) y v (0 = cutícula, 1 = punta)
-      function design(base, draw) {
-        var c = document.createElement('canvas');
-        c.width = 256; c.height = 512;
-        var g = c.getContext('2d');
-        g.fillStyle = base; g.fillRect(0, 0, 256, 512);
-        if (draw) draw(g, function (u, v) { return [u * 256, (1 - v) * 512]; });
-        var tex = new THREE.CanvasTexture(c);
-        tex.encoding = THREE.sRGBEncoding;
-        return tex;
+      // ---- Superficie curva (coordenadas de la uña: x a lo ancho, y de la cutícula a la punta) ----
+      function surfZ(x) { return TOP - (x * x) / (2 * BEND); }
+      function normalAt(x) { return new THREE.Vector3(x / BEND, 0, 1).normalize(); }
+      function onSurface(x, y, lift) { return new THREE.Vector3(x, y, surfZ(x)).addScaledVector(normalAt(x), lift || 0); }
+      function place(nail, obj, x, y, lift) {
+        obj.position.copy(onSurface(x, y, lift));
+        obj.rotation.y = Math.atan(x / BEND); // acompaña la curva
+        nail.add(obj);
       }
-      function blob(g, P, u, v, r) { // sombra negra difuminada (efecto aura)
-        var q = P(u, v);
-        var grad = g.createRadialGradient(q[0], q[1], 0, q[0], q[1], r);
-        grad.addColorStop(0, 'rgba(20,16,19,0.95)'); grad.addColorStop(0.45, 'rgba(20,16,19,0.75)'); grad.addColorStop(1, 'rgba(20,16,19,0)');
-        g.fillStyle = grad; g.beginPath(); g.arc(q[0], q[1], r, 0, Math.PI * 2); g.fill();
+
+      // Contorno stiletto: lleno cerca de la base y afinándose hasta una punta filosa apenas redondeada
+      function stilettoShape(len, width) {
+        var w = width / 2, s = new THREE.Shape();
+        s.moveTo(-w * 0.92, 0);
+        s.quadraticCurveTo(0, -w * 0.5, w * 0.92, 0);
+        s.bezierCurveTo(w * 1.08, len * 0.3, w * 0.45, len * 0.66, 0, len);
+        s.bezierCurveTo(-w * 0.45, len * 0.66, -w * 1.08, len * 0.3, -w * 0.92, 0);
+        return s;
+      }
+      function halfWidth(nail, y) { // medio ancho de la uña a la altura y
+        var o = nail.userData.outline, best = 0;
+        for (var i = 0; i < o.length; i++) {
+          var a = o[i], b = o[(i + 1) % o.length];
+          if ((a.y - y) * (b.y - y) <= 0 && a.y !== b.y) best = Math.max(best, Math.abs(a.x + (b.x - a.x) * (y - a.y) / (b.y - a.y)));
+        }
+        return best;
       }
 
-      var sizes = [[1.5, 0.62], [1.72, 0.68], [1.95, 0.76], [1.72, 0.68], [1.55, 0.64]];
-      var textures = [
-        design(BLACK),
-        design(NUDE),
-        design(NUDE, function (g, P) {
-          blob(g, P, 0.1, 0.62, 52); blob(g, P, 0.9, 0.46, 56); blob(g, P, 0.3, 0.88, 40);
-          blob(g, P, 0.8, 0.8, 38); blob(g, P, 0.16, 0.28, 34);
-        }),
-        design(BLACK),
-        design(NUDE)
+      // ---- Texturas: color + material (canal G = rugosidad, B = metalizado), dibujadas en medidas de la uña ----
+      function matStyle(rough, metal) { return 'rgb(0,' + Math.round(rough * 255) + ',' + Math.round(metal * 255) + ')'; }
+      function grain(g, amount, sparkle, seed, ch) { // grano fino; "sparkle" = destellos de polvo cromado
+        var img = g.getImageData(0, 0, TW, TH), d = img.data, s = seed >>> 0 || 1;
+        for (var i = 0; i < d.length; i += 4) {
+          s = (s * 1664525 + 1013904223) >>> 0;
+          var r = s / 4294967296, k = (r - 0.5) * amount;
+          if (sparkle && r > 1 - sparkle * d[i + 1] / 255) k += 110; // más destellos donde el cromo es más claro
+          if (ch < 0) { d[i] += k; d[i + 1] += k; d[i + 2] += k; } else d[i + ch] += k;
+        }
+        g.putImageData(img, 0, 0);
+      }
+      function nailMaps(len, width, paint, seed, sparkle) {
+        var cc = document.createElement('canvas'), mc = document.createElement('canvas');
+        cc.width = mc.width = TW; cc.height = mc.height = TH;
+        var c = cc.getContext('2d'), m = mc.getContext('2d');
+        [c, m].forEach(function (g) { g.setTransform(TW / width, 0, 0, -TH / len, TW / 2, TH); });
+        paint(c, m, width / 2, len);
+        grain(c, 5, sparkle || 0, seed, -1);
+        grain(m, 22, 0, seed + 1, 1); // rugosidad apenas despareja, como un gel real
+        var map = new THREE.CanvasTexture(cc), mr = new THREE.CanvasTexture(mc);
+        map.encoding = THREE.sRGBEncoding;
+        map.anisotropy = mr.anisotropy = 8;
+        return { map: map, mr: mr };
+      }
+      function fillAll(g, style, len) { g.fillStyle = style; g.fillRect(-1, -1, 2, len + 2); }
+      function milky(c, m, w, len) { // gel blanco lechoso: apenas grisáceo en la base, más blanco hacia la punta
+        var g = c.createLinearGradient(0, 0, 0, len);
+        g.addColorStop(0, '#d3cecd'); g.addColorStop(0.45, '#e6e3e2'); g.addColorStop(1, '#f3f1f0');
+        fillAll(c, g, len);
+        fillAll(m, matStyle(0.3, 0), len);
+      }
+      function chrome(stops, shade, rough) { // cromo: franja de luz a lo largo + bordes y punta más oscuros
+        return function (c, m, w, len) {
+          var gx = c.createLinearGradient(-w, 0, w, 0), gy = c.createLinearGradient(0, 0, 0, len);
+          stops.forEach(function (s) { gx.addColorStop(s[0], s[1]); });
+          shade.forEach(function (s) { gy.addColorStop(s[0], s[1]); });
+          fillAll(c, gx, len);
+          fillAll(c, gy, len);
+          fillAll(m, matStyle(rough, 1), len);
+        };
+      }
+      function aura(c, m, w, len) { // blanco lechoso en el centro que se esfuma a negro en los bordes y la punta
+        fillAll(c, '#121114', len);
+        c.save();
+        c.translate(0, len * 0.36);
+        c.scale(1, len * 0.56 / (w * 0.95));
+        var g = c.createRadialGradient(0, 0, 0, 0, 0, w * 0.95);
+        g.addColorStop(0, '#f1efee'); g.addColorStop(0.6, '#e9e6e5');
+        g.addColorStop(0.85, 'rgba(220,216,215,0.55)'); g.addColorStop(1, 'rgba(220,216,215,0)');
+        c.fillStyle = g; c.fillRect(-w * 1.2, -w * 1.2, w * 2.4, w * 2.4);
+        c.restore();
+        fillAll(m, matStyle(0.26, 0), len);
+      }
+
+      // ---- Caminos: muestrear, desplazar hacia afuera y repartir piezas a distancia pareja ----
+      function resample(pts, step, closed) {
+        var src = closed ? pts.concat([pts[0]]) : pts, segs = [], total = 0;
+        for (var i = 0; i < src.length - 1; i++) {
+          var l = Math.hypot(src[i + 1][0] - src[i][0], src[i + 1][1] - src[i][1]);
+          segs.push(l); total += l;
+        }
+        var count = Math.max(1, Math.round(total / step)), d = total / count, out = [], si = 0, acc = 0;
+        for (var k = 0; k < (closed ? count : count + 1); k++) {
+          var target = k * d;
+          while (si < segs.length - 1 && acc + segs[si] < target) { acc += segs[si]; si++; }
+          var f = segs[si] ? Math.min(1, (target - acc) / segs[si]) : 0;
+          out.push([src[si][0] + (src[si + 1][0] - src[si][0]) * f, src[si][1] + (src[si + 1][1] - src[si][1]) * f]);
+        }
+        return out;
+      }
+      function offsetPath(pts, dist, closed) { // dist > 0: hacia la derecha del recorrido (afuera, si es antihorario)
+        var n = pts.length, out = [];
+        function nrm(p, q) { var dx = q[0] - p[0], dy = q[1] - p[1], l = Math.hypot(dx, dy) || 1; return [dy / l, -dx / l]; }
+        for (var i = 0; i < n; i++) {
+          var prev = closed ? pts[(i - 1 + n) % n] : pts[i - 1], next = closed ? pts[(i + 1) % n] : pts[i + 1];
+          var n1 = prev ? nrm(prev, pts[i]) : null, n2 = next ? nrm(pts[i], next) : null;
+          n1 = n1 || n2; n2 = n2 || n1;
+          var mx = n1[0] + n2[0], my = n1[1] + n2[1], ml = Math.hypot(mx, my) || 1;
+          mx /= ml; my /= ml;
+          var k = dist / Math.max(0.45, mx * n1[0] + my * n1[1]); // esquinas a inglete
+          out.push([pts[i][0] + mx * k, pts[i][1] + my * k]);
+        }
+        return out;
+      }
+      function shapePoints(shape) {
+        var out = [];
+        shape.getPoints(16).forEach(function (p) {
+          var last = out[out.length - 1];
+          if (!last || Math.hypot(p.x - last[0], p.y - last[1]) > 1e-5) out.push([p.x, p.y]);
+        });
+        if (out.length > 1 && Math.hypot(out[0][0] - out[out.length - 1][0], out[0][1] - out[out.length - 1][1]) < 1e-5) out.pop();
+        return out;
+      }
+      function edgeLine(nail, y0, slope, bow, margin) { // línea que cruza la uña, recortada a su contorno
+        var pts = [];
+        for (var x = -0.5; x <= 0.5001; x += 0.01) {
+          var y = y0 + slope * x + bow * x * x;
+          if (Math.abs(x) <= halfWidth(nail, y) - margin) pts.push([x, y]);
+        }
+        return pts;
+      }
+
+      // ---- Adornos ----
+      function bead(nail, x, y, r, lift) { nail.userData.beads.push([x, y, r, lift == null ? r * 0.7 : lift]); }
+      function lineBeads(nail, pts, off, r) {
+        resample(off ? offsetPath(pts, off, false) : pts, r * 2.15, false).forEach(function (p) { bead(nail, p[0], p[1], r); });
+      }
+      function outlineBeads(nail, shape, off, r) { // caviar alrededor de una pieza, siempre del lado de afuera
+        var pts = shapePoints(shape), area = 0;
+        for (var i = 0; i < pts.length; i++) { var a = pts[i], b = pts[(i + 1) % pts.length]; area += a[0] * b[1] - b[0] * a[1]; }
+        resample(offsetPath(pts, area > 0 ? off : -off, true), r * 2.15, true).forEach(function (p) { bead(nail, p[0], p[1], r); });
+      }
+      // Pieza en relieve (gel 3D) tipo almohadilla: una grilla fina cuya altura sale de la distancia al borde
+      // (canto redondeado y meseta arriba). Lo que queda fuera del contorno se hunde dentro de la uña.
+      function raised(nail, shape, material, height, lift) {
+        var poly = resample(shapePoints(shape), 0.01, true), n = poly.length;
+        var minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        poly.forEach(function (p) { minX = Math.min(minX, p[0]); maxX = Math.max(maxX, p[0]); minY = Math.min(minY, p[1]); maxY = Math.max(maxY, p[1]); });
+        var S = Math.max(0.0025, Math.min(0.005, Math.min(maxX - minX, maxY - minY) / 60)); // más fina en piezas chicas
+        var R = height * 1.4, nx = Math.ceil((maxX - minX) / S) + 3, ny = Math.ceil((maxY - minY) / S) + 3;
+        var X0 = minX - S, Y0 = minY - S, positions = [], inside = [], index = [], i, j, k;
+        // distancia al borde: solo hace falta cerca del contorno (más lejos, la pieza ya tiene toda su altura)
+        var dist = new Float32Array(nx * ny).fill(R);
+        for (k = 0; k < n; k++) {
+          var a = poly[k], b = poly[(k + 1) % n], ex = b[0] - a[0], ey = b[1] - a[1], ll = ex * ex + ey * ey || 1;
+          var i0 = Math.max(0, Math.floor((Math.min(a[0], b[0]) - R - X0) / S)), i1 = Math.min(nx - 1, Math.ceil((Math.max(a[0], b[0]) + R - X0) / S));
+          var j0 = Math.max(0, Math.floor((Math.min(a[1], b[1]) - R - Y0) / S)), j1 = Math.min(ny - 1, Math.ceil((Math.max(a[1], b[1]) + R - Y0) / S));
+          for (j = j0; j <= j1; j++) {
+            for (i = i0; i <= i1; i++) {
+              var px = X0 + i * S - a[0], py = Y0 + j * S - a[1], t = Math.max(0, Math.min(1, (px * ex + py * ey) / ll));
+              var d = Math.hypot(px - ex * t, py - ey * t), id = j * nx + i;
+              if (d < dist[id]) dist[id] = d;
+            }
+          }
+        }
+        for (j = 0; j < ny; j++) {
+          var y = Y0 + j * S, cuts = []; // adentro/afuera por fila: dónde corta el contorno a esta altura
+          for (k = 0; k < n; k++) {
+            var p = poly[k], q = poly[(k + 1) % n];
+            if ((p[1] > y) !== (q[1] > y)) cuts.push(p[0] + (q[0] - p[0]) * (y - p[1]) / (q[1] - p[1]));
+          }
+          cuts.sort(function (u, v) { return u - v; });
+          for (i = 0; i < nx; i++) {
+            var x = X0 + i * S, c = 0;
+            while (c < cuts.length && cuts[c] < x) c++;
+            var inn = c % 2 === 1, f = 1 - dist[j * nx + i] / R;
+            positions.push(x, y, surfZ(x) + (inn ? height * Math.sqrt(1 - f * f) + (lift || 0) : -0.012));
+            inside.push(inn);
+          }
+        }
+        for (j = 0; j < ny - 1; j++) {
+          for (i = 0; i < nx - 1; i++) {
+            var a0 = j * nx + i, a1 = a0 + 1, b0 = a0 + nx, b1 = b0 + 1;
+            if (inside[a0] || inside[a1] || inside[b0] || inside[b1]) index.push(a0, a1, b0, a1, b1, b0);
+          }
+        }
+        var geo = new THREE.BufferGeometry();
+        geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+        geo.setIndex(index);
+        geo.computeVertexNormals();
+        var mesh = new THREE.Mesh(geo, material);
+        mesh.castShadow = mesh.receiveShadow = true;
+        nail.add(mesh);
+      }
+      // Cadenita curb: eslabones ovalados que se enganchan, girados en forma alternada, apoyados sobre la uña
+      function chain(nail, pts) {
+        var path = resample(pts, 0.05, false), m = new THREE.Matrix4();
+        for (var i = 0; i < path.length; i++) {
+          var a = path[Math.max(0, i - 1)], b = path[Math.min(path.length - 1, i + 1)], p = path[i];
+          var X = onSurface(b[0], b[1]).sub(onSurface(a[0], a[1])).normalize();
+          var Y = new THREE.Vector3().crossVectors(normalAt(p[0]), X).normalize();
+          var N = new THREE.Vector3().crossVectors(X, Y);
+          var tw = (i % 2 ? 1 : -1) * 0.55;
+          var Yt = Y.clone().multiplyScalar(Math.cos(tw)).addScaledVector(N, Math.sin(tw));
+          m.makeBasis(X, Yt, new THREE.Vector3().crossVectors(X, Yt));
+          m.setPosition(onSurface(p[0], p[1], 0.017));
+          nail.userData.links.push(m.clone());
+        }
+      }
+      // Piedra de fondo plano: corona facetada (tabla y facetas) que refleja el estudio en destellos
+      function stone(r, material) {
+        var h = r * 0.62;
+        var geo = new THREE.LatheGeometry([
+          new THREE.Vector2(r, 0), new THREE.Vector2(r, h * 0.14), new THREE.Vector2(r * 0.8, h * 0.6),
+          new THREE.Vector2(r * 0.5, h), new THREE.Vector2(0, h)
+        ], 10);
+        geo = geo.toNonIndexed(); // cada cara con su propia normal: facetas nítidas
+        geo.rotateX(Math.PI / 2);
+        geo.computeVertexNormals();
+        var mesh = new THREE.Mesh(geo, material);
+        mesh.castShadow = true;
+        return mesh;
+      }
+      // Cruz gótica: brazos que se ensanchan y terminan en punta (a: medio ancho, f: ensanche, k: largo del
+      // ensanche, tip: largo de la punta; up/side/down: largo de cada brazo). "up" apunta hacia la punta de la uña.
+      function crossShape(cx, cy, o) {
+        var pts = [];
+        [[0, 1, o.up], [-1, 0, o.side], [0, -1, o.down], [1, 0, o.side]].forEach(function (arm) {
+          var dx = arm[0], dy = arm[1], d = arm[2], lx = -dy, ly = dx, A = d - o.tip;
+          [[o.a, -o.a], [A, -o.a], [A + o.k, -o.f], [d, 0], [A + o.k, o.f], [A, o.a]].forEach(function (q) {
+            pts.push([cx + dx * q[0] + lx * q[1], cy + dy * q[0] + ly * q[1]]);
+          });
+        });
+        var s = new THREE.Shape();
+        pts.forEach(function (p, i) { if (i) s.lineTo(p[0], p[1]); else s.moveTo(p[0], p[1]); });
+        return s;
+      }
+      function heartShape(cx, cy, size) { // corazón derecho: lóbulos hacia la punta de la uña y punta hacia la cutícula
+        var s = size / 110, X = function (x) { return cx + (x - 25) * s; }, Y = function (y) { return cy - (y - 47.5) * s; };
+        var h = new THREE.Shape();
+        h.moveTo(X(25), Y(25));
+        h.bezierCurveTo(X(25), Y(25), X(20), Y(0), X(0), Y(0));
+        h.bezierCurveTo(X(-30), Y(0), X(-30), Y(35), X(-30), Y(35));
+        h.bezierCurveTo(X(-30), Y(55), X(-10), Y(77), X(25), Y(95));
+        h.bezierCurveTo(X(60), Y(77), X(80), Y(55), X(80), Y(35));
+        h.bezierCurveTo(X(80), Y(35), X(80), Y(0), X(50), Y(0));
+        h.bezierCurveTo(X(35), Y(0), X(25), Y(25), X(25), Y(25));
+        return h;
+      }
+
+      // ---- Las cinco uñas en abanico ----
+      var SET = [
+        { len: 1.95, width: 0.6, paint: milky },
+        { len: 2.15, width: 0.64, sparkle: 0.06, paint: chrome(
+          [[0, '#0d0d0f'], [0.3, '#232328'], [0.47, '#8a8d95'], [0.53, '#9a9da5'], [0.68, '#2c2d33'], [1, '#0d0d0f']],
+          [[0, 'rgba(8,8,10,0.9)'], [0.28, 'rgba(8,8,10,0)'], [0.78, 'rgba(8,8,10,0)'], [1, 'rgba(8,8,10,0.85)']], 0.2) },
+        { len: 2.35, width: 0.7, paint: milky },
+        { len: 2.15, width: 0.64, paint: aura },
+        { len: 1.95, width: 0.6, sparkle: 0.02, paint: chrome(
+          [[0, '#07090f'], [0.25, '#141c2e'], [0.55, '#5f7aa3'], [0.64, '#8fa8cc'], [0.75, '#2a3a5c'], [1, '#07090f']],
+          [[0, 'rgba(5,7,12,0.7)'], [0.3, 'rgba(5,7,12,0)'], [0.85, 'rgba(5,7,12,0)'], [1, 'rgba(5,7,12,0.8)']], 0.14) }
       ];
-
-      var nails = sizes.map(function (s, i) {
-        var tex = textures[i];
-        tex.repeat.set(1 / s[1], 1 / s[0]);   // del contorno de la uña (x, y) a la imagen (u, v)
-        tex.offset.set(0.5, 0);
-        var mesh = new THREE.Mesh(
-          nailGeometry({ length: s[0], width: s[1], roundness: 0.3, thickness: T, bend: BEND, freeEdgeFrom: 99 }),
-          gel({ color: '#ffffff', map: tex, roughness: 0.12, envMapIntensity: 0.6 })
-        );
-        mesh.userData = { len: s[0], width: s[1] };
-        var angle = (i - 2) * 0.42;
-        mesh.position.set(Math.sin(angle) * 1.25, Math.cos(angle) * 1.25 - 2.0, Math.abs(i - 2) * -0.06);
-        mesh.rotation.z = -angle;
+      var nails = SET.map(function (s, i) {
+        // la misma malla curva de las otras uñas (sin caras planas), con el contorno stiletto
+        var shape = stilettoShape(s.len, s.width);
+        var geo = realNail({ customShape: shape, length: s.len, thickness: T, bend: BEND, freeEdgeFrom: 99 }).geo;
+        var pos = geo.attributes.position, uv = geo.attributes.uv;
+        for (var k = 0; k < pos.count; k++) uv.setXY(k, pos.getX(k) / s.width + 0.5, pos.getY(k) / s.len);
+        var maps = nailMaps(s.len, s.width, s.paint, 101 + i * 17, s.sparkle);
+        var mesh = new THREE.Mesh(geo, new THREE.MeshPhysicalMaterial({
+          map: maps.map, roughnessMap: maps.mr, metalnessMap: maps.mr, roughness: 1, metalness: 1,
+          clearcoat: 1, clearcoatRoughness: 0.03, envMapIntensity: 1.25
+        }));
+        mesh.castShadow = mesh.receiveShadow = true;
+        mesh.userData = { len: s.len, width: s.width, outline: shape.getSpacedPoints(300), beads: [], links: [] };
+        var a = (i - 2) * 0.34;
+        mesh.position.set(Math.sin(a) * 1.3, Math.cos(a) * 1.3 - 2.05, -Math.abs(i - 2) * 0.12);
+        mesh.rotation.z = -a;
         group.add(mesh);
         return mesh;
       });
 
-      // ---- Ayudas para apoyar adornos sobre la superficie curva de la uña ----
-      function surface(x, y, lift) { return new THREE.Vector3(x, y, 1.7 * T - (x * x) / (2 * BEND) + (lift || 0)); }
-      function uv(nail, u, v) { return [(u - 0.5) * nail.userData.width, v * nail.userData.len]; }
-      function place(nail, obj, u, v, lift) {
-        var p = uv(nail, u, v);
-        obj.position.copy(surface(p[0], p[1], lift));
-        obj.rotation.y = Math.atan(p[0] / BEND); // acompaña la curva de la uña
-        nail.add(obj);
-      }
-      // Línea en relieve (tubo) que sigue la superficie
-      function ridge(nail, pts, radius, material) {
-        var curve = new THREE.CatmullRomCurve3(pts.map(function (q) { var p = uv(nail, q[0], q[1]); return surface(p[0], p[1], radius * 0.4); }));
-        var tube = new THREE.Mesh(new THREE.TubeGeometry(curve, pts.length * 12, radius, 10, false), material);
-        nail.add(tube);
-        pts.forEach(function (q, k) { // puntas redondeadas
-          if (k !== 0 && k !== pts.length - 1) return;
-          var cap = new THREE.Mesh(new THREE.SphereGeometry(radius, 12, 10), material);
-          var p = uv(nail, q[0], q[1]);
-          cap.position.copy(surface(p[0], p[1], radius * 0.4));
-          nail.add(cap);
-        });
-      }
-      function puffy(shape, depth, bevel) { // pieza abombada: poco espesor y mucho bisel redondeado
-        var geo = new THREE.ExtrudeGeometry(shape, { depth: depth, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel * 0.7, bevelSegments: 8, curveSegments: 24 });
-        geo.computeVertexNormals();
-        return geo;
-      }
-      function sparkleStar(r) { // estrellita de 4 puntas con lados curvos hacia adentro
-        var s = new THREE.Shape(), inner = r * 0.16;
-        for (var k = 0; k < 4; k++) {
-          var a = k * Math.PI / 2 + Math.PI / 2, b = a + Math.PI / 4, c = a + Math.PI / 2;
-          if (!k) s.moveTo(Math.cos(a) * r, Math.sin(a) * r);
-          s.quadraticCurveTo(Math.cos(b) * inner, Math.sin(b) * inner, Math.cos(c) * r, Math.sin(c) * r);
-        }
-        return new THREE.Mesh(puffy(s, 0.004, r * 0.22), chrome);
-      }
-
-      // 1. Negra con diseño neo tribal (cybersigilism, gótico y2k): columna central afilada y espinas curvas
-      //    simétricas que se abren hacia los costados, todo en cromo en relieve que copia la curva de la uña.
-      function chromePiece(nail, shape) {
-        var geo = new THREE.ExtrudeGeometry(shape, { depth: 0.003, bevelEnabled: true, bevelThickness: 0.014, bevelSize: 0.009, bevelSegments: 5, curveSegments: 28 });
-        var pos = geo.attributes.position;
-        for (var i = 0; i < pos.count; i++) { // apoyar la pieza sobre la superficie curva
-          var x = pos.getX(i), y = pos.getY(i);
-          pos.setZ(i, pos.getZ(i) + 1.7 * T - (x * x) / (2 * BEND) + 0.012);
-        }
-        geo.computeVertexNormals();
-        nail.add(new THREE.Mesh(geo, chrome));
-      }
-      function tribal(nail) {
-        var W = nail.userData.width, L = nail.userData.len;
-        var X = function (u) { return (u - 0.5) * W; }, Y = function (v) { return v * L; };
-        // Columna central: hoja larga y afilada en ambas puntas
-        var spine = new THREE.Shape();
-        spine.moveTo(X(0.5), Y(0.08));
-        spine.quadraticCurveTo(X(0.555), Y(0.45), X(0.5), Y(0.93));
-        spine.quadraticCurveTo(X(0.445), Y(0.45), X(0.5), Y(0.08));
-        chromePiece(nail, spine);
-        // Espina curva (media luna): nace en la columna y termina en punta
-        function thorn(rootV, half, tipU, tipV, cU, cV, d, mirror) {
-          var m = function (u) { return mirror ? 1 - u : u; };
+      // 1. Bandas cromadas en diagonal, contorneadas con caviar, y dos tachas cerca de la cutícula
+      (function (nail) {
+        var L = nail.userData.len, H = 0.026, off = BEAD * 0.95;
+        [[0.36, 0.075], [0.64, 0.065]].forEach(function (b) {
+          var top = edgeLine(nail, L * b[0] + b[1], -0.4, 0.15, 0.04), bottom = edgeLine(nail, L * b[0] - b[1], -0.4, 0.15, 0.04);
           var s = new THREE.Shape();
-          s.moveTo(X(m(0.5)), Y(rootV + half));
-          s.quadraticCurveTo(X(m(cU)), Y(cV + d), X(m(tipU)), Y(tipV));
-          s.quadraticCurveTo(X(m(cU - 0.04)), Y(cV - d), X(m(0.5)), Y(rootV - half));
-          chromePiece(nail, s);
-        }
-        [
-          [0.66, 0.024, 0.69, 0.87, 0.82, 0.66, 0.026],  // sube hacia la punta
-          [0.47, 0.026, 0.88, 0.43, 0.78, 0.57, 0.03], // sale al costado con gancho
-          [0.31, 0.024, 0.8, 0.12, 0.84, 0.33, 0.026],  // baja hacia la cutícula
-          [0.2, 0.02, 0.64, 0.05, 0.6, 0.18, 0.02]     // espinita chica en la base
-        ].forEach(function (t) {
-          thorn(t[0], t[1], t[2], t[3], t[4], t[5], t[6], false);
-          thorn(t[0], t[1], t[2], t[3], t[4], t[5], t[6], true);
+          top.forEach(function (p, i) { if (i) s.lineTo(p[0], p[1]); else s.moveTo(p[0], p[1]); });
+          bottom.slice().reverse().forEach(function (p) { s.lineTo(p[0], p[1]); });
+          raised(nail, s, blackChrome, H);
+          lineBeads(nail, top, -off, BEAD);
+          lineBeads(nail, bottom, off, BEAD);
         });
-        // Puntitos cromados entre las espinas, como en los diseños tribales
-        [[0.66, 0.6], [0.72, 0.3]].forEach(function (p) {
-          [p[0], 1 - p[0]].forEach(function (u) {
-            var b = new THREE.Mesh(new THREE.SphereGeometry(0.017, 14, 10), chrome);
-            b.scale.z = 0.7;
-            place(nail, b, u, p[1], 0.008);
+        bead(nail, -0.07, 0.3, 0.034, 0.018);
+        bead(nail, 0.065, 0.37, 0.03, 0.016);
+      })(nails[0]);
+
+      // 2. Cruz de caviar sobre el negro cromado
+      (function (nail) {
+        var L = nail.userData.len, yc = L * 0.55, hw = halfWidth(nail, yc) - 0.05;
+        lineBeads(nail, [[0, L * 0.16], [0, L * 0.93]], 0, BEAD);
+        lineBeads(nail, [[-hw, yc], [-0.04, yc]], 0, BEAD);
+        lineBeads(nail, [[0.04, yc], [hw, yc]], 0, BEAD);
+      })(nails[1]);
+
+      // 3. Cruz gótica en relieve contorneada con caviar (brazo largo hacia la cutícula, como una cruz derecha)
+      (function (nail) {
+        var H = 0.03, cross = crossShape(0, nail.userData.len * 0.47, { a: 0.048, f: 0.09, k: 0.06, tip: 0.12, up: 0.28, side: 0.17, down: 0.48 });
+        raised(nail, cross, blackChrome, H);
+        outlineBeads(nail, cross, BEAD * 0.95, BEAD);
+      })(nails[2]);
+
+      // 4. Corazón en relieve (punta hacia abajo) del que cuelga, con una cadenita, un dije de cruz plateada
+      //    con piedra negra facetada en el centro y cristalitos en los brazos
+      (function (nail) {
+        var L = nail.userData.len, H = 0.03, hy = L * 0.5, size = 0.27, tipY = hy - 47.5 * size / 110;
+        var heart = heartShape(0, hy, size);
+        raised(nail, heart, blackChrome, H);
+        outlineBeads(nail, heart, BEAD * 0.95, BEAD);
+        var cy = L * 0.27, o = { a: 0.022, f: 0.045, k: 0.03, tip: 0.055, up: 0.1, side: 0.09, down: 0.16 };
+        var top = cy + o.up + 0.012, from = tipY - 0.05;
+        chain(nail, [[0, from], [0.014, (from + top) / 2], [0, top]]);
+        raised(nail, crossShape(0, cy, o), silver, 0.02, 0.004);
+        place(nail, stone(0.036, jet), 0, cy, 0.02);
+        [[0, -1, o.down], [-1, 0, o.side], [1, 0, o.side]].forEach(function (arm) {
+          var d = arm[2] - o.tip + o.k * 0.4;
+          place(nail, stone(0.017, crystal), arm[0] * d, cy + arm[1] * d, 0.02);
+        });
+      })(nails[3]);
+
+      // 5. Dos vueltas de cadenita sobre el azul cromado
+      (function (nail) {
+        var L = nail.userData.len;
+        chain(nail, edgeLine(nail, L * 0.34, 0.5, 0, 0.015));
+        chain(nail, edgeLine(nail, L * 0.6, 0.5, 0, 0.015));
+      })(nails[4]);
+
+      // Caviar, tachas y eslabones: una sola malla instanciada por uña (rápido aunque sean cientos)
+      nails.forEach(function (nail) {
+        var m = new THREE.Matrix4(), list = nail.userData.beads, links = nail.userData.links;
+        if (list.length) {
+          var beads = new THREE.InstancedMesh(sphereGeo, silver, list.length);
+          list.forEach(function (b, i) {
+            m.makeScale(b[2], b[2], b[2]);
+            m.setPosition(onSurface(b[0], b[1], b[3]));
+            beads.setMatrixAt(i, m);
           });
-        });
-      }
-      tribal(nails[0]);
-
-      // 2. Nude con dos bandas cromadas y una cruz gótica
-      function band(v, bow, u0, u1) { var pts = []; for (var k = 0; k <= 8; k++) { var f = k / 8; pts.push([u0 + (u1 - u0) * f, v + Math.sin(f * Math.PI) * bow]); } return pts; }
-      ridge(nails[1], band(0.2, 0.05, 0.14, 0.86), 0.024, chrome);
-      ridge(nails[1], band(0.7, -0.05, 0.3, 0.7), 0.022, chrome);
-      var cross = new THREE.Group();
-      var crossShape = new THREE.Shape(); // cruz con brazos que se ensanchan en las puntas
-      crossShape.moveTo(-0.022, 0.05);
-      [[-0.1, 0.05], [-0.13, 0.075], [-0.1, 0.1], [-0.022, 0.1], [-0.022, 0.17], [-0.045, 0.2], [0, 0.23], [0.045, 0.2],
-       [0.022, 0.17], [0.022, 0.1], [0.1, 0.1], [0.13, 0.075], [0.1, 0.05], [0.022, 0.05], [0.022, -0.17], [0.05, -0.21],
-       [0, -0.25], [-0.05, -0.21], [-0.022, -0.17], [-0.022, 0.05]].forEach(function (p) { crossShape.lineTo(p[0], p[1]); });
-      cross.add(new THREE.Mesh(puffy(crossShape, 0.006, 0.016), chrome));
-      // remates redondos (trébol) y piedrita central
-      [[0, 0.25, 0.022], [-0.15, 0.075, 0.02], [0.15, 0.075, 0.02], [0, -0.27, 0.024], [0, 0.075, 0.026]].forEach(function (b) {
-        var ball = new THREE.Mesh(new THREE.SphereGeometry(b[2], 20, 14), chrome);
-        ball.position.set(b[0], b[1], 0.02);
-        cross.add(ball);
-      });
-      cross.scale.setScalar(1.35);
-      place(nails[1], cross, 0.5, 0.47, 0.006);
-
-      // 3. Nude con aura negra y estrellitas abombadas
-      place(nails[2], sparkleStar(0.19), 0.55, 0.5, 0.012);
-      place(nails[2], sparkleStar(0.1), 0.4, 0.75, 0.01);
-
-      // 4. Negra con tachas cromadas (bolitas) que se abren hacia la punta
-      [[0.2, 1], [0.3, 2], [0.4, 3], [0.5, 4], [0.6, 4], [0.7, 3], [0.8, 2]].forEach(function (row) {
-        for (var j = 0; j < row[1]; j++) {
-          var stud = new THREE.Mesh(new THREE.SphereGeometry(0.038, 18, 14), chrome);
-          place(nails[3], stud, 0.5 + (j - (row[1] - 1) / 2) * 0.16, row[0], 0.012);
+          beads.castShadow = beads.receiveShadow = true;
+          nail.add(beads);
+        }
+        if (links.length) {
+          var chainMesh = new THREE.InstancedMesh(linkGeo, silver, links.length);
+          links.forEach(function (mat, i) { chainMesh.setMatrixAt(i, mat); });
+          chainMesh.castShadow = chainMesh.receiveShadow = true;
+          nail.add(chainMesh);
         }
       });
 
-      // 5. Nude con cruz de puntitos de gel negro en relieve
-      var dot = function (u, v) { place(nails[4], new THREE.Mesh(new THREE.SphereGeometry(0.032, 16, 12), blackGel), u, v, 0.004); };
-      for (var v = 0.12; v <= 0.9; v += 0.07) dot(0.5, v);
-      [0.2, 0.3, 0.4, 0.6, 0.7, 0.8].forEach(function (u) { dot(u, 0.6); });
-
-      group.rotation.x = -0.2;
+      group.rotation.x = -0.22;
+      group.position.y = -0.22;
       return group;
     }
 
@@ -699,13 +877,13 @@
     rim2.position.set(3.2, 0.5, -3);
     scene.add(rim2);
   }
-  var STUDIO = { semi: true, capping: true, softgel: true };
+  var STUDIO = { semi: true, capping: true, softgel: true, presson: true };
 
   // ---------------------------------------------------------------------------
   // Un visor por tarjeta
   // ---------------------------------------------------------------------------
   var viewers = [];
-  var CAMERA = { semi: 5.2, capping: 5.4, softgel: 6.2, presson: 6.2 };
+  var CAMERA = { semi: 5.2, capping: 5.4, softgel: 6.2, presson: 6.0 };
 
   function createViewer(container, index) {
     var THREE = window.THREE;
@@ -791,6 +969,7 @@
     if ('ResizeObserver' in window) new ResizeObserver(resize).observe(container);
     else window.addEventListener('resize', resize);
 
+    renderer.render(scene, camera); // primer dibujo acá (prepara materiales y sombras) y no todos juntos en el mismo cuadro
     container.classList.add('is-ready');
     viewers.push(viewer);
     return viewer;
@@ -831,8 +1010,11 @@
             if (v) v.visible = entry.isIntersecting;
           });
         });
+        // de a un modelo por vez, para no trabar la página mientras se arman
         containers.forEach(function (c, i) {
-          try { createViewer(c, i); seen.observe(c); } catch (e) { c.classList.add('is-unavailable'); }
+          setTimeout(function () {
+            try { createViewer(c, i); seen.observe(c); } catch (e) { c.classList.add('is-unavailable'); }
+          }, i * 60);
         });
         requestAnimationFrame(loop);
       })
@@ -846,7 +1028,7 @@
     var trigger = new IntersectionObserver(function (entries) {
       if (entries.some(function (e) { return e.isIntersecting; })) { trigger.disconnect(); start(); }
     }, { rootMargin: '400px 0px' });
-    trigger.observe(containers[0]);
+    containers.forEach(function (c) { trigger.observe(c); }); // cualquiera de las cuatro (por si se llega directo a una)
   } else {
     start();
   }
