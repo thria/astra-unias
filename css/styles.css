@@ -2588,3 +2588,28 @@ html.map-is-full { overflow: hidden; }
   color: #FFF7F9;
   font: 600 0.78rem/1.2 var(--font-body);
 }
+
+/* Tipografía (2026-10-03): Hanken Grotesk en toda la página, sans limpia y moderna.
+   Títulos finos (300) y aireados con alguna palabra en negrita, como la referencia que eligió la dueña;
+   textos en 400 y detalles en 600. Reemplaza a Instrument Serif y Figtree. */
+:root {
+  --font-display: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+body { letter-spacing: 0.005em; }
+h1, h2, h3 { font-weight: 300; letter-spacing: -0.035em; }
+h1 strong, h2 strong, h3 strong, .hero__claim strong { font-weight: 700; letter-spacing: -0.04em; }
+.section__head h2,
+.local h2 { line-height: 1.02; }
+.about__copy h2 { line-height: 1.05; }
+.service-list h3 { font-weight: 500; letter-spacing: -0.02em; }
+.hero__claim { font-weight: 300; letter-spacing: -0.03em; }
+.review blockquote { font-weight: 400; letter-spacing: -0.01em; }
+.site-footer__motto { font-weight: 300; letter-spacing: -0.02em; }
+/* tamaños que se habían agrandado para la serif anterior, ajustados a la sans */
+.review blockquote { font-size: 1.25rem; line-height: 1.4; }
+.steps h3 { font-size: 1.3rem; font-weight: 500; }
+.site-footer__motto { font-size: 1.3rem; }
+.local__place { font-size: 1.1rem; }
+/* pasos en fila: el contenido arranca arriba (el paso con menos texto no corre su título hacia abajo) */
+.steps li { align-content: start; }
