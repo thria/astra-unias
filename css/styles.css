@@ -2478,17 +2478,14 @@ button.almanac__day.is-selected:hover { background: var(--color-ink); color: var
 .steps.is-row li { grid-template-columns: 1fr; }
 .steps.is-row li::before { grid-row: auto; margin-bottom: 0.4rem; }
 
-/* Galería: cada foto se revela de izquierda a derecha mientras se acomoda de un leve zoom
-   (una detrás de otra; reemplaza la entrada deslizada) */
+/* Galería: cada foto aparece con un "pop" (crece de un poco más chica con un rebotecito), una detrás de otra */
 .reveal-on .carousel.reveal .carousel__track > * {
-  opacity: 1;
+  opacity: 0;
   translate: none;
-  clip-path: inset(0 100% 0 0);
-  transition: clip-path 1.05s cubic-bezier(0.65, 0, 0.2, 1) var(--enter-delay, 0s), scale 0.45s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease;
+  transform: scale(0.82);
+  transition: opacity 0.3s ease var(--enter-delay, 0s), transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) var(--enter-delay, 0s), scale 0.45s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease;
 }
-.reveal-on .carousel.reveal.is-visible .carousel__track > * { opacity: 1; translate: none; clip-path: inset(-3rem); } /* margen negativo: no recorta la sombra ni el zoom del hover */
-.reveal-on .carousel.reveal .gallery__item img { scale: 1.1; transition: scale 1.5s cubic-bezier(0.22, 1, 0.36, 1) var(--enter-delay, 0s); }
-.reveal-on .carousel.reveal.is-visible .gallery__item img { scale: 1; }
+.reveal-on .carousel.reveal.is-visible .carousel__track > * { opacity: 1; translate: none; transform: none; }
 
 /* Galería en pantallas táctiles: un solo movimiento limpio al pasar de foto.
    El tamaño y la transparencia siguen al dedo cuadro a cuadro (sin transición que llegue tarde
@@ -2496,7 +2493,7 @@ button.almanac__day.is-selected:hover { background: var(--color-ink); color: var
 @media (hover: none), (pointer: coarse) {
   .carousel__track > .gallery__item { scroll-snap-stop: always; }
   .carousel__track > .gallery__item,
-  .reveal-on .carousel.reveal .carousel__track > * { transition-property: clip-path, box-shadow; }
+  .reveal-on .carousel.reveal .carousel__track > * { transition-property: opacity, transform, box-shadow; }
   .carousel__track > .gallery__item > a { transition: none; }
 }
 

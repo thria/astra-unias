@@ -60,9 +60,9 @@
       io.observe(el);
     });
 
-    // En el carrusel las fotos entran de izquierda a derecha, una detrás de la otra
+    // En el carrusel las fotos aparecen con un pop, una detrás de la otra (rápido)
     Array.prototype.forEach.call(document.querySelectorAll('.carousel__track > *'), function (item, i) {
-      item.style.setProperty('--enter-delay', (i * 0.12) + 's');
+      item.style.setProperty('--enter-delay', (i * 0.07) + 's');
     });
   }
 
