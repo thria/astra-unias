@@ -419,7 +419,7 @@
 
     // Press on: set de 5 uñas stiletto largas, hecho a partir de una foto de referencia de press on góticos de lujo.
     // De izquierda a derecha:
-    //  1. Blanco lechoso con dos bandas en relieve de negro cromado contorneadas con caviar plateado, y dos tachas.
+    //  1. Blanco lechoso con tribal negro en relieve (llamas curvas que terminan en punta) y dos tachas.
     //  2. Negro cromado con polvo plateado en el centro y una cruz de caviar.
     //  3. Blanco lechoso con una cruz gótica en relieve de negro cromado, contorneada con caviar.
     //  4. Blanco lechoso con aura negra, corazón en relieve contorneado y un dije de cruz plateada
@@ -618,8 +618,10 @@
           for (i = 0; i < nx; i++) {
             var x = X0 + i * S, c = 0;
             while (c < cuts.length && cuts[c] < x) c++;
-            var inn = c % 2 === 1, f = 1 - dist[j * nx + i] / R;
-            positions.push(x, y, surfZ(x) + (inn ? height * Math.sqrt(1 - f * f) + (lift || 0) : -0.012));
+            // perfil de canto redondeado (cuarto de círculo); afuera baja igual (espejo), así el borde cae justo
+            // sobre el contorno y sin escalones de la grilla
+            var f = 1 - dist[j * nx + i] / R, g = Math.sqrt(1 - f * f), inn = c % 2 === 1;
+            positions.push(x, y, surfZ(x) + (inn ? (height + (lift || 0)) * g : -height * g));
             inside.push(inn);
           }
         }
@@ -725,20 +727,27 @@
         return mesh;
       });
 
-      // 1. Bandas cromadas en diagonal, contorneadas con caviar, y dos tachas cerca de la cutícula
+      // 1. Tribal negro en relieve: llamas curvas que suben por la uña y terminan en punta, con tachas plateadas
       (function (nail) {
-        var L = nail.userData.len, H = 0.026, off = BEAD * 0.95;
-        [[0.36, 0.075], [0.64, 0.065]].forEach(function (b) {
-          var top = edgeLine(nail, L * b[0] + b[1], -0.4, 0.15, 0.04), bottom = edgeLine(nail, L * b[0] - b[1], -0.4, 0.15, 0.04);
+        var L = nail.userData.len;
+        // u: de -1 (borde izquierdo) a 1 (borde derecho) a esa altura; v: de 0 (cutícula) a 1 (punta)
+        var P = function (u, v) { return [u * halfWidth(nail, v * L), v * L]; };
+        function blade(p0, c, p1, t) { // trazo curvo afinado en las dos puntas, con la panza hacia un lado
+          var a = P(p0[0], p0[1]), m = P(c[0], c[1]), b = P(p1[0], p1[1]);
+          var dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy), nx = -dy / l, ny = dx / l;
           var s = new THREE.Shape();
-          top.forEach(function (p, i) { if (i) s.lineTo(p[0], p[1]); else s.moveTo(p[0], p[1]); });
-          bottom.slice().reverse().forEach(function (p) { s.lineTo(p[0], p[1]); });
-          raised(nail, s, blackChrome, H);
-          lineBeads(nail, top, -off, BEAD);
-          lineBeads(nail, bottom, off, BEAD);
-        });
-        bead(nail, -0.07, 0.3, 0.034, 0.018);
-        bead(nail, 0.065, 0.37, 0.03, 0.016);
+          s.moveTo(a[0], a[1]);
+          s.quadraticCurveTo(m[0] + nx * t, m[1] + ny * t, b[0], b[1]);
+          s.quadraticCurveTo(m[0] - nx * t * 0.25, m[1] - ny * t * 0.25, a[0], a[1]);
+          raised(nail, s, blackChrome, 0.026);
+        }
+        blade([-0.6, 0.06], [-1.05, 0.5], [0.05, 0.93], 0.22);  // llama principal por el lado izquierdo, hasta la punta
+        // espinas que nacen de la llama y se curvan hacia la punta, cada vez más cortas
+        blade([-0.72, 0.22], [0.05, 0.2], [0.62, 0.4], -0.1);
+        blade([-0.74, 0.44], [0.1, 0.44], [0.58, 0.64], -0.085);
+        blade([-0.6, 0.64], [0.1, 0.66], [0.4, 0.83], -0.065);
+        bead(nail, 0.55, 0.12, 0.026, 0.014); // tachas entre las espinas
+        bead(nail, 0.72, 0.52, 0.02, 0.011);
       })(nails[0]);
 
       // 2. Cruz de caviar sobre el negro cromado
