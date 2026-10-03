@@ -165,4 +165,20 @@
       if (el) io.observe(el);
     });
   }
+
+  // Celular: al bajar leyendo se esconde hacia abajo (no tapa el texto); al subir o al llegar al final, vuelve
+  if (window.matchMedia('(max-width: 48em)').matches) {
+    var lastY = window.scrollY, ticking = false;
+    window.addEventListener('scroll', function () {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () {
+        ticking = false;
+        var y = window.scrollY, atEnd = y + window.innerHeight >= document.documentElement.scrollHeight - 80;
+        if (Math.abs(y - lastY) < 12 && !atEnd) return; // movimientos mínimos: no cambia
+        root.classList.toggle('is-tucked', y > lastY && y > 200 && !atEnd);
+        lastY = y;
+      });
+    }, { passive: true });
+  }
 })();

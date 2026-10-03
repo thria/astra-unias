@@ -2505,3 +2505,23 @@ button.almanac__day.is-selected:hover { background: var(--color-ink); color: var
 .site-header .theme-switch__thumb,
 .site-header .theme-switch button { border-radius: 3px; }
 .site-header .button--small { border-radius: 4px; }
+
+/* Celular: zonas de toque de al menos ~44 px en los controles chicos (se ven igual, pero el dedo acierta) */
+@media (pointer: coarse), (max-width: 48em) {
+  .carousel__dot { position: relative; }
+  .carousel__dot::before { content: ""; position: absolute; inset: -18px -4px; }
+  .site-header .theme-switch button { position: relative; }
+  .site-header .theme-switch button::after { content: ""; position: absolute; inset: -6px 0; }
+  .site-header .brand { padding-block: 0.7rem; box-sizing: content-box; }
+  .site-footer__links a,
+  .local__link { display: inline-block; padding-block: 0.75rem; }
+  .site-footer__legal { font-size: 0.8125rem; line-height: 2; }
+}
+
+/* Mizu en celular: escondida hacia abajo mientras se baja leyendo (ver js/mascot.js) */
+.mascot.is-in.is-tucked { opacity: 0; translate: 0 130%; }
+.mascot.is-in.is-tucked > * { pointer-events: none; }
+/* Celular: lugar libre al final del pie para que Mizu no tape los links legales */
+@media (max-width: 48em) {
+  .site-footer { padding-bottom: calc(6.5rem + env(safe-area-inset-bottom, 0px)); }
+}

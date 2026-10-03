@@ -14,6 +14,8 @@
   var THREE_URL = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
   var CONTROLS_URL = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js';
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Celulares: menos píxeles, sombras y texturas más livianas y 30 cuadros por segundo (rinde y no recalienta)
+  var MOBILE = window.matchMedia('(max-width: 48em), (pointer: coarse)').matches;
 
   // Huella de cada librería: si el archivo del CDN fuera alterado, el navegador no lo ejecuta
   var INTEGRITY = {};
@@ -431,7 +433,7 @@
       var THREE = window.THREE;
       var group = new THREE.Group();
       var T = 0.05, BEND = 0.55, TOP = 1.7 * T; // espesor, curva a lo ancho y altura de la cara de arriba
-      var TW = 512, TH = 1024;                     // resolución de las texturas de cada uña
+      var TW = MOBILE ? 256 : 512, TH = MOBILE ? 512 : 1024; // resolución de las texturas de cada uña
       var BEAD = 0.017;                            // radio del caviar
 
       // ---- Materiales ----
@@ -874,7 +876,7 @@
     var key = new THREE.DirectionalLight(0xfff3ea, 2.3);
     key.position.set(2.6, 3.6, 4.2);
     key.castShadow = true;
-    key.shadow.mapSize.set(1024, 1024);
+    key.shadow.mapSize.set(MOBILE ? 512 : 1024, MOBILE ? 512 : 1024);
     key.shadow.camera.left = key.shadow.camera.bottom = -2.4;
     key.shadow.camera.right = key.shadow.camera.top = 2.4;
     key.shadow.camera.near = 1;
@@ -906,7 +908,7 @@
     var name = container.getAttribute('data-model');
     var studio = !!STUDIO[name];
     var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, MOBILE ? 1.5 : 2));
     renderer.outputEncoding = THREE.sRGBEncoding;
     var canvas = renderer.domElement;
     canvas.setAttribute('aria-hidden', 'true');
@@ -992,7 +994,10 @@
   }
 
   // Solo se dibujan los visores que están en pantalla
+  var lastFrame = 0;
   function loop(time) {
+    if (MOBILE && time - lastFrame < 30) { requestAnimationFrame(loop); return; } // ~30 cuadros por segundo
+    lastFrame = time;
     if (!document.hidden) {
       var t = time / 1000;
       viewers.forEach(function (v) {
@@ -1026,12 +1031,19 @@
             if (v) v.visible = entry.isIntersecting;
           });
         });
-        // de a un modelo por vez, para no trabar la página mientras se arman
-        containers.forEach(function (c, i) {
-          setTimeout(function () {
-            try { createViewer(c, i); seen.observe(c); } catch (e) { c.classList.add('is-unavailable'); }
-          }, i * 60);
-        });
+        // Cada modelo se arma recién cuando su tarjeta está por llegar (y de a uno), así el trabajo
+        // queda repartido mientras se baja y no traba la página (en celular las tarjetas van una abajo de otra)
+        var build = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry, k) {
+            if (!entry.isIntersecting) return;
+            build.unobserve(entry.target);
+            var c = entry.target, i = containers.indexOf(c);
+            setTimeout(function () {
+              try { createViewer(c, i); seen.observe(c); } catch (e) { c.classList.add('is-unavailable'); }
+            }, k * 60);
+          });
+        }, { rootMargin: '100% 0px' });
+        containers.forEach(function (c) { build.observe(c); });
         requestAnimationFrame(loop);
       })
       .catch(function () {
@@ -1043,7 +1055,7 @@
   if ('IntersectionObserver' in window) {
     var trigger = new IntersectionObserver(function (entries) {
       if (entries.some(function (e) { return e.isIntersecting; })) { trigger.disconnect(); start(); }
-    }, { rootMargin: '400px 0px' });
+    }, { rootMargin: '150% 0px' }); // las librerías se bajan con tiempo
     containers.forEach(function (c) { trigger.observe(c); }); // cualquiera de las cuatro (por si se llega directo a una)
   } else {
     start();

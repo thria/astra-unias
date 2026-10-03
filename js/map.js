@@ -165,6 +165,11 @@
 
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
     map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
+    // los créditos arrancan cerrados (botón "i"): abiertos tapaban medio mapa en el celular
+    map.once('load', function () {
+      var attrib = container.querySelector('.maplibregl-ctrl-attrib');
+      if (attrib) attrib.classList.remove('maplibregl-compact-show');
+    });
 
     new maplibregl.Marker({ element: makeMarker(), anchor: 'bottom' }).setLngLat(PLAZA).addTo(map);
 
