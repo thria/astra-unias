@@ -2552,3 +2552,39 @@ html.map-is-full { overflow: hidden; }
   box-shadow: 0 6px 18px -10px rgb(0 0 0 / 0.5);
 }
 .map-overlay .maplibregl-ctrl-top-right { top: calc(0.75rem + env(safe-area-inset-top, 0px)); right: 0.75rem; }
+
+/* Dónde atiendo: los textos entran en una cascada suave y casi sin movimiento (el protagonista es el mapa).
+   La línea rosa se dibuja desde el centro y después aparecen título, zona, párrafo y link, uno detrás de otro. */
+.reveal-on .local__text.reveal { opacity: 1; translate: none; transition: none; }
+.reveal-on .local__text.reveal > * {
+  opacity: 0;
+  translate: 0 0.6rem;
+  transition: opacity 0.6s ease, translate 0.75s cubic-bezier(0.33, 1, 0.68, 1), color 0.25s ease;
+}
+.reveal-on .local__text.reveal > :nth-child(2) { transition-delay: 0.08s, 0.08s, 0s; }
+.reveal-on .local__text.reveal > :nth-child(3) { transition-delay: 0.16s, 0.16s, 0s; }
+.reveal-on .local__text.reveal > :nth-child(4) { transition-delay: 0.24s, 0.24s, 0s; }
+.reveal-on .local__text.reveal.is-visible > * { opacity: 1; translate: none; }
+.reveal-on .local__text.reveal::before { scale: 0 1; transition: scale 0.8s cubic-bezier(0.33, 1, 0.68, 1); }
+.reveal-on .local__text.reveal.is-visible::before { scale: 1 1; }
+
+/* Mapa: el aviso de "Ctrl + rueda" / "dos dedos" ya no oscurece todo el mapa al bajar la página;
+   es una etiqueta chica abajo, que aparece y se va suave */
+.local__map .maplibregl-cooperative-gesture-screen {
+  inset: auto 0 0.8rem;
+  padding: 0;
+  background: none;
+  font-size: 1rem;
+  transition: opacity 0.4s ease 0.9s;
+}
+.local__map .maplibregl-cooperative-gesture-screen.maplibregl-show { transition: opacity 0.2s ease; }
+.local__map .maplibregl-desktop-message,
+.local__map .maplibregl-mobile-message {
+  padding: 0.45rem 0.8rem;
+  border-radius: 4px;
+  background: rgb(21 18 17 / 0.72);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  color: #FFF7F9;
+  font: 600 0.78rem/1.2 var(--font-body);
+}
