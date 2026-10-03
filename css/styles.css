@@ -2499,3 +2499,9 @@ button.almanac__day.is-selected:hover { background: var(--color-ink); color: var
   .reveal-on .carousel.reveal .carousel__track > * { transition-property: clip-path, box-shadow; }
   .carousel__track > .gallery__item > a { transition: none; }
 }
+
+/* Encabezado: selector de tema y "Pedir turno" con las mismas puntas casi rectas que la barra de vidrio */
+.site-header .theme-switch { border-radius: 4px; }
+.site-header .theme-switch__thumb,
+.site-header .theme-switch button { border-radius: 3px; }
+.site-header .button--small { border-radius: 4px; }
