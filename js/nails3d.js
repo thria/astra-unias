@@ -419,11 +419,11 @@
 
     // Press on: set de 5 uñas stiletto largas, hecho a partir de una foto de referencia de press on góticos de lujo.
     // De izquierda a derecha:
-    //  1. Blanco lechoso con tribal negro en relieve (llamas curvas que terminan en punta) y dos tachas.
+    //  1. Blanco lechoso con aura negra, corazón en relieve contorneado y un dije de cruz plateada
+    //     (piedra negra facetada y cristalitos) que cuelga de una cadenita.
     //  2. Negro cromado con polvo plateado en el centro y una cruz de caviar.
     //  3. Blanco lechoso con una cruz gótica en relieve de negro cromado, contorneada con caviar.
-    //  4. Blanco lechoso con aura negra, corazón en relieve contorneado y un dije de cruz plateada
-    //     (piedra negra facetada y cristalitos) que cuelga de una cadenita.
+    //  4. Blanco lechoso con tribal negro en relieve (llamas curvas que terminan en punta) y dos tachas.
     //  5. Azul noche cromado (efecto ojo de gato) con dos vueltas de cadenita plateada.
     // PBR: color, rugosidad y metalizado pintados por zonas + capa de brillo (clearcoat); caviar y cadenas de
     // plata pulida; piedras con facetas. Medidas aproximadas: 1 unidad ≈ 14 mm (caviar ≈ 0,5 mm de radio).
@@ -697,12 +697,12 @@
 
       // ---- Las cinco uñas en abanico ----
       var SET = [
-        { len: 1.95, width: 0.6, paint: milky },
+        { len: 1.95, width: 0.6, paint: aura },   // izquierda: aura negra con corazón y dije,
         { len: 2.15, width: 0.64, sparkle: 0.06, paint: chrome(
           [[0, '#0d0d0f'], [0.3, '#232328'], [0.47, '#8a8d95'], [0.53, '#9a9da5'], [0.68, '#2c2d33'], [1, '#0d0d0f']],
           [[0, 'rgba(8,8,10,0.9)'], [0.28, 'rgba(8,8,10,0)'], [0.78, 'rgba(8,8,10,0)'], [1, 'rgba(8,8,10,0.85)']], 0.2) },
         { len: 2.35, width: 0.7, paint: milky },
-        { len: 2.15, width: 0.64, paint: aura },
+        { len: 2.15, width: 0.64, paint: milky }, // tribal
         { len: 1.95, width: 0.6, sparkle: 0.02, paint: chrome(
           [[0, '#07090f'], [0.25, '#141c2e'], [0.55, '#5f7aa3'], [0.64, '#8fa8cc'], [0.75, '#2a3a5c'], [1, '#07090f']],
           [[0, 'rgba(5,7,12,0.7)'], [0.3, 'rgba(5,7,12,0)'], [0.85, 'rgba(5,7,12,0)'], [1, 'rgba(5,7,12,0.8)']], 0.14) }
@@ -727,28 +727,32 @@
         return mesh;
       });
 
-      // 1. Tribal negro en relieve: llamas curvas que suben por la uña y terminan en punta, con tachas plateadas
+      // 4. Tribal negro en relieve: llamas curvas que suben por la uña y terminan en punta, con tachas plateadas
       (function (nail) {
         var L = nail.userData.len;
-        // u: de -1 (borde izquierdo) a 1 (borde derecho) a esa altura; v: de 0 (cutícula) a 1 (punta)
-        var P = function (u, v) { return [u * halfWidth(nail, v * L), v * L]; };
+        // u: de -1 a 1 a lo ancho a esa altura; v: de 0 (cutícula) a 1 (punta). Va espejado (M = -1): la llama
+        // principal queda del lado de afuera del abanico y no se mete debajo de la uña del centro
+        var M = -1, P = function (u, v) { return [M * u * halfWidth(nail, v * L), v * L]; };
         function blade(p0, c, p1, t) { // trazo curvo afinado en las dos puntas, con la panza hacia un lado
           var a = P(p0[0], p0[1]), m = P(c[0], c[1]), b = P(p1[0], p1[1]);
           var dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy), nx = -dy / l, ny = dx / l;
           var s = new THREE.Shape();
           s.moveTo(a[0], a[1]);
+          t *= M; // al espejar, la panza también cambia de lado
           s.quadraticCurveTo(m[0] + nx * t, m[1] + ny * t, b[0], b[1]);
           s.quadraticCurveTo(m[0] - nx * t * 0.25, m[1] - ny * t * 0.25, a[0], a[1]);
           raised(nail, s, blackChrome, 0.026);
         }
-        blade([-0.6, 0.06], [-1.05, 0.5], [0.05, 0.93], 0.22);  // llama principal por el lado izquierdo, hasta la punta
+        blade([-0.6, 0.06], [-1.05, 0.5], [0.05, 0.93], 0.22);  // llama principal por un costado, hasta la punta
         // espinas que nacen de la llama y se curvan hacia la punta, cada vez más cortas
         blade([-0.72, 0.22], [0.05, 0.2], [0.62, 0.4], -0.1);
         blade([-0.74, 0.44], [0.1, 0.44], [0.58, 0.64], -0.085);
         blade([-0.6, 0.64], [0.1, 0.66], [0.4, 0.83], -0.065);
-        bead(nail, 0.55, 0.12, 0.026, 0.014); // tachas entre las espinas
-        bead(nail, 0.72, 0.52, 0.02, 0.011);
-      })(nails[0]);
+        [[0.35, 0.12, 0.026], [0.72, 0.52, 0.02]].forEach(function (s) { // tachas entre las espinas (sobre la uña)
+          var p = P(s[0], s[1]);
+          bead(nail, p[0], p[1], s[2], s[2] * 0.55);
+        });
+      })(nails[3]);
 
       // 2. Cruz de caviar sobre el negro cromado
       (function (nail) {
@@ -765,7 +769,7 @@
         outlineBeads(nail, cross, BEAD * 0.95, BEAD);
       })(nails[2]);
 
-      // 4. Corazón en relieve (punta hacia abajo) del que cuelga, con una cadenita, un dije de cruz plateada
+      // 1. Corazón en relieve (punta hacia abajo) del que cuelga, con una cadenita, un dije de cruz plateada
       //    con piedra negra facetada en el centro y cristalitos en los brazos
       (function (nail) {
         var L = nail.userData.len, H = 0.03, hy = L * 0.5, size = 0.27, tipY = hy - 47.5 * size / 110;
@@ -781,13 +785,16 @@
           var d = arm[2] - o.tip + o.k * 0.4;
           place(nail, stone(0.017, crystal), arm[0] * d, cy + arm[1] * d, 0.02);
         });
-      })(nails[3]);
+      })(nails[0]);
 
       // 5. Dos vueltas de cadenita sobre el azul cromado
       (function (nail) {
         var L = nail.userData.len;
-        chain(nail, edgeLine(nail, L * 0.34, 0.5, 0, 0.015));
-        chain(nail, edgeLine(nail, L * 0.6, 0.5, 0, 0.015));
+        [0.34, 0.6].forEach(function (v) {
+          var path = edgeLine(nail, L * v, 0.5, 0, 0.05); // los eslabones terminan antes del borde (no asoman)
+          chain(nail, path);
+          [path[0], path[path.length - 1]].forEach(function (p) { bead(nail, p[0], p[1], 0.022, 0.014); }); // remate pegado
+        });
       })(nails[4]);
 
       // Caviar, tachas y eslabones: una sola malla instanciada por uña (rápido aunque sean cientos)
