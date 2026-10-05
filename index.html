@@ -9,7 +9,7 @@
   <link rel="canonical" href="https://astra-unias.vercel.app/">
   <meta name="theme-color" content="#F8F4EF">
   <!-- Aplica el tema elegido antes de pintar la página (evita un parpadeo claro/oscuro) -->
-  <script src="js/boot.js?v=1"></script>
+  <script src="js/boot.js?v=2"></script>
   <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="img/logo-astra.png" as="image" crossorigin="anonymous">
 
@@ -30,8 +30,8 @@
   <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
   <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=116">
-  <script src="js/theme.js?v=8" defer></script>
+  <link rel="stylesheet" href="css/styles.css?v=118">
+  <script src="js/theme.js?v=9" defer></script>
   <script src="js/map.js?v=13" defer></script>
   <script src="js/carousel.js?v=5" defer></script>
   <script src="js/agenda.js?v=5" defer></script>
@@ -111,16 +111,6 @@
         </ul>
       </nav>
       <div class="site-header__actions">
-        <!-- Selector de tema en cápsula de vidrio: claro u oscuro (al entrar, sigue al dispositivo) -->
-        <div class="theme-switch" role="radiogroup" aria-label="Tema de la página" data-mode="light">
-          <span class="theme-switch__thumb" aria-hidden="true"></span>
-          <button type="button" role="radio" aria-checked="false" data-theme-mode="light" aria-label="Tema claro" title="Tema claro">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v1.5M12 20v1.5M5.3 5.3l1 1M17.7 17.7l1 1M2.5 12H4M20 12h1.5M5.3 18.7l1-1M17.7 6.3l1-1"/></svg>
-          </button>
-          <button type="button" role="radio" aria-checked="false" data-theme-mode="dark" aria-label="Tema oscuro" title="Tema oscuro">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>
-          </button>
-        </div>
         <a class="button button--small" href="https://ig.me/m/astra.unias" target="_blank" rel="noopener">Pedir turno</a>
       </div>
     </div>
@@ -149,10 +139,6 @@
           <span class="hero__claim"><span class="hero__word" style="--i:0"><span>Tus</span></span> <span class="hero__word" style="--i:1"><span>deseos</span></span> <span class="hero__word" style="--i:2"><span>hechos</span></span> <span class="hero__word" style="--i:3"><span><strong>realidad</strong></span></span></span>
         </h1>
         <p class="hero__lead">Semipermanente, capping, soft gel y press on en La Plata.</p>
-        <div class="hero__actions">
-          <a class="button button--light" href="https://ig.me/m/astra.unias" target="_blank" rel="noopener">Pedir turno</a>
-          <a class="button button--outline-light" href="#trabajos">Ver trabajos</a>
-        </div>
       </div>
     </section>
     <!-- "Cortina": todo lo que sigue a la portada sube por encima de ella al bajar (la portada queda fija) -->

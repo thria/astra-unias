@@ -2616,3 +2616,6 @@ h1 strong, h2 strong, h3 strong, .hero__claim strong { font-weight: 700; letter-
 /* sin la línea rosa arriba de los títulos (lo pidió la dueña) */
 .section__head::before,
 .local__text::before { content: none; display: none; }
+/* "Pedir turno" del encabezado sobre la foto de portada: claro en los dos temas (oscuro sobre la foto no se veía) */
+.site-header--floating.is-over-hero .site-header__actions .button--small,
+.site-header--floating.is-over-hero .site-header__actions .button--small:hover { background: #FFF7F9; border-color: #FFF7F9; color: #2A2321; }

@@ -1,44 +1,18 @@
-// Selector de tema: claro u oscuro. Mientras la persona no elija, la página sigue al dispositivo;
-// cuando elige, se recuerda en este navegador.
+// Tema según la hora del día (de quien visita): claro de 7 a 19:59 y oscuro de 20 a 6:59.
+// js/boot.js lo aplica antes de pintar; acá se revisa cada minuto para cambiar solo si la página
+// queda abierta al llegar las 7 o las 20, y se actualiza el color de la barra del navegador del celular.
 (function () {
   var root = document.documentElement;
-  var picker = document.querySelector('.theme-switch');
   var themeColor = document.querySelector('meta[name="theme-color"]');
-  var systemDark = window.matchMedia('(prefers-color-scheme: dark)');
   var COLORS = { light: '#F8F4EF', dark: '#151211' };
-  if (!picker) return;
-  var options = Array.prototype.slice.call(picker.querySelectorAll('[data-theme-mode]'));
-
-  function currentTheme() { return root.dataset.theme || (systemDark.matches ? 'dark' : 'light'); }
-
-  function syncUi() {
-    var mode = currentTheme();
-    picker.setAttribute('data-mode', mode);
-    options.forEach(function (b) { b.setAttribute('aria-checked', String(b.getAttribute('data-theme-mode') === mode)); });
-    if (themeColor) themeColor.setAttribute('content', COLORS[currentTheme()]);
+  function apply() {
+    var h = new Date().getHours(), mode = (h >= 7 && h < 20) ? 'light' : 'dark';
+    if (root.dataset.theme !== mode) root.dataset.theme = mode;
+    if (themeColor) themeColor.setAttribute('content', COLORS[mode]);
   }
-
-  function choose(mode) {
-    root.dataset.theme = mode;
-    try { localStorage.setItem('astra-theme', mode); } catch (e) {}
-    syncUi();
-  }
-
-  options.forEach(function (b) {
-    b.addEventListener('click', function () { choose(b.getAttribute('data-theme-mode')); });
-  });
-  // Flechas del teclado para moverse entre las dos opciones (como un grupo de radio)
-  picker.addEventListener('keydown', function (e) {
-    var i = options.indexOf(document.activeElement);
-    if (i < 0 || (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft')) return;
-    e.preventDefault();
-    var next = options[(i + (e.key === 'ArrowRight' ? 1 : options.length - 1)) % options.length];
-    next.focus();
-    choose(next.getAttribute('data-theme-mode'));
-  });
-
-  systemDark.addEventListener('change', syncUi);
-  syncUi();
+  apply();
+  setInterval(apply, 60000);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) apply(); }); // al volver a la pestaña
 })();
 
 // Encabezado flotante: vidrio transparente con textos claros mientras está sobre la foto del inicio.
