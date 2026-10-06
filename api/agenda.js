@@ -151,7 +151,9 @@ module.exports = async function handler(req, res) {
           try { bookings[raw[i]] = JSON.parse(raw[i + 1]); } catch (e) { /* ficha dañada: se ignora */ }
         }
         const all = (await redis(db, ['SMEMBERS', KEY])) || [];
-        return send(res, 200, { ok: true, bookings: bookings, busy: all.filter(function (s) { return s >= todayKey(); }).sort() });
+        const stale = all.filter(function (s) { return !SLOT_FORMAT.test(s); }); // horarios con el formato viejo (sin minutos): se borran
+        if (stale.length) await redis(db, ['SREM', KEY].concat(stale));
+        return send(res, 200, { ok: true, bookings: bookings, busy: all.filter(function (s) { return s >= todayKey() && SLOT_FORMAT.test(s); }).sort() });
       }
       if (body.action === 'save' || body.action === 'remove') {
         if (typeof body.slot !== 'string' || !SLOT_FORMAT.test(body.slot)) return send(res, 400, { error: 'Pedido inválido' });

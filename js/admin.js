@@ -430,7 +430,7 @@
   function loadBookings() {
     return api({ action: 'list' }).then(function (r) {
       bookings = r.bookings || {};
-      busyList = r.busy || [];
+      busyList = (r.busy || []).filter(function (k) { return /Td{2}:d{2}$/.test(k); }); // solo horarios con el formato actual
       refreshAll();
     }).catch(function (e) { announce(e.message); });
   }
