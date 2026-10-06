@@ -23,6 +23,7 @@
 
   // ---- Utilidades ----
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return '&#' + c.charCodeAt(0) + ';'; }); }
+  function norm(s) { return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim(); } // sin tildes ni mayúsculas
   function plural(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
   function money(n) { return '$' + Math.round(n || 0).toLocaleString('es-AR'); }
   function announce(t) { if (status) status.textContent = t; }
@@ -35,7 +36,7 @@
   function shortDate(key) { var p = parts(key); return p.date.getUTCDate() + '/' + (p.date.getUTCMonth() + 1); }
   function clientId(b) {
     var phone = (b.phone || '').replace(/\D/g, '').slice(-8);
-    return phone.length >= 6 ? 'tel:' + phone : 'nom:' + (b.name || '').trim().toLowerCase();
+    return phone.length >= 6 ? 'tel:' + phone : 'nom:' + norm(b.name);
   }
   // Número para WhatsApp (Argentina): 221 15 555-1234, 0221 555 1234 o +54 9 221 5551234 → 5492215551234
   function waNumber(phone) {
@@ -90,9 +91,9 @@
       .sort(function (a, b) { return a.name.localeCompare(b.name, 'es'); });
   }
   function findClient(name) {
-    var n = (name || '').trim().toLowerCase();
+    var n = norm(name);
     if (!n) return null;
-    return clients().filter(function (c) { return c.name.toLowerCase() === n; })[0] || null;
+    return clients().filter(function (c) { return norm(c.name) === n; })[0] || null;
   }
   function historyLine(c) {
     if (!c) return '';
@@ -114,12 +115,72 @@
   var bFree = document.querySelector('[data-booking-free]');
   var bBlock = document.querySelector('[data-booking-block]');
   var bSave = document.querySelector('[data-booking-save]');
-  var options = document.querySelector('[data-client-options]');
+  var suggest = document.querySelector('[data-client-suggest]');
+  var nameInput = bForm.elements.name;
+  var matches = [], active = -1;
   var currentKey = null;
 
-  function fillOptions() {
-    options.innerHTML = clients().map(function (c) { return '<option value="' + esc(c.name) + '">'; }).join('');
+  // ---- Buscador de clientas ya cargadas (al escribir el nombre) ----
+  // Busca sin importar tildes ni mayúsculas, por nombre, teléfono o Instagram; al elegir una se completan
+  // sus datos, así no se crean clientas repetidas.
+  function closeSuggest() {
+    suggest.hidden = true;
+    suggest.innerHTML = '';
+    nameInput.setAttribute('aria-expanded', 'false');
+    nameInput.removeAttribute('aria-activedescendant');
+    matches = []; active = -1;
   }
+  function renderSuggest() {
+    var q = norm(nameInput.value), digits = nameInput.value.replace(/\D/g, '');
+    if (!q) return closeSuggest();
+    matches = clients().filter(function (c) {
+      return norm(c.name).indexOf(q) >= 0 ||
+        (digits.length >= 3 && c.phone.replace(/\D/g, '').indexOf(digits) >= 0) ||
+        (c.instagram && norm(c.instagram).indexOf(q.replace(/^@/, '')) >= 0);
+    }).sort(function (a, b) { // primero las que empiezan con lo escrito
+      return (norm(a.name).indexOf(q) === 0 ? 0 : 1) - (norm(b.name).indexOf(q) === 0 ? 0 : 1);
+    }).slice(0, 6);
+    // si ya está escrita exactamente una clienta elegida, no hace falta la lista
+    if (!matches.length || (matches.length === 1 && norm(matches[0].name) === q)) return closeSuggest();
+    active = -1;
+    suggest.innerHTML = matches.map(function (c, i) {
+      var info = [c.phone, c.instagram ? '@' + c.instagram : '', c.visits ? plural(c.visits, 'visita', 'visitas') : 'sin visitas aún']
+        .filter(Boolean).join(' · ');
+      return '<li role="option" id="sug-' + i + '" data-index="' + i + '" aria-selected="false">' +
+        '<strong>' + esc(c.name) + '</strong><span>' + esc(info) + '</span></li>';
+    }).join('');
+    suggest.hidden = false;
+    nameInput.setAttribute('aria-expanded', 'true');
+  }
+  function highlight(i) {
+    active = (i + matches.length) % matches.length;
+    Array.prototype.forEach.call(suggest.children, function (li, k) { li.setAttribute('aria-selected', String(k === active)); });
+    nameInput.setAttribute('aria-activedescendant', 'sug-' + active);
+  }
+  function pickClient(c) {
+    var f = bForm.elements;
+    f.name.value = c.name;
+    f.phone.value = c.phone || '';
+    f.instagram.value = c.instagram ? '@' + c.instagram : '';
+    if (c.notes) f.notes.value = c.notes;
+    closeSuggest();
+    updateExtras();
+    f.service.focus();
+  }
+  nameInput.addEventListener('keydown', function (e) {
+    if (suggest.hidden) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); highlight(active + 1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); highlight(active - 1); }
+    else if (e.key === 'Enter' && active >= 0) { e.preventDefault(); pickClient(matches[active]); }
+    else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeSuggest(); }
+  });
+  nameInput.addEventListener('blur', function () { setTimeout(closeSuggest, 150); });
+  // mousedown (antes del blur) para que el toque elija la clienta
+  suggest.addEventListener('mousedown', function (e) {
+    var li = e.target.closest('[data-index]');
+    if (li) { e.preventDefault(); pickClient(matches[+li.getAttribute('data-index')]); }
+  });
+  function fillOptions() { closeSuggest(); }
   function readForm() {
     var f = bForm.elements;
     return {
@@ -159,7 +220,8 @@
   window.astraOpenBooking = openBooking;
 
   bForm.addEventListener('input', function (e) {
-    if (e.target.name === 'name') { // clienta conocida: completa contacto y notas si están vacíos
+    if (e.target.name === 'name') { // muestra las clientas parecidas; si coincide exacto, completa lo vacío
+      renderSuggest();
       var c = findClient(e.target.value), f = bForm.elements;
       if (c) {
         if (!f.phone.value) f.phone.value = c.phone;
@@ -170,6 +232,8 @@
     updateExtras();
   });
   document.querySelector('[data-booking-close]').addEventListener('click', closeBooking);
+  // Escape con la lista de clientas abierta: cierra solo la lista, no la ficha
+  dialog.addEventListener('cancel', function (e) { if (!suggest.hidden) { e.preventDefault(); closeSuggest(); } });
   dialog.addEventListener('click', function (e) { if (e.target === dialog) closeBooking(); }); // tocar afuera cierra
 
   function busyAction(promise, okText) {

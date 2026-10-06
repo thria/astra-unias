@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=121">
+  <link rel="stylesheet" href="css/styles.css?v=122">
   <script src="js/agenda.js?v=7" defer></script>
 </head>
 <body class="admin">
@@ -118,10 +118,13 @@
       </header>
 
       <div class="booking__grid">
-        <label class="booking__field booking__field--wide">Clienta
-          <input name="name" list="clientas-lista" maxlength="80" autocomplete="off" placeholder="Nombre y apellido">
-        </label>
-        <datalist id="clientas-lista" data-client-options></datalist>
+        <!-- al escribir, se buscan las clientas ya cargadas para elegirlas (y no duplicarlas) -->
+        <div class="booking__field booking__field--wide booking__combo">
+          <label for="booking-name">Clienta</label>
+          <input id="booking-name" name="name" maxlength="80" autocomplete="off" placeholder="Escribí el nombre, teléfono o Instagram"
+                 role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="booking-suggest">
+          <ul class="booking__suggest" id="booking-suggest" role="listbox" data-client-suggest hidden></ul>
+        </div>
         <label class="booking__field">WhatsApp
           <input name="phone" type="tel" maxlength="30" inputmode="tel" placeholder="221 555 1234">
         </label>
@@ -172,6 +175,6 @@
   </dialog>
 
 
-  <script src="js/admin.js?v=3"></script>
+  <script src="js/admin.js?v=4"></script>
 </body>
 </html>

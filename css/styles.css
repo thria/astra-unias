@@ -2717,3 +2717,14 @@ h1 strong, h2 strong, h3 strong, .hero__claim strong { font-weight: 700; letter-
   .admin-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.3rem; }
   .admin-tabs__btn { padding-inline: 0.3rem; font-size: 0.8125rem; }
 }
+/* buscador de clientas en la ficha */
+.booking__combo { position: relative; }
+.booking__suggest {
+  position: absolute; z-index: 5; top: 100%; left: 0; right: 0; margin: 0.25rem 0 0; padding: 0.25rem; list-style: none;
+  max-height: 16rem; overflow-y: auto; border: 1px solid var(--color-line); border-radius: 4px;
+  background: var(--color-bg); box-shadow: 0 16px 40px -18px rgb(0 0 0 / 0.5);
+}
+.booking__suggest li { display: grid; gap: 0.1rem; padding: 0.6rem 0.7rem; border-radius: 3px; cursor: pointer; color: var(--color-ink); }
+.booking__suggest li strong { font-size: 0.9375rem; }
+.booking__suggest li span { color: var(--color-ink-soft); font-size: 0.8125rem; font-weight: 400; }
+.booking__suggest li:hover, .booking__suggest li[aria-selected="true"] { background: var(--color-blush); }
