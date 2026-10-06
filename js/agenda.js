@@ -9,8 +9,15 @@
 
   // Horario de atención: cambiar acá si cambian los días u horarios
   var CONFIG = {
-    slotHours: [10, 12, 14, 16, 18], // hora de inicio de cada turno
-    workDays: [1, 2, 3, 4, 5, 6],    // 0 = domingo … 6 = sábado
+    // horarios de inicio de cada turno según el día (0 = domingo … 6 = sábado); el día que no está, no se atiende
+    schedule: {
+      1: ['09:00', '11:30', '14:00', '16:00'],                  // lunes
+      2: ['09:00', '11:30', '14:30', '17:00', '19:30'],         // martes
+      3: ['14:30', '17:00', '19:30'],                           // miércoles
+      4: ['09:00', '11:30', '14:30', '17:00', '19:30'],         // jueves
+      5: ['13:30', '15:30'],                                    // viernes
+      6: ['14:30', '17:00']                                     // sábado
+    },
     weeks: 4,                        // cuántas semanas hacia adelante se pueden ver
     bookingUrl: 'https://ig.me/m/astra.unias'
   };
@@ -44,8 +51,8 @@
   function arToUtc(y, m, d, h) { return Date.UTC(y, m, d, h || 0) + AR_OFFSET; }
   function pad(n) { return (n < 10 ? '0' : '') + n; }
   function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
-  function slotKey(wall, hour) {
-    return wall.getUTCFullYear() + '-' + pad(wall.getUTCMonth() + 1) + '-' + pad(wall.getUTCDate()) + 'T' + pad(hour);
+  function slotKey(wall, time) { // ej. 2026-10-06T11:30
+    return wall.getUTCFullYear() + '-' + pad(wall.getUTCMonth() + 1) + '-' + pad(wall.getUTCDate()) + 'T' + time;
   }
 
   function todayStart() {
@@ -60,12 +67,13 @@
     var now = Date.now();
     var info = { start: dayStart, wall: wall, slots: [], free: 0, open: 0, kind: 'free' };
     if (dayStart < todayStart() || dayStart >= rangeEnd()) { info.kind = 'out'; return info; }
-    if (CONFIG.workDays.indexOf(wall.getUTCDay()) < 0) { info.kind = 'closed'; return info; }
-    CONFIG.slotHours.forEach(function (hour) {
-      var key = slotKey(wall, hour);
-      var past = arToUtc(wall.getUTCFullYear(), wall.getUTCMonth(), wall.getUTCDate(), hour) <= now;
+    var times = CONFIG.schedule[wall.getUTCDay()];
+    if (!times) { info.kind = 'closed'; return info; }
+    times.forEach(function (time) {
+      var key = slotKey(wall, time), hm = time.split(':');
+      var past = arToUtc(wall.getUTCFullYear(), wall.getUTCMonth(), wall.getUTCDate(), +hm[0]) + (+hm[1]) * 60000 <= now;
       var taken = busy.has(key);
-      info.slots.push({ key: key, time: pad(hour) + ':00', past: past, taken: taken });
+      info.slots.push({ key: key, time: time.replace(/^0/, ''), past: past, taken: taken }); // se muestra 9:00
       if (!past) { info.open++; if (!taken) info.free++; }
     });
     if (!info.open) info.kind = 'past';

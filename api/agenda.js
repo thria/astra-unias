@@ -8,7 +8,7 @@
 //   2. Settings → Environment Variables → ADMIN_PASSWORD = la contraseña del panel /admin.
 
 const KEY = 'astra:reservados';
-const SLOT_FORMAT = /^\d{4}-\d{2}-\d{2}T\d{2}$/; // ej. 2026-10-05T14 = 5 de octubre, turno de las 14 h
+const SLOT_FORMAT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/; // ej. 2026-10-06T11:30 = 6 de octubre, turno de las 11:30
 const AR_OFFSET_MS = 3 * 60 * 60 * 1000;
 const crypto = require('crypto');
 const MAX_FAILS = 8;          // contraseñas incorrectas permitidas por IP...
