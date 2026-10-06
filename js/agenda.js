@@ -36,7 +36,7 @@
   var layout = root.querySelector('.agenda__layout');
   var message = root.querySelector('[data-agenda-message]');
   var messageText = root.querySelector('[data-agenda-message-text]');
-  var status = root.querySelector('[data-agenda-status]');
+  var status = root.querySelector('[data-agenda-status]') || document.querySelector('[data-agenda-status]');
 
   var busy = new Set();
   var months = [];      // meses que abarca el rango visible: [{ y, m }]
@@ -141,7 +141,17 @@
   }
 
   // ---- Horarios del día elegido ----
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return '&#' + c.charCodeAt(0) + ';'; }); }
+
   function slotHtml(slot, dateText) {
+    if (isAdmin && (!slot.past || slot.taken)) {
+      var bk = (window.astraBookings || {})[slot.key];
+      var who = slot.taken ? (bk && bk.name ? bk.name : 'Bloqueado') : 'Libre';
+      return '<li><button type="button" class="slot slot--admin ' + (slot.taken ? 'slot--busy' : 'slot--free') + (slot.past ? ' slot--was' : '') +
+        (bk && bk.status ? ' is-' + esc(bk.status) : '') + '" data-slot="' + slot.key + '" data-time="' + slot.time + '"' +
+        ' aria-label="' + esc(dateText + ', ' + slot.time + ': ' + who) + '. Abrir ficha">' +
+        '<span class="slot__time">' + slot.time + '</span><span class="slot__who">' + esc(who) + '</span></button></li>';
+    }
     if (slot.past) return '<li><span class="slot slot--past" aria-label="' + slot.time + ', ya pasó">' + slot.time + '</span></li>';
     if (isAdmin) {
       return '<li><button type="button" class="slot ' + (slot.taken ? 'slot--busy' : 'slot--free') + '" data-slot="' + slot.key + '"' +
@@ -276,7 +286,8 @@
       var slotBtn = event.target.closest('[data-slot]');
       if (slotBtn) {
         var key = slotBtn.getAttribute('data-slot');
-        save([key], !busy.has(key));
+        if (window.astraOpenBooking) window.astraOpenBooking(key, fullDate(dayInfo(selected).wall), slotBtn.getAttribute('data-time'), busy.has(key));
+        else save([key], !busy.has(key));
         return;
       }
       var dayBtn = event.target.closest('[data-day-slots]');
@@ -306,6 +317,12 @@
   }
 
   // En el panel la carga empieza después de iniciar sesión (ver admin.html)
-  if (isAdmin) window.astraAgendaLoad = load;
+  if (isAdmin) {
+    window.astraAgendaLoad = load;
+    // el panel (js/admin.js) marca u ocupa horarios y vuelve a dibujar la agenda
+    window.astraAgendaSetBusy = function (key, on) { if (on) busy.add(key); else busy.delete(key); render(); };
+    window.astraAgendaRender = function () { if (months.length) render(); };
+    window.astraAgendaSave = save;
+  }
   else load();
 })();

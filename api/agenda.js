@@ -1,19 +1,49 @@
 // Función de Vercel para la agenda de turnos.
 //   GET  /api/agenda → lista de horarios reservados (público, sin datos personales)
-//   POST /api/agenda → la dueña marca o libera un horario (requiere contraseña)
+//   POST /api/agenda → panel de la dueña (requiere contraseña): marcar o liberar horarios y
+//                       guardar la ficha de cada turno (clienta, contacto, servicio, diseño, precio, seña, estado)
 //
 // Configuración en Vercel (una sola vez):
 //   1. Storage → crear una base "Upstash for Redis" (gratis) y conectarla al proyecto.
 //      Vercel agrega solo las variables KV_REST_API_URL y KV_REST_API_TOKEN.
 //   2. Settings → Environment Variables → ADMIN_PASSWORD = la contraseña del panel /admin.
 
-const KEY = 'astra:reservados';
+const KEY = 'astra:reservados';       // horarios ocupados (lo único que ve la página pública)
+const BOOKINGS = 'astra:turnos';        // fichas privadas de cada turno (solo con contraseña)
 const SLOT_FORMAT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/; // ej. 2026-10-06T11:30 = 6 de octubre, turno de las 11:30
 const AR_OFFSET_MS = 3 * 60 * 60 * 1000;
 const crypto = require('crypto');
 const MAX_FAILS = 8;          // contraseñas incorrectas permitidas por IP...
 const LOCK_SECONDS = 15 * 60;  // ...antes de bloquearla 15 minutos
 const MAX_SLOTS = 62;          // un pedido no puede tocar más de un mes de horarios a la vez
+const STATUSES = ['pendiente', 'confirmado', 'asistio', 'no-vino'];
+const KEEP_DAYS = 730;          // las fichas viejas se guardan 2 años (historial de clientas) y después se borran
+
+// Ficha de un turno: solo campos conocidos, texto plano y con largo máximo
+function cleanBooking(input) {
+  const b = input && typeof input === 'object' ? input : {};
+  // texto plano: sin caracteres de control (salvo saltos de línea) y con largo máximo
+  const text = function (v, max) {
+    return typeof v === 'string' ? v.replace(/[\u0000-\u0009\u000b-\u001f\u007f]/g, ' ').trim().slice(0, max) : '';
+  };
+  const money = function (v) { const n = Math.round(Number(v)); return isFinite(n) && n >= 0 && n < 10000000 ? n : 0; };
+  return {
+    name: text(b.name, 80),
+    phone: text(b.phone, 30).replace(/[^0-9+ ()-]/g, ''),
+    instagram: text(b.instagram, 40).replace(/[^A-Za-z0-9._@]/g, ''),
+    service: text(b.service, 60),
+    design: text(b.design, 1000),
+    notes: text(b.notes, 1000),
+    price: money(b.price),
+    deposit: b.deposit === true,
+    status: STATUSES.indexOf(b.status) >= 0 ? b.status : 'pendiente',
+    updated: new Date().toISOString()
+  };
+}
+
+function daysAgoKey(days) {
+  return new Date(Date.now() - AR_OFFSET_MS - days * 86400000).toISOString().slice(0, 10) + 'T00';
+}
 
 function storage() {
   const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
@@ -113,18 +143,46 @@ module.exports = async function handler(req, res) {
 
       if (body.action === 'login') return send(res, 200, { ok: true });
 
+      // Fichas de los turnos (panel): leer todas, guardar una o borrar una
+      if (body.action === 'list') {
+        const raw = (await redis(db, ['HGETALL', BOOKINGS])) || [];
+        const bookings = {};
+        for (let i = 0; i + 1 < raw.length; i += 2) {
+          try { bookings[raw[i]] = JSON.parse(raw[i + 1]); } catch (e) { /* ficha dañada: se ignora */ }
+        }
+        const all = (await redis(db, ['SMEMBERS', KEY])) || [];
+        return send(res, 200, { ok: true, bookings: bookings, busy: all.filter(function (s) { return s >= todayKey(); }).sort() });
+      }
+      if (body.action === 'save' || body.action === 'remove') {
+        if (typeof body.slot !== 'string' || !SLOT_FORMAT.test(body.slot)) return send(res, 400, { error: 'Pedido inválido' });
+        if (body.action === 'save') {
+          const booking = cleanBooking(body.booking);
+          await redis(db, ['HSET', BOOKINGS, body.slot, JSON.stringify(booking)]);
+          await redis(db, ['SADD', KEY, body.slot]);
+          return send(res, 200, { ok: true, booking: booking });
+        }
+        await redis(db, ['HDEL', BOOKINGS, body.slot]);
+        await redis(db, ['SREM', KEY, body.slot]);
+        return send(res, 200, { ok: true });
+      }
+
       const slots = Array.isArray(body.slots) ? body.slots : [];
       if (!slots.length || slots.length > MAX_SLOTS || !slots.every(function (s) { return SLOT_FORMAT.test(s); }) || typeof body.busy !== 'boolean') {
         return send(res, 400, { error: 'Pedido inválido' });
       }
 
       await redis(db, [body.busy ? 'SADD' : 'SREM', KEY].concat(slots));
+      if (!body.busy) await redis(db, ['HDEL', BOOKINGS].concat(slots)); // al liberar, se borra también la ficha
 
       // Limpieza: borra los turnos de días anteriores a hoy
       const all = (await redis(db, ['SMEMBERS', KEY])) || [];
       const today = todayKey();
       const old = all.filter(function (s) { return s < today; });
       if (old.length) await redis(db, ['SREM', KEY].concat(old));
+      // y las fichas de hace más de 2 años
+      const keys = (await redis(db, ['HKEYS', BOOKINGS])) || [];
+      const ancient = keys.filter(function (s) { return s < daysAgoKey(KEEP_DAYS); });
+      if (ancient.length) await redis(db, ['HDEL', BOOKINGS].concat(ancient));
 
       return send(res, 200, { ok: true, busy: all.filter(function (s) { return s >= today; }).sort() });
     }

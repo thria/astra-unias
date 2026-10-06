@@ -2622,3 +2622,98 @@ h1 strong, h2 strong, h3 strong, .hero__claim strong { font-weight: 700; letter-
 /* Celular: entrada simple del iPad del mapa (ver js/effects.js), solo opacidad y desplazamiento */
 .ipad.ipad--enter { opacity: 0; translate: 0 1.5rem; will-change: auto; transition: opacity 0.6s ease, translate 0.75s cubic-bezier(0.33, 1, 0.68, 1); }
 .ipad.ipad--enter.is-in { opacity: 1; translate: none; }
+
+/* ===== Panel de turnos (/admin): pestañas, ficha del turno, próximos, clientas y resumen ===== */
+.admin-tabs { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-block: 0.5rem 1.5rem; }
+.admin-tabs__btn {
+  min-height: 2.75rem; padding: 0.5rem 1.1rem; border: 1px solid var(--color-line); border-radius: 4px;
+  background: transparent; color: var(--color-ink); font: 600 0.9375rem/1 var(--font-body); cursor: pointer;
+}
+.admin-tabs__btn[aria-pressed="true"] { background: var(--color-ink); border-color: var(--color-ink); color: var(--color-bg); }
+
+/* horarios del panel: hora + nombre de la clienta */
+.slot.slot--admin { flex-direction: column; align-items: flex-start; gap: 0.15rem; min-width: 7.5rem; min-height: 3.25rem; padding: 0.45rem 0.75rem; text-align: left; }
+.slot__time { font-weight: 700; }
+.slot__who { max-width: 9rem; overflow: hidden; font-size: 0.75rem; font-weight: 500; white-space: nowrap; text-overflow: ellipsis; opacity: 0.85; }
+.slot--admin.slot--busy { border-left: 3px solid var(--color-rose); }
+.slot--admin.is-confirmado { border-left-color: #6FA982; }
+.slot--admin.is-asistio { border-left-color: #8A8F98; }
+.slot--admin.is-no-vino { border-left-color: #C25B5B; }
+.slot--admin.slot--was { opacity: 0.7; }
+
+/* ficha */
+.booking {
+  width: min(40rem, calc(100vw - 1.5rem)); max-height: calc(100dvh - 1.5rem); padding: 0; border: 1px solid var(--color-line);
+  border-radius: 6px; background: var(--color-bg); color: var(--color-ink); box-shadow: 0 30px 80px -30px rgb(0 0 0 / 0.6);
+}
+.booking::backdrop { background: rgb(21 18 17 / 0.55); backdrop-filter: blur(3px); }
+.booking__form { display: grid; gap: 1rem; padding: 1.25rem; }
+.booking__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+.booking__title { font-size: 1.6rem; font-weight: 600; letter-spacing: -0.02em; }
+.booking__when { color: var(--color-ink-soft); font-size: 0.9375rem; }
+.booking__close { width: 2.75rem; height: 2.75rem; border: 1px solid var(--color-line); border-radius: 4px; background: none; color: var(--color-ink); font-size: 1rem; cursor: pointer; }
+.booking__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem 1rem; }
+.booking__field { display: grid; gap: 0.35rem; font-size: 0.8125rem; font-weight: 600; color: var(--color-ink-soft); }
+.booking__field--wide, .booking__status, .booking__check { grid-column: 1 / -1; }
+.booking__field input, .booking__field select, .booking__field textarea {
+  width: 100%; min-height: 2.75rem; padding: 0.55rem 0.7rem; border: 1px solid var(--color-line); border-radius: 4px;
+  background: transparent; color: var(--color-ink); font: 400 1rem/1.4 var(--font-body);
+}
+.booking__field select option { color: #2A2321; }
+.booking__field textarea { resize: vertical; }
+.booking__field input:focus, .booking__field select:focus, .booking__field textarea:focus { outline: 2px solid var(--color-rose); outline-offset: 1px; }
+.booking__check { display: flex; align-items: center; gap: 0.6rem; font-weight: 600; }
+.booking__check input, .booking__status input { width: 1.15rem; height: 1.15rem; accent-color: var(--color-rose); }
+.booking__status { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; margin: 0; padding: 0.6rem 0.8rem; border: 1px solid var(--color-line); border-radius: 4px; }
+.booking__status legend { padding-inline: 0.3rem; font-size: 0.8125rem; font-weight: 600; color: var(--color-ink-soft); }
+.booking__status label { display: flex; align-items: center; gap: 0.4rem; min-height: 2.25rem; }
+.booking__history { padding: 0.6rem 0.8rem; border-radius: 4px; background: var(--color-blush); font-size: 0.875rem; }
+.booking__actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.booking__actions .button { min-height: 2.75rem; border-radius: 4px; }
+.booking__danger { color: #C25B5B; border-color: currentColor; }
+@media (max-width: 30em) {
+  .booking__grid { grid-template-columns: 1fr; }
+  .booking__actions .button { flex: 1 1 100%; }
+}
+
+/* listas: próximos y clientas */
+.admin-panel { display: grid; gap: 0.75rem; }
+.admin-empty { color: var(--color-ink-soft); }
+.admin-day { margin-top: 1rem; font-size: 1.15rem; font-weight: 600; letter-spacing: -0.01em; }
+.admin-item { display: grid; gap: 0.5rem; padding: 0.75rem; border: 1px solid var(--color-line); border-radius: 6px; }
+.admin-item__main { display: flex; gap: 0.9rem; align-items: flex-start; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.admin-item__time { min-width: 3.2rem; font-weight: 700; font-size: 1.05rem; }
+.admin-item__body { display: grid; gap: 0.15rem; }
+.admin-item__body span { color: var(--color-ink-soft); font-size: 0.875rem; }
+.admin-item__design { white-space: pre-line; }
+.admin-item__meta { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+.admin-item__wa { margin-left: auto; padding: 0.45rem 0.8rem; border-radius: 4px; background: #25D366; color: #0B2B17; font-size: 0.8125rem; font-weight: 700; text-decoration: none; }
+.admin-chip { padding: 0.2rem 0.55rem; border: 1px solid var(--color-line); border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+.admin-chip.is-confirmado, .admin-chip.is-ok { border-color: #6FA982; color: #4E8A62; }
+.admin-chip.is-no-vino, .admin-chip.is-warn { border-color: #C25B5B; color: #B04848; }
+.admin-chip.is-asistio { color: var(--color-ink-soft); }
+.admin-search input { width: 100%; min-height: 2.9rem; padding: 0.6rem 0.8rem; border: 1px solid var(--color-line); border-radius: 4px; background: transparent; color: var(--color-ink); font: 400 1rem var(--font-body); }
+.admin-client { border: 1px solid var(--color-line); border-radius: 6px; }
+.admin-client summary { display: grid; gap: 0.15rem; padding: 0.8rem; cursor: pointer; }
+.admin-client summary span { color: var(--color-ink-soft); font-size: 0.875rem; }
+.admin-client__body { display: grid; gap: 0.5rem; padding: 0 0.8rem 0.8rem; font-size: 0.9375rem; }
+.admin-client__notes { padding: 0.5rem 0.7rem; border-radius: 4px; background: var(--color-blush); white-space: pre-line; }
+.admin-client__links { display: flex; gap: 1rem; }
+.admin-client__links a { color: var(--color-rose); font-weight: 600; }
+.admin-client__history { display: grid; gap: 0.25rem; margin: 0; padding: 0; list-style: none; }
+.admin-client__history button { padding: 0.35rem 0; border: 0; background: none; color: var(--color-ink); font: 400 0.875rem var(--font-body); text-align: left; cursor: pointer; }
+
+/* resumen */
+.admin-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 0.75rem; }
+.admin-stat { display: grid; gap: 0.2rem; padding: 0.9rem; border: 1px solid var(--color-line); border-radius: 6px; }
+.admin-stat span { color: var(--color-ink-soft); font-size: 0.8125rem; font-weight: 600; }
+.admin-stat strong { font-size: 1.6rem; font-weight: 600; letter-spacing: -0.02em; }
+.admin-stat small { color: var(--color-ink-soft); font-size: 0.75rem; }
+.admin-services { display: grid; gap: 0.3rem; margin: 0; padding: 0; list-style: none; }
+.admin-services li { display: flex; justify-content: space-between; padding: 0.45rem 0; border-bottom: 1px solid var(--color-line); }
+.admin__export { justify-self: start; margin-top: 1rem; border-radius: 4px; }
+.admin__foot { display: grid; gap: 0.75rem; justify-items: start; margin-top: 1.5rem; }
+@media (max-width: 30em) {
+  .admin-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.3rem; }
+  .admin-tabs__btn { padding-inline: 0.3rem; font-size: 0.8125rem; }
+}

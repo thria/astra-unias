@@ -11,8 +11,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=119">
-  <script src="js/agenda.js?v=6" defer></script>
+  <link rel="stylesheet" href="css/styles.css?v=121">
+  <script src="js/agenda.js?v=7" defer></script>
 </head>
 <body class="admin">
   <header class="site-header">
@@ -26,7 +26,7 @@
     <div class="container admin__inner">
       <div class="section__head">
         <h1 class="admin__title">Panel de turnos</h1>
-        <p>Tocá un horario para marcarlo como reservado y tocalo de nuevo para liberarlo. Los cambios se ven al instante en la página.</p>
+        <p>Tu agenda de Astra: tocá un horario para anotar el turno (clienta, servicio, diseño, seña) o para bloquearlo. La página pública solo muestra si está libre u ocupado.</p>
       </div>
 
       <!-- Inicio de sesión -->
@@ -36,6 +36,33 @@
         <p class="admin__error" data-login-error role="alert" hidden></p>
         <button class="button" type="submit">Entrar</button>
       </form>
+
+      <!-- Pestañas del panel (se muestran después de entrar) -->
+      <nav class="admin-tabs" data-admin-tabs aria-label="Secciones del panel" hidden>
+        <button type="button" class="admin-tabs__btn" data-tab="agenda" aria-pressed="true">Agenda</button>
+        <button type="button" class="admin-tabs__btn" data-tab="proximos" aria-pressed="false">Próximos</button>
+        <button type="button" class="admin-tabs__btn" data-tab="clientas" aria-pressed="false">Clientas</button>
+        <button type="button" class="admin-tabs__btn" data-tab="resumen" aria-pressed="false">Resumen</button>
+      </nav>
+
+      <!-- Próximos turnos: hoy y los que vienen, con recordatorio por WhatsApp -->
+      <section class="admin-panel" data-panel="proximos" hidden>
+        <div class="admin-list" data-upcoming></div>
+      </section>
+
+      <!-- Clientas: buscador e historial -->
+      <section class="admin-panel" data-panel="clientas" hidden>
+        <label class="admin-search"><span class="sr-only">Buscar clienta</span>
+          <input type="search" placeholder="Buscar por nombre, teléfono o Instagram" data-client-search autocomplete="off">
+        </label>
+        <div class="admin-list" data-clients></div>
+      </section>
+
+      <!-- Resumen del mes -->
+      <section class="admin-panel" data-panel="resumen" hidden>
+        <div data-summary></div>
+        <button type="button" class="button button--ghost admin__export" data-export>Descargar copia de seguridad (planilla)</button>
+      </section>
 
       <!-- Agenda editable (se muestra después de entrar) -->
       <div class="agenda" data-agenda data-agenda-mode="admin" hidden>
@@ -68,15 +95,83 @@
           <p data-agenda-message-text></p>
         </div>
         <ul class="agenda__legend" role="list" aria-label="Referencias">
-          <li><span class="slot slot--free slot--sample" aria-hidden="true">10:00</span> Libre (tocá para reservar)</li>
-          <li><span class="slot slot--busy slot--sample" aria-hidden="true">10:00</span> Reservado (tocá para liberar)</li>
+          <li><span class="slot slot--free slot--sample" aria-hidden="true">9:00</span> Libre (tocá para anotar un turno)</li>
+          <li><span class="slot slot--busy slot--sample" aria-hidden="true">9:00</span> Ocupado (tocá para ver o editar la ficha)</li>
         </ul>
+      </div>
+
+      <div class="admin__foot" data-admin-foot hidden>
         <p class="admin__status" data-agenda-status role="status" aria-live="polite"></p>
         <button class="button button--ghost admin__logout" type="button" data-logout>Cerrar sesión</button>
       </div>
     </div>
   </main>
+  <!-- Ficha del turno -->
+  <dialog class="booking" data-booking aria-labelledby="booking-title">
+    <form class="booking__form" data-booking-form method="dialog">
+      <header class="booking__head">
+        <div>
+          <h2 id="booking-title" class="booking__title" data-booking-title>Turno</h2>
+          <p class="booking__when" data-booking-when></p>
+        </div>
+        <button type="button" class="booking__close" data-booking-close aria-label="Cerrar">✕</button>
+      </header>
 
-  <script src="js/admin.js?v=1"></script>
+      <div class="booking__grid">
+        <label class="booking__field booking__field--wide">Clienta
+          <input name="name" list="clientas-lista" maxlength="80" autocomplete="off" placeholder="Nombre y apellido">
+        </label>
+        <datalist id="clientas-lista" data-client-options></datalist>
+        <label class="booking__field">WhatsApp
+          <input name="phone" type="tel" maxlength="30" inputmode="tel" placeholder="221 555 1234">
+        </label>
+        <label class="booking__field">Instagram
+          <input name="instagram" maxlength="40" placeholder="@usuaria" autocapitalize="off">
+        </label>
+        <label class="booking__field">Servicio
+          <select name="service">
+            <option value="">Elegir…</option>
+            <option>Semipermanente</option>
+            <option>Capping</option>
+            <option>Soft gel</option>
+            <option>Press on</option>
+            <option>Service / mantenimiento</option>
+            <option>Retiro</option>
+            <option>Otro</option>
+          </select>
+        </label>
+        <label class="booking__field">Precio ($)
+          <input name="price" type="number" min="0" step="500" inputmode="numeric" placeholder="0">
+        </label>
+        <label class="booking__field booking__field--wide">Diseño y especificaciones
+          <textarea name="design" rows="3" maxlength="1000" placeholder="Largo, forma, colores, foto de referencia, apliques…"></textarea>
+        </label>
+        <label class="booking__field booking__field--wide">Notas privadas
+          <textarea name="notes" rows="2" maxlength="1000" placeholder="Alergias, uñas sensibles, preferencias…"></textarea>
+        </label>
+        <label class="booking__check"><input type="checkbox" name="deposit"> Seña pagada ($5.000)</label>
+        <fieldset class="booking__status">
+          <legend>Estado</legend>
+          <label><input type="radio" name="status" value="pendiente" checked> Pendiente</label>
+          <label><input type="radio" name="status" value="confirmado"> Confirmado</label>
+          <label><input type="radio" name="status" value="asistio"> Vino</label>
+          <label><input type="radio" name="status" value="no-vino"> No vino</label>
+        </fieldset>
+      </div>
+
+      <p class="booking__history" data-booking-history hidden></p>
+      <p class="admin__error" data-booking-error role="alert" hidden></p>
+
+      <footer class="booking__actions">
+        <button type="submit" class="button" data-booking-save>Guardar turno</button>
+        <a class="button button--ghost" data-booking-whatsapp target="_blank" rel="noopener" hidden>Recordatorio por WhatsApp</a>
+        <button type="button" class="button button--ghost" data-booking-block>Bloquear sin clienta</button>
+        <button type="button" class="button button--ghost booking__danger" data-booking-free hidden>Liberar horario</button>
+      </footer>
+    </form>
+  </dialog>
+
+
+  <script src="js/admin.js?v=3"></script>
 </body>
 </html>
