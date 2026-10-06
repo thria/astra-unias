@@ -11,8 +11,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=123">
-  <script src="js/agenda.js?v=7" defer></script>
+  <link rel="stylesheet" href="css/styles.css?v=124">
+  <script src="js/agenda.js?v=8" defer></script>
 </head>
 <body class="admin">
   <header class="site-header">
@@ -108,7 +108,21 @@
         <ul class="agenda__legend" role="list" aria-label="Referencias">
           <li><span class="slot slot--free slot--sample" aria-hidden="true">9:00</span> Libre (tocá para anotar un turno)</li>
           <li><span class="slot slot--busy slot--sample" aria-hidden="true">9:00</span> Ocupado (tocá para ver o editar la ficha)</li>
+          <li><span class="slot slot--off slot--sample" aria-hidden="true">9:00</span> No trabajo (tocá para volver a habilitarlo)</li>
         </ul>
+
+        <!-- Días libres: vacaciones, cursos o días que no trabaja (en la página figuran sin atención) -->
+        <section class="admin-off" aria-labelledby="off-title">
+          <h2 id="off-title" class="admin-day">Días que no trabajo</h2>
+          <p class="admin-off__help">Para vacaciones, cursos o días libres: elegí desde qué día y hasta cuál. En la página van a figurar sin atención.</p>
+          <form class="admin-off__form" data-off-form>
+            <label>Desde <input type="date" name="from" required></label>
+            <label>Hasta <input type="date" name="to" required></label>
+            <button type="submit" class="button">Marcar como no trabajo</button>
+          </form>
+          <p class="admin__error" data-off-error role="alert" hidden></p>
+          <ul class="admin-off__list" data-off-list role="list"></ul>
+        </section>
       </div>
 
       <div class="admin__foot" data-admin-foot hidden>
@@ -179,13 +193,13 @@
       <footer class="booking__actions">
         <button type="submit" class="button" data-booking-save>Guardar turno</button>
         <a class="button button--ghost" data-booking-whatsapp target="_blank" rel="noopener" hidden>Recordatorio por WhatsApp</a>
-        <button type="button" class="button button--ghost" data-booking-block>Bloquear sin clienta</button>
+        <button type="button" class="button button--ghost" data-booking-block>No trabajo en este horario</button>
         <button type="button" class="button button--ghost booking__danger" data-booking-free hidden>Liberar horario</button>
       </footer>
     </form>
   </dialog>
 
 
-  <script src="js/admin.js?v=7"></script>
+  <script src="js/admin.js?v=8"></script>
 </body>
 </html>

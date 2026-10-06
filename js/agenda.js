@@ -39,6 +39,7 @@
   var status = root.querySelector('[data-agenda-status]') || document.querySelector('[data-agenda-status]');
 
   var busy = new Set();
+  var closed = new Set(); // días ("2026-10-12") u horarios ("2026-10-12T14:00") en que no se trabaja
   var months = [];      // meses que abarca el rango visible: [{ y, m }]
   var monthIndex = 0;
   var selected = null;  // inicio del día elegido (ms UTC)
@@ -69,14 +70,22 @@
     if (dayStart < todayStart() || dayStart >= rangeEnd()) { info.kind = 'out'; return info; }
     var times = CONFIG.schedule[wall.getUTCDay()];
     if (!times) { info.kind = 'closed'; return info; }
+    var dayKey = slotKey(wall, '').slice(0, 10);
+    info.dayKey = dayKey;
+    info.dayOff = closed.has(dayKey); // día marcado como "no trabajo"
+    if (info.dayOff && !isAdmin) { info.kind = 'closed'; return info; }
     times.forEach(function (time) {
       var key = slotKey(wall, time), hm = time.split(':');
       var past = arToUtc(wall.getUTCFullYear(), wall.getUTCMonth(), wall.getUTCDate(), +hm[0]) + (+hm[1]) * 60000 <= now;
       var taken = busy.has(key);
-      info.slots.push({ key: key, time: time.replace(/^0/, ''), past: past, taken: taken }); // se muestra 9:00
-      if (!past) { info.open++; if (!taken) info.free++; }
+      var off = info.dayOff || closed.has(key);
+      if (off && !isAdmin) return; // la página pública no muestra los horarios en que no se trabaja
+      info.slots.push({ key: key, time: time.replace(/^0/, ''), past: past, taken: taken, off: off }); // se muestra 9:00
+      if (!past && !off) { info.open++; if (!taken) info.free++; }
     });
-    if (!info.open) info.kind = 'past';
+    if (info.dayOff) { info.kind = 'off'; return info; }
+    if (!info.slots.length) { info.kind = 'closed'; return info; }
+    if (!info.open) info.kind = info.slots.some(function (s) { return !s.past; }) ? (isAdmin ? 'off' : 'closed') : 'past';
     else if (!info.free) info.kind = 'full';
     return info;
   }
@@ -91,10 +100,10 @@
     var d = info.wall.getUTCDate();
     var classes = 'almanac__day is-' + info.kind +
       (info.start === today ? ' is-today' : '') + (info.start === selected ? ' is-selected' : '');
-    var selectable = info.kind === 'free' || info.kind === 'full';
+    var selectable = info.kind === 'free' || info.kind === 'full' || (isAdmin && info.kind === 'off');
     var label = fullDate(info.wall) + ': ' + ({
       free: info.free + (info.free === 1 ? ' turno libre' : ' turnos libres'),
-      full: 'completo', closed: 'no se atiende', past: 'ya pasó', out: 'fuera de la agenda'
+      full: 'completo', off: 'no trabajás', closed: 'no se atiende', past: 'ya pasó', out: 'fuera de la agenda'
     })[info.kind];
     return selectable
       ? '<button type="button" class="' + classes + '" data-day="' + info.start + '" aria-pressed="' + (info.start === selected) + '" aria-label="' + label + '">' +
@@ -144,6 +153,10 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return '&#' + c.charCodeAt(0) + ';'; }); }
 
   function slotHtml(slot, dateText) {
+    if (isAdmin && slot.off && !slot.past && !slot.taken) {
+      return '<li><button type="button" class="slot slot--admin slot--off" data-off-slot="' + slot.key + '" aria-label="' + esc(dateText + ', ' + slot.time) +
+        ': no trabajás. Tocá para volver a habilitarlo">' + '<span class="slot__time">' + slot.time + '</span><span class="slot__who">No trabajo</span></button></li>';
+    }
     if (isAdmin && (!slot.past || slot.taken)) {
       var bk = (window.astraBookings || {})[slot.key];
       var who = slot.taken ? (bk && bk.name ? bk.name : 'Bloqueado') : 'Libre';
@@ -176,14 +189,14 @@
     var dateText = fullDate(info.wall);
     var openKeys = info.slots.filter(function (s) { return !s.past; }).map(function (s) { return s.key; });
     var noteText = isAdmin
-      ? (info.kind === 'full' ? 'Día completo.' : 'Tocá un horario para reservarlo o liberarlo.')
+      ? (info.dayOff ? 'Este día no trabajás: en la página figura sin atención.' : info.kind === 'full' ? 'Día completo.' : 'Tocá un horario para anotar un turno o marcar que no trabajás.')
       : info.kind === 'full'
         ? 'Este día ya está completo. Escribime y te aviso si se libera un lugar.'
         : 'Tocá un horario libre para pedirlo.';
     var action = isAdmin
-      ? (openKeys.length
-        ? '<button type="button" class="agenda__cta" data-day-slots="' + openKeys.join(',') + '" data-day-busy="' + (info.free > 0) + '">' +
-          (info.free > 0 ? PLUS + 'Reservar día completo' : 'Liberar día') + '</button>'
+      ? (info.slots.some(function (s) { return !s.past; })
+        ? '<button type="button" class="agenda__cta" data-day-off="' + info.dayKey + '" data-day-off-on="' + !info.dayOff + '">' +
+          (info.dayOff ? PLUS + 'Volver a abrir el día' : 'No trabajo este día') + '</button>'
         : '')
       : '<a class="agenda__cta" href="' + CONFIG.bookingUrl + '" target="_blank" rel="noopener">' + PLUS + 'Pedir turno</a>';
 
@@ -290,8 +303,37 @@
         else save([key], !busy.has(key));
         return;
       }
-      var dayBtn = event.target.closest('[data-day-slots]');
-      if (dayBtn) save(dayBtn.getAttribute('data-day-slots').split(','), dayBtn.getAttribute('data-day-busy') === 'true');
+      var offSlot = event.target.closest('[data-off-slot]');
+      if (offSlot) { setClosed([offSlot.getAttribute('data-off-slot')], false, 'Horario habilitado de nuevo.'); return; }
+      var dayOff = event.target.closest('[data-day-off]');
+      if (dayOff) {
+        var on = dayOff.getAttribute('data-day-off-on') === 'true', info = dayInfo(selected);
+        var booked = info.slots.filter(function (s) { return s.taken && !s.past; }).length;
+        if (on && booked && !window.confirm('Ese día tenés ' + booked + (booked === 1 ? ' turno anotado' : ' turnos anotados') + '. Se mantienen en tu agenda, pero acordate de avisarles. ¿Marcar el día como "no trabajo"?')) return;
+        setClosed([dayOff.getAttribute('data-day-off')], on, on ? 'Listo: ese día figura sin atención.' : 'Día abierto de nuevo.');
+      }
+    });
+  }
+
+  // Días u horarios en que no se trabaja: se ve al instante y si falla se deshace
+  function setClosed(items, on, okText) {
+    var before = new Set(closed);
+    items.forEach(function (k) { if (on) closed.add(k); else closed.delete(k); });
+    render();
+    return fetch('/api/agenda', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Admin-Password': window.astraAdminPassword || '' },
+      body: JSON.stringify({ action: 'close', items: items, closed: on })
+    }).then(function (r) {
+      if (!r.ok) throw new Error(r.status === 401 ? 'La sesión venció. Volvé a entrar.' : 'No se pudo guardar.');
+      announce(okText || 'Guardado.');
+      if (window.astraOnClosedChange) window.astraOnClosedChange();
+      return true;
+    }).catch(function (error) {
+      closed = before;
+      render();
+      announce(error.message + ' Probá de nuevo.');
+      return false;
     });
   }
 
@@ -308,6 +350,8 @@
         }
         if (data.error) throw new Error(data.error);
         busy = new Set(data.busy || []);
+        closed = new Set(data.closed || []);
+        if (window.astraOnClosedChange) setTimeout(window.astraOnClosedChange, 0); // lista de días libres del panel
         setupRange();
         render();
       })
@@ -323,6 +367,8 @@
     window.astraAgendaSetBusy = function (key, on) { if (on) busy.add(key); else busy.delete(key); render(); };
     window.astraAgendaRender = function () { if (months.length) render(); };
     window.astraAgendaSave = save;
+    window.astraSetClosed = setClosed;
+    window.astraGetClosed = function () { return Array.from(closed).sort(); };
   }
   else load();
 })();

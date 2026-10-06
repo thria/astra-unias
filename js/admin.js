@@ -259,12 +259,61 @@
       window.astraAgendaSetBusy(key, true);
     }), 'Turno guardado.');
   });
+  // "No trabajo en este horario": en la página deja de ofrecerse (no figura como ocupado)
   bBlock.addEventListener('click', function () {
     var key = currentKey;
-    busyAction(api({ slots: [key], busy: true }).then(function () {
-      if (busyList.indexOf(key) < 0) busyList.push(key);
-      window.astraAgendaSetBusy(key, true);
-    }), 'Horario bloqueado.');
+    closeBooking();
+    window.astraSetClosed([key], true, 'Listo: ese horario figura sin atención.');
+  });
+
+  // ---- Días que no trabajo (vacaciones, cursos, días libres) ----
+  var offForm = document.querySelector('[data-off-form]');
+  var offError = document.querySelector('[data-off-error]');
+  var offList = document.querySelector('[data-off-list]');
+  function addDays(ymd, n) { var d = new Date(ymd + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); }
+  // agrupa días seguidos: "12 al 16 de octubre"
+  function renderOff() {
+    if (!window.astraGetClosed) return;
+    var all = window.astraGetClosed(), days = all.filter(function (k) { return k.length === 10; }), ranges = [];
+    days.forEach(function (d) {
+      var last = ranges[ranges.length - 1];
+      if (last && addDays(last.to, 1) === d) last.to = d; else ranges.push({ from: d, to: d });
+    });
+    var slots = all.filter(function (k) { return k.length > 10; });
+    var label = function (r) {
+      var a = parts(r.from + 'T00:00'), b = parts(r.to + 'T00:00');
+      if (r.from === r.to) return dayText(r.from + 'T00:00');
+      return a.date.getUTCDate() + (a.date.getUTCMonth() === b.date.getUTCMonth() ? '' : ' de ' + MONTHS[a.date.getUTCMonth()]) +
+        ' al ' + b.date.getUTCDate() + ' de ' + MONTHS[b.date.getUTCMonth()];
+    };
+    offList.innerHTML = ranges.map(function (r) {
+      return '<li><span>' + esc(label(r)) + '</span><button type="button" class="admin-off__remove" data-off-from="' + r.from + '" data-off-to="' + r.to + '">Volver a abrir</button></li>';
+    }).concat(slots.map(function (k) {
+      return '<li><span>' + esc(dayText(k) + ', ' + parts(k).time + ' h') + '</span><button type="button" class="admin-off__remove" data-off-slot-key="' + k + '">Volver a abrir</button></li>';
+    })).join('') || '<li class="admin-empty">No marcaste días ni horarios sin atención.</li>';
+  }
+  window.astraOnClosedChange = renderOff;
+
+  offForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var from = offForm.from.value, to = offForm.to.value, today = todayKey();
+    offError.hidden = true;
+    var fail = function (t) { offError.textContent = t; offError.hidden = false; };
+    if (!from || !to) return fail('Elegí las dos fechas.');
+    if (to < from) return fail('La fecha "hasta" tiene que ser igual o posterior a "desde".');
+    if (to < today) return fail('Esas fechas ya pasaron.');
+    var days = [];
+    for (var d = from < today ? today : from; d <= to && days.length <= 130; d = addDays(d, 1)) days.push(d);
+    if (days.length > 130) return fail('Elegí un período de hasta 4 meses.');
+    window.astraSetClosed(days, true, 'Listo: esos días figuran sin atención.').then(function (ok) { if (ok) offForm.reset(); });
+  });
+  offList.addEventListener('click', function (e) {
+    var btn = e.target.closest('.admin-off__remove');
+    if (!btn) return;
+    if (btn.hasAttribute('data-off-slot-key')) { window.astraSetClosed([btn.getAttribute('data-off-slot-key')], false, 'Horario habilitado de nuevo.'); return; }
+    var days = [];
+    for (var d = btn.getAttribute('data-off-from'); d <= btn.getAttribute('data-off-to'); d = addDays(d, 1)) days.push(d);
+    window.astraSetClosed(days, false, 'Días abiertos de nuevo.');
   });
   bFree.addEventListener('click', function () {
     var key = currentKey, b = bookings[key];
@@ -457,6 +506,7 @@
       tabs.hidden = false;
       foot.hidden = false;
       showTab('agenda');
+      offForm.from.min = offForm.to.min = todayKey(); // no se pueden elegir días que ya pasaron
       window.astraBookings = bookings;
       window.astraAgendaLoad();
       loadBookings();

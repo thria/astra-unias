@@ -10,6 +10,9 @@
 
 const KEY = 'astra:reservados';       // horarios ocupados (lo único que ve la página pública)
 const BOOKINGS = 'astra:turnos';        // fichas privadas de cada turno (solo con contraseña)
+const CLOSED = 'astra:cerrados';       // días ("2026-10-12") u horarios ("2026-10-12T14:00") en que no se trabaja
+const DAY_FORMAT = /^\d{4}-\d{2}-\d{2}$/;
+const MAX_CLOSE = 130;                  // hasta ~4 meses de días libres en un solo pedido
 const SLOT_FORMAT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/; // ej. 2026-10-06T11:30 = 6 de octubre, turno de las 11:30
 const AR_OFFSET_MS = 3 * 60 * 60 * 1000;
 const crypto = require('crypto');
@@ -117,7 +120,12 @@ module.exports = async function handler(req, res) {
     if (req.method === 'GET') {
       const all = (await redis(db, ['SMEMBERS', KEY])) || [];
       const today = todayKey();
-      return send(res, 200, { configured: true, adminReady: adminReady, busy: all.filter(function (s) { return s >= today && SLOT_FORMAT.test(s); }).sort() });
+      const closed = (await redis(db, ['SMEMBERS', CLOSED])) || [];
+      return send(res, 200, {
+        configured: true, adminReady: adminReady,
+        busy: all.filter(function (s) { return s >= today && SLOT_FORMAT.test(s); }).sort(),
+        closed: closed.filter(function (s) { return s.slice(0, 10) >= today.slice(0, 10); }).sort() // días u horarios sin atención
+      });
     }
 
     if (req.method === 'POST') {
@@ -154,6 +162,20 @@ module.exports = async function handler(req, res) {
         const stale = all.filter(function (s) { return !SLOT_FORMAT.test(s); }); // horarios con el formato viejo (sin minutos): se borran
         if (stale.length) await redis(db, ['SREM', KEY].concat(stale));
         return send(res, 200, { ok: true, bookings: bookings, busy: all.filter(function (s) { return s >= todayKey() && SLOT_FORMAT.test(s); }).sort() });
+      }
+      // Días u horarios en que no se trabaja (abrir / cerrar)
+      if (body.action === 'close') {
+        const items = Array.isArray(body.items) ? body.items : [];
+        if (!items.length || items.length > MAX_CLOSE || typeof body.closed !== 'boolean' ||
+            !items.every(function (s) { return typeof s === 'string' && (DAY_FORMAT.test(s) || SLOT_FORMAT.test(s)); })) {
+          return send(res, 400, { error: 'Pedido inválido' });
+        }
+        await redis(db, [body.closed ? 'SADD' : 'SREM', CLOSED].concat(items));
+        const closed = (await redis(db, ['SMEMBERS', CLOSED])) || [];
+        const today = todayKey().slice(0, 10);
+        const past = closed.filter(function (s) { return s.slice(0, 10) < today; }); // limpieza de días pasados
+        if (past.length) await redis(db, ['SREM', CLOSED].concat(past));
+        return send(res, 200, { ok: true, closed: closed.filter(function (s) { return s.slice(0, 10) >= today; }).sort() });
       }
       if (body.action === 'save' || body.action === 'remove') {
         if (typeof body.slot !== 'string' || !SLOT_FORMAT.test(body.slot)) return send(res, 400, { error: 'Pedido inválido' });
