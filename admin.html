@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=122">
+  <link rel="stylesheet" href="css/styles.css?v=123">
   <script src="js/agenda.js?v=7" defer></script>
 </head>
 <body class="admin">
@@ -47,6 +47,17 @@
 
       <!-- Próximos turnos: hoy y los que vienen, con recordatorio por WhatsApp -->
       <section class="admin-panel" data-panel="proximos" hidden>
+        <div class="admin-listbar">
+          <div class="segmented" role="group" aria-label="Qué turnos ver">
+            <button type="button" class="segmented__btn" data-list-mode="next" aria-pressed="true">Desde hoy</button>
+            <button type="button" class="segmented__btn" data-list-mode="month" aria-pressed="false">Mes completo</button>
+          </div>
+          <div class="admin-month" data-list-month hidden>
+            <button type="button" class="agenda__nav" data-list-prev aria-label="Mes anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+            <span data-list-month-label></span>
+            <button type="button" class="agenda__nav" data-list-next aria-label="Mes siguiente"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+          </div>
+        </div>
         <div class="admin-list" data-upcoming></div>
       </section>
 
@@ -175,6 +186,6 @@
   </dialog>
 
 
-  <script src="js/admin.js?v=4"></script>
+  <script src="js/admin.js?v=5"></script>
 </body>
 </html>

@@ -279,16 +279,46 @@
   // ---- Próximos turnos ----
   var upcoming = document.querySelector('[data-upcoming]');
   function chip(text, cls) { return '<span class="admin-chip ' + (cls || '') + '">' + esc(text) + '</span>'; }
+  // "Desde hoy" o "Mes completo" (con los días que ya pasaron y flechas para cambiar de mes)
+  var listMode = 'next', listMonth = todayKey().slice(0, 7);
+  var monthBar = document.querySelector('[data-list-month]');
+  var monthLabel = document.querySelector('[data-list-month-label]');
+  function shiftMonth(ym, n) { var d = new Date(Date.UTC(+ym.slice(0, 4), +ym.slice(5, 7) - 1 + n, 1)); return d.toISOString().slice(0, 7); }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-list-mode]'), function (b) {
+    b.addEventListener('click', function () {
+      listMode = b.getAttribute('data-list-mode');
+      Array.prototype.forEach.call(document.querySelectorAll('[data-list-mode]'), function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      renderUpcoming();
+    });
+  });
+  document.querySelector('[data-list-prev]').addEventListener('click', function () { listMonth = shiftMonth(listMonth, -1); renderUpcoming(); });
+  document.querySelector('[data-list-next]').addEventListener('click', function () { listMonth = shiftMonth(listMonth, 1); renderUpcoming(); });
+
   function renderUpcoming() {
     var today = todayKey();
-    var keys = busyList.concat(Object.keys(bookings)).filter(function (k, i, a) { return k.slice(0, 10) >= today && a.indexOf(k) === i; }).sort();
-    if (!keys.length) { upcoming.innerHTML = '<p class="admin-empty">No hay turnos anotados de hoy en adelante.</p>'; return; }
-    var html = '', lastDay = '';
+    monthBar.hidden = listMode !== 'month';
+    if (listMode === 'month') monthLabel.textContent = MONTHS[+listMonth.slice(5, 7) - 1].replace(/^./, function (c) { return c.toUpperCase(); }) + ' ' + listMonth.slice(0, 4);
+    var keys = busyList.concat(Object.keys(bookings)).filter(function (k, i, a) {
+      if (a.indexOf(k) !== i) return false;
+      return listMode === 'month' ? k.slice(0, 7) === listMonth : k.slice(0, 10) >= today;
+    }).sort();
+    if (!keys.length) {
+      upcoming.innerHTML = '<p class="admin-empty">' + (listMode === 'month' ? 'No hay turnos anotados en este mes.' : 'No hay turnos anotados de hoy en adelante.') + '</p>';
+      return;
+    }
+    var head = '';
+    if (listMode === 'month') { // cuenta rápida del mes arriba de la lista
+      var named = keys.filter(function (k) { return bookings[k] && bookings[k].name; });
+      var came = named.filter(function (k) { return bookings[k].status === 'asistio'; }).length;
+      var missed = named.filter(function (k) { return bookings[k].status === 'no-vino'; }).length;
+      head = '<p class="admin-monthsum">' + plural(named.length, 'turno', 'turnos') + ' · ' + came + ' vinieron · ' + plural(missed, 'falta', 'faltas') + '</p>';
+    }
+    var html = head || '', lastDay = '';
     keys.forEach(function (key) {
       var b = bookings[key] || {}, day = key.slice(0, 10);
       if (day !== lastDay) { html += '<h3 class="admin-day">' + (day === today ? 'Hoy · ' : '') + esc(dayText(key)) + '</h3>'; lastDay = day; }
-      var wa = b.name ? waLink(key, b) : '';
-      html += '<article class="admin-item">' +
+      var wa = b.name && day >= today ? waLink(key, b) : ''; // recordatorio solo para los que vienen
+      html += '<article class="admin-item' + (day < today ? ' is-past' : '') + '">' +
         '<button type="button" class="admin-item__main" data-open="' + key + '">' +
           '<span class="admin-item__time">' + esc(parts(key).time) + '</span>' +
           '<span class="admin-item__body"><strong>' + esc(b.name || 'Bloqueado') + '</strong>' +

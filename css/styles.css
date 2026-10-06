@@ -2728,3 +2728,9 @@ h1 strong, h2 strong, h3 strong, .hero__claim strong { font-weight: 700; letter-
 .booking__suggest li strong { font-size: 0.9375rem; }
 .booking__suggest li span { color: var(--color-ink-soft); font-size: 0.8125rem; font-weight: 400; }
 .booking__suggest li:hover, .booking__suggest li[aria-selected="true"] { background: var(--color-blush); }
+/* Próximos: selector "Desde hoy / Mes completo" y meses */
+.admin-listbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; }
+.admin-month { display: flex; align-items: center; gap: 0.5rem; font-weight: 600; }
+.admin-month span { min-width: 8.5rem; text-align: center; }
+.admin-monthsum { color: var(--color-ink-soft); font-size: 0.9375rem; }
+.admin-item.is-past { opacity: 0.72; }
