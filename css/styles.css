@@ -2619,3 +2619,6 @@ h1 strong, h2 strong, h3 strong, .hero__claim strong { font-weight: 700; letter-
 /* "Pedir turno" del encabezado sobre la foto de portada: claro en los dos temas (oscuro sobre la foto no se veía) */
 .site-header--floating.is-over-hero .site-header__actions .button--small,
 .site-header--floating.is-over-hero .site-header__actions .button--small:hover { background: #FFF7F9; border-color: #FFF7F9; color: #2A2321; }
+/* Celular: entrada simple del iPad del mapa (ver js/effects.js), solo opacidad y desplazamiento */
+.ipad.ipad--enter { opacity: 0; translate: 0 1.5rem; will-change: auto; transition: opacity 0.6s ease, translate 0.75s cubic-bezier(0.33, 1, 0.68, 1); }
+.ipad.ipad--enter.is-in { opacity: 1; translate: none; }

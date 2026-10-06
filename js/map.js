@@ -254,10 +254,12 @@
     ]), 'top-right');
     map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
     // los créditos arrancan cerrados (botón "i"): abiertos tapaban medio mapa en el celular
-    map.once('load', function () {
+    var closeAttrib = function () {
       var attrib = container.querySelector('.maplibregl-ctrl-attrib');
       if (attrib) attrib.classList.remove('maplibregl-compact-show');
-    });
+    };
+    map.once('load', closeAttrib);
+    map.once('idle', closeAttrib); // el mapa lo vuelve a abrir al terminar de cargar los datos
 
     new maplibregl.Marker({ element: makeMarker(), anchor: 'bottom' }).setLngLat(PLAZA).addTo(map);
 

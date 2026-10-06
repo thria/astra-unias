@@ -142,7 +142,19 @@
   // se endereza solo (antes de que el mapa reciba el gesto, así las coordenadas coinciden) y queda
   // derecho hasta que sale de la pantalla.
   var ipad = document.querySelector('.local .ipad');
-  if (ipad && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  var ipadMobile = window.matchMedia('(max-width: 48em), (pointer: coarse)').matches;
+  // Celular: en vez del giro atado al scroll (que con el mapa adentro se veía a los tirones), una sola
+  // entrada suave: aparece y sube apenas, sin perspectiva 3D, y después queda quieto
+  if (ipad && ipadMobile && 'IntersectionObserver' in window) {
+    ipad.classList.add('ipad--enter');
+    var ipadIo = new IntersectionObserver(function (entries) {
+      if (!entries[0].isIntersecting) return;
+      ipad.classList.add('is-in');
+      ipadIo.disconnect();
+    }, { threshold: 0.15 });
+    ipadIo.observe(ipad);
+  }
+  if (ipad && !ipadMobile) {
     var ipadQueued = false, ipadFlat = false;
     var ipadTop = function () { // posición sin el giro (se mide desde el contenedor, que no se transforma)
       return (ipad.offsetParent ? ipad.offsetParent.getBoundingClientRect().top : 0) + ipad.offsetTop;
