@@ -117,7 +117,7 @@ module.exports = async function handler(req, res) {
     if (req.method === 'GET') {
       const all = (await redis(db, ['SMEMBERS', KEY])) || [];
       const today = todayKey();
-      return send(res, 200, { configured: true, adminReady: adminReady, busy: all.filter(function (s) { return s >= today; }).sort() });
+      return send(res, 200, { configured: true, adminReady: adminReady, busy: all.filter(function (s) { return s >= today && SLOT_FORMAT.test(s); }).sort() });
     }
 
     if (req.method === 'POST') {
@@ -177,7 +177,7 @@ module.exports = async function handler(req, res) {
       // Limpieza: borra los turnos de días anteriores a hoy
       const all = (await redis(db, ['SMEMBERS', KEY])) || [];
       const today = todayKey();
-      const old = all.filter(function (s) { return s < today; });
+      const old = all.filter(function (s) { return s < today || !SLOT_FORMAT.test(s); }); // y los del formato viejo (sin minutos)
       if (old.length) await redis(db, ['SREM', KEY].concat(old));
       // y las fichas de hace más de 2 años
       const keys = (await redis(db, ['HKEYS', BOOKINGS])) || [];
