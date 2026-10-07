@@ -21,6 +21,22 @@ const LOCK_SECONDS = 15 * 60;  // ...antes de bloquearla 15 minutos
 const MAX_SLOTS = 62;          // un pedido no puede tocar más de un mes de horarios a la vez
 const STATUSES = ['pendiente', 'confirmado', 'asistio', 'no-vino'];
 const KEEP_DAYS = 730;          // las fichas viejas se guardan 2 años (historial de clientas) y después se borran
+const PRICES = 'astra:precios';    // precios de la página (los cambia la dueña desde el panel)
+const PRICE_KEYS = ['semi', 'nivelacion', 'capping', 'softgel', 'presson_set', 'presson_kit',
+  'd1_min', 'd1_max', 'd2_min', 'd2_max', 'd3_min', 'd3_max', 'd4_min', 'd4_max',
+  'ret_completo', 'ret_otro', 'ret_colega'];
+
+// Precios: solo las claves conocidas, números enteros entre 0 y 10 millones
+function cleanPrices(input) {
+  const p = input && typeof input === 'object' ? input : {};
+  const out = {};
+  for (const key of PRICE_KEYS) {
+    const n = Math.round(Number(p[key]));
+    if (!isFinite(n) || n < 0 || n >= 10000000) return null;
+    out[key] = n;
+  }
+  return out;
+}
 
 // Ficha de un turno: solo campos conocidos, texto plano y con largo máximo
 function cleanBooking(input) {
@@ -117,6 +133,13 @@ module.exports = async function handler(req, res) {
   if (!db) return send(res, 200, { configured: false, adminReady: adminReady, busy: [] });
 
   try {
+    // Precios públicos (la página los pide con /api/agenda?precios=1)
+    if (req.method === 'GET' && req.query && req.query.precios) {
+      const raw = await redis(db, ['GET', PRICES]);
+      let prices = null;
+      try { prices = raw ? cleanPrices(JSON.parse(raw)) : null; } catch (e) { prices = null; }
+      return send(res, 200, { prices: prices });
+    }
     if (req.method === 'GET') {
       const all = (await redis(db, ['SMEMBERS', KEY])) || [];
       const today = todayKey();
@@ -150,6 +173,14 @@ module.exports = async function handler(req, res) {
       if (fails) await redis(db, ['DEL', failKey]);
 
       if (body.action === 'login') return send(res, 200, { ok: true });
+
+      // Precios de la página: guardar los que cargó la dueña
+      if (body.action === 'prices') {
+        const prices = cleanPrices(body.prices);
+        if (!prices) return send(res, 400, { error: 'Revisá los precios: tienen que ser números.' });
+        await redis(db, ['SET', PRICES, JSON.stringify(prices)]);
+        return send(res, 200, { ok: true, prices: prices });
+      }
 
       // Fichas de los turnos (panel): leer todas, guardar una o borrar una
       if (body.action === 'list') {

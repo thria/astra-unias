@@ -2791,3 +2791,18 @@ dialog.booking::backdrop { background: rgb(21 18 17 / 0.55); backdrop-filter: bl
 @media (prefers-reduced-motion: reduce) {
   .has-prices .service-card__prices, .has-prices .service-card__toggle::after { transition: none; }
 }
+
+/* Panel: precios de la página */
+.admin-prices__intro { color: var(--color-ink-soft); font-size: 0.9375rem; }
+.admin-prices { display: grid; gap: 1rem; }
+.admin-prices__group { display: grid; gap: 0.5rem; margin: 0; padding: 0.9rem 1rem 1rem; border: 1px solid var(--color-line); border-radius: 4px; }
+.admin-prices__group legend { padding: 0 0.35rem; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-ink-soft); }
+.admin-prices__row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1rem; }
+.admin-prices__name { flex: 1 1 12rem; }
+.admin-prices__pair { display: inline-flex; align-items: center; gap: 0.4rem; }
+.admin-prices__input { display: inline-flex; align-items: center; gap: 0.3rem; color: var(--color-ink-soft); }
+.admin-prices__input input { width: 7.5rem; min-height: 2.75rem; padding: 0.45rem 0.6rem; border: 1px solid var(--color-line); border-radius: 4px; background: transparent; color: var(--color-ink); font: 500 1rem var(--font-body); font-variant-numeric: tabular-nums; }
+.admin-prices__pair .admin-prices__input input { width: 6.5rem; }
+.admin-prices__input input:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 1px; }
+.admin-prices__actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.admin-prices__actions .button { border-radius: 4px; }

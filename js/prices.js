@@ -25,4 +25,23 @@
     });
   });
   list.classList.add('has-prices');
+
+  // Precios actualizados desde el panel /admin (si no hay, quedan los escritos en la página)
+  function money(n) { return '$' + Number(n).toLocaleString('es-AR'); }
+  fetch('/api/agenda?precios=1', { headers: { Accept: 'application/json' } })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (data) {
+      var p = data && data.prices;
+      if (!p) return;
+      Array.prototype.forEach.call(list.querySelectorAll('[data-price]'), function (el) {
+        var v = p[el.getAttribute('data-price')];
+        if (typeof v === 'number') el.textContent = money(v);
+      });
+      Array.prototype.forEach.call(list.querySelectorAll('[data-range]'), function (el) {
+        var k = el.getAttribute('data-range'), min = p[k + '_min'], max = p[k + '_max'];
+        if (typeof min !== 'number' || typeof max !== 'number') return;
+        el.textContent = max === 0 ? 'Gratis' : min === max ? money(min) : (min === 0 ? 'Gratis' : money(min)) + ' – ' + money(max);
+      });
+    })
+    .catch(function () { /* sin conexión: quedan los precios de la página */ });
 })();

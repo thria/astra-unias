@@ -458,6 +458,77 @@
     setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
   });
 
+  // ---- Precios de la página ----
+  var pricesForm = document.querySelector('[data-prices-form]');
+  var PRICE_DEFAULTS = {
+    semi: 20000, nivelacion: 24000, capping: 25000, softgel: 26000, presson_set: 20000, presson_kit: 8000,
+    d1_min: 0, d1_max: 3000, d2_min: 4000, d2_max: 6000, d3_min: 7000, d3_max: 9000, d4_min: 10000, d4_max: 20000,
+    ret_completo: 10000, ret_otro: 5000, ret_colega: 7000
+  };
+  var PRICE_GROUPS = [
+    { title: 'Servicios', rows: [['semi', 'Semipermanente'], ['nivelacion', 'Semipermanente con nivelación'], ['capping', 'Capping en gel'], ['softgel', 'Soft gel']] },
+    { title: 'Press on', rows: [['presson_set', 'Set liso'], ['presson_kit', 'Kit de aplicación']] },
+    { title: 'Diseño (desde – hasta)', range: true, rows: [['d1', 'Nivel 1 · sencillo'], ['d2', 'Nivel 2 · simple'], ['d3', 'Nivel 3'], ['d4', 'Nivel 4']] },
+    { title: 'Retirado', rows: [['ret_completo', 'Completo'], ['ret_otro', 'Para otro servicio'], ['ret_colega', 'Trabajo de colega (para otro servicio)']] }
+  ];
+  var pricesLoaded = false;
+
+  function priceInput(key, label) {
+    return '<label class="admin-prices__input"><span class="sr-only">' + esc(label) + '</span><span aria-hidden="true">$</span>' +
+      '<input type="number" inputmode="numeric" min="0" max="9999999" step="1" name="' + key + '" required></label>';
+  }
+  function renderPricesForm(values) {
+    pricesForm.innerHTML = PRICE_GROUPS.map(function (g) {
+      return '<fieldset class="admin-prices__group"><legend>' + esc(g.title) + '</legend>' + g.rows.map(function (r) {
+        return '<div class="admin-prices__row"><span class="admin-prices__name">' + esc(r[1]) + '</span>' +
+          (g.range
+            ? '<span class="admin-prices__pair">' + priceInput(r[0] + '_min', r[1] + ', desde') + '<span aria-hidden="true">–</span>' + priceInput(r[0] + '_max', r[1] + ', hasta') + '</span>'
+            : priceInput(r[0], r[1])) + '</div>';
+      }).join('') + '</fieldset>';
+    }).join('') +
+      '<div class="admin-prices__actions"><button type="submit" class="button">Guardar precios</button>' +
+      '<button type="button" class="button button--ghost" data-prices-reset>Volver a los precios de la carta</button></div>';
+    fillPrices(values);
+  }
+  function fillPrices(values) {
+    Object.keys(PRICE_DEFAULTS).forEach(function (k) {
+      if (pricesForm.elements[k]) pricesForm.elements[k].value = typeof values[k] === 'number' ? values[k] : PRICE_DEFAULTS[k];
+    });
+  }
+  function loadPrices() {
+    if (pricesLoaded) return;
+    pricesLoaded = true;
+    renderPricesForm(PRICE_DEFAULTS);
+    fetch('/api/agenda?precios=1', { headers: { Accept: 'application/json' }, cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) { if (d && d.prices) fillPrices(d.prices); })
+      .catch(function () { /* quedan los de la carta */ });
+  }
+  pricesForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var prices = {}, bad = null;
+    Object.keys(PRICE_DEFAULTS).forEach(function (k) {
+      var input = pricesForm.elements[k], n = Number(String(input.value).replace(/[.\s$]/g, ''));
+      if (input.value === '' || !isFinite(n) || n < 0 || n > 9999999) { if (!bad) bad = input; return; }
+      prices[k] = Math.round(n);
+    });
+    if (bad) { announce('Revisá los precios: hay uno vacío o que no es un número.'); bad.focus(); return; }
+    ['d1', 'd2', 'd3', 'd4'].forEach(function (k) {
+      if (prices[k + '_min'] > prices[k + '_max']) { var t = prices[k + '_min']; prices[k + '_min'] = prices[k + '_max']; prices[k + '_max'] = t; }
+    });
+    var btn = pricesForm.querySelector('[type="submit"]');
+    btn.disabled = true;
+    api({ action: 'prices', prices: prices }).then(function (r) {
+      fillPrices(r.prices || prices);
+      announce('Listo: precios guardados. Ya se ven en la página.');
+    }).catch(function (err) { announce(err.message); }).finally(function () { btn.disabled = false; });
+  });
+  pricesForm.addEventListener('click', function (e) {
+    if (!e.target.closest('[data-prices-reset]')) return;
+    fillPrices(PRICE_DEFAULTS);
+    announce('Cargué los precios de la carta. Tocá Guardar precios para publicarlos.');
+  });
+
   // ---- Pestañas ----
   function showTab(name) {
     Array.prototype.forEach.call(tabs.querySelectorAll('[data-tab]'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-tab') === name)); });
@@ -466,6 +537,7 @@
     if (name === 'proximos') renderUpcoming();
     if (name === 'clientas') renderClients();
     if (name === 'resumen') renderSummary();
+    if (name === 'precios') loadPrices();
   }
   tabs.addEventListener('click', function (e) { var b = e.target.closest('[data-tab]'); if (b) showTab(b.getAttribute('data-tab')); });
 
@@ -521,7 +593,7 @@
 
   document.querySelector('[data-logout]').addEventListener('click', function () {
     window.astraAdminPassword = '';
-    bookings = {}; busyList = []; window.astraBookings = {};
+    bookings = {}; busyList = []; window.astraBookings = {}; pricesLoaded = false;
     form.reset();
     agenda.hidden = true; tabs.hidden = true; foot.hidden = true;
     panels.forEach(function (p) { p.hidden = true; });

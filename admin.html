@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=126">
+  <link rel="stylesheet" href="css/styles.css?v=127">
   <script src="js/agenda.js?v=8" defer></script>
 </head>
 <body class="admin">
@@ -43,6 +43,7 @@
         <button type="button" class="admin-tabs__btn" data-tab="proximos" aria-pressed="false">Próximos</button>
         <button type="button" class="admin-tabs__btn" data-tab="clientas" aria-pressed="false">Clientas</button>
         <button type="button" class="admin-tabs__btn" data-tab="resumen" aria-pressed="false">Resumen</button>
+        <button type="button" class="admin-tabs__btn" data-tab="precios" aria-pressed="false">Precios</button>
       </nav>
 
       <!-- Próximos turnos: hoy y los que vienen, con recordatorio por WhatsApp -->
@@ -73,6 +74,12 @@
       <section class="admin-panel" data-panel="resumen" hidden>
         <div data-summary></div>
         <button type="button" class="button button--ghost admin__export" data-export>Descargar copia de seguridad (planilla)</button>
+      </section>
+
+      <!-- Precios que se ven en la página (tarjetas de Servicios → Ver precios) -->
+      <section class="admin-panel" data-panel="precios" hidden>
+        <p class="admin-prices__intro">Cambiá los montos y tocá <strong>Guardar precios</strong>: la página se actualiza al instante. Para que un diseño figure como <em>Gratis</em>, poné 0.</p>
+        <form class="admin-prices" data-prices-form novalidate></form>
       </section>
 
       <!-- Agenda editable (se muestra después de entrar) -->
@@ -200,6 +207,6 @@
   </dialog>
 
 
-  <script src="js/admin.js?v=9"></script>
+  <script src="js/admin.js?v=10"></script>
 </body>
 </html>
