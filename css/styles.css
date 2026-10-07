@@ -2642,11 +2642,11 @@ h1 strong, h2 strong, h3 strong, .hero__claim strong { font-weight: 700; letter-
 .slot--admin.slot--was { opacity: 0.7; }
 
 /* ficha */
-.booking {
+dialog.booking {
   width: min(40rem, calc(100vw - 1.5rem)); max-height: calc(100dvh - 1.5rem); padding: 0; border: 1px solid var(--color-line);
   border-radius: 6px; background: var(--color-bg); color: var(--color-ink); box-shadow: 0 30px 80px -30px rgb(0 0 0 / 0.6);
 }
-.booking::backdrop { background: rgb(21 18 17 / 0.55); backdrop-filter: blur(3px); }
+dialog.booking::backdrop { background: rgb(21 18 17 / 0.55); backdrop-filter: blur(3px); }
 .booking__form { display: grid; gap: 1rem; padding: 1.25rem; }
 .booking__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
 .booking__title { font-size: 1.6rem; font-weight: 600; letter-spacing: -0.02em; }
