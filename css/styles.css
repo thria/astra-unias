@@ -2806,3 +2806,9 @@ dialog.booking::backdrop { background: rgb(21 18 17 / 0.55); backdrop-filter: bl
 .admin-prices__input input:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 1px; }
 .admin-prices__actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
 .admin-prices__actions .button { border-radius: 4px; }
+/* "Ver precios" en el color de acento para que resalte */
+.has-prices .service-card__toggle { border-color: var(--color-rose); background: var(--color-rose); color: var(--color-on-rose); }
+.service-card.is-open .service-card__toggle { background: transparent; color: var(--color-rose); }
+@media (hover: hover) and (pointer: fine) {
+  .has-prices .service-card__toggle:hover { border-color: var(--color-ink); background: var(--color-ink); color: var(--color-bg); }
+}
