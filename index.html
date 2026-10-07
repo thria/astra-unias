@@ -30,12 +30,13 @@
   <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
   <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="css/styles.css?v=125">
+  <link rel="stylesheet" href="css/styles.css?v=126">
   <script src="js/theme.js?v=9" defer></script>
   <script src="js/map.js?v=14" defer></script>
   <script src="js/carousel.js?v=5" defer></script>
   <script src="js/agenda.js?v=8" defer></script>
   <script src="js/nails3d.js?v=37" defer></script>
+  <script src="js/prices.js?v=1" defer></script>
   <script src="js/effects.js?v=18" defer></script>
   <script src="js/mascot.js?v=21" defer></script>
 
@@ -272,23 +273,101 @@
             <div class="service-card__model" data-model="semi" role="img" aria-label="Modelo 3D de una uña natural corta con esmalte semipermanente rosa intenso brillante"></div>
             <h3>Semipermanente</h3>
             <p>Esmalte en gel sobre tu uña natural. Brillo intenso que dura semanas sin descascararse.</p>
+            <button class="service-card__toggle" type="button" aria-expanded="false" aria-controls="precios-semi">Ver precios</button>
+            <div class="service-card__prices" id="precios-semi">
+              <div class="prices">
+                <dl class="prices__list prices__list--main">
+                  <div><dt>Semipermanente</dt><dd>$20.000</dd></div>
+                  <div><dt>Con nivelación</dt><dd>$24.000</dd></div>
+                </dl>
+                <p class="prices__note">Incluye deco simple en una uña.</p>
+                <p class="prices__label">Diseño</p>
+                <dl class="prices__list">
+                  <div><dt>Nivel 1 · sencillo</dt><dd>Gratis – $3.000</dd></div>
+                  <div><dt>Nivel 2 · simple</dt><dd>$4.000 – $6.000</dd></div>
+                  <div><dt>Nivel 3</dt><dd>$7.000 – $9.000</dd></div>
+                  <div><dt>Nivel 4</dt><dd>$10.000 – $20.000</dd></div>
+                </dl>
+                <p class="prices__label">Retirado</p>
+                <dl class="prices__list">
+                  <div><dt>Completo</dt><dd>$10.000</dd></div>
+                  <div><dt>Para otro servicio</dt><dd>$5.000</dd></div>
+                  <div><dt>Trabajo de colega (para otro servicio)</dt><dd>$7.000</dd></div>
+                </dl>
+              </div>
+            </div>
           </li>
           <li class="service-card">
             <div class="service-card__model" data-model="capping" role="img" aria-label="Modelo 3D de una uña natural cubierta por una capa de gel, de beige suave en la base a blanco en la punta"></div>
             <h3>Capping</h3>
             <p>Una capa de gel que protege la uña natural y la ayuda a crecer más fuerte.</p>
+            <button class="service-card__toggle" type="button" aria-expanded="false" aria-controls="precios-capping">Ver precios</button>
+            <div class="service-card__prices" id="precios-capping">
+              <div class="prices">
+                <dl class="prices__list prices__list--main">
+                  <div><dt>Capping en gel</dt><dd>$25.000</dd></div>
+                </dl>
+                <p class="prices__note">Incluye deco simple en una uña.</p>
+                <p class="prices__label">Diseño</p>
+                <dl class="prices__list">
+                  <div><dt>Nivel 1 · sencillo</dt><dd>Gratis – $3.000</dd></div>
+                  <div><dt>Nivel 2 · simple</dt><dd>$4.000 – $6.000</dd></div>
+                  <div><dt>Nivel 3</dt><dd>$7.000 – $9.000</dd></div>
+                  <div><dt>Nivel 4</dt><dd>$10.000 – $20.000</dd></div>
+                </dl>
+                <p class="prices__label">Retirado</p>
+                <dl class="prices__list">
+                  <div><dt>Completo</dt><dd>$10.000</dd></div>
+                  <div><dt>Para otro servicio</dt><dd>$5.000</dd></div>
+                  <div><dt>Trabajo de colega (para otro servicio)</dt><dd>$7.000</dd></div>
+                </dl>
+              </div>
+            </div>
           </li>
           <li class="service-card">
             <div class="service-card__model" data-model="softgel" role="img" aria-label="Modelo 3D de una uña almendra larga de soft gel rosa pastel satinado"></div>
             <h3>Soft gel</h3>
             <p>Extensiones con tips de gel suave. Elegís el largo y la forma: almendra, cuadrada, stiletto.</p>
+            <button class="service-card__toggle" type="button" aria-expanded="false" aria-controls="precios-softgel">Ver precios</button>
+            <div class="service-card__prices" id="precios-softgel">
+              <div class="prices">
+                <dl class="prices__list prices__list--main">
+                  <div><dt>Soft gel</dt><dd>$26.000</dd></div>
+                </dl>
+                <p class="prices__note">Incluye deco simple en una uña.</p>
+                <p class="prices__label">Diseño</p>
+                <dl class="prices__list">
+                  <div><dt>Nivel 1 · sencillo</dt><dd>Gratis – $3.000</dd></div>
+                  <div><dt>Nivel 2 · simple</dt><dd>$4.000 – $6.000</dd></div>
+                  <div><dt>Nivel 3</dt><dd>$7.000 – $9.000</dd></div>
+                  <div><dt>Nivel 4</dt><dd>$10.000 – $20.000</dd></div>
+                </dl>
+                <p class="prices__label">Retirado</p>
+                <dl class="prices__list">
+                  <div><dt>Completo</dt><dd>$10.000</dd></div>
+                  <div><dt>Para otro servicio</dt><dd>$5.000</dd></div>
+                  <div><dt>Trabajo de colega (para otro servicio)</dt><dd>$7.000</dd></div>
+                </dl>
+              </div>
+            </div>
           </li>
           <li class="service-card">
             <div class="service-card__model" data-model="presson" role="img" aria-label="Modelo 3D de un set de cinco uñas press on stiletto góticas en blanco lechoso, negro cromado y azul noche, con tribal, cruz y corazón en relieve, caviar plateado, cadenitas y un dije de cruz con piedras"></div>
             <h3>Press on</h3>
             <p>Sets hechos a la medida de tus uñas para poner y sacar en casa cuando quieras.</p>
+            <button class="service-card__toggle" type="button" aria-expanded="false" aria-controls="precios-presson">Ver precios</button>
+            <div class="service-card__prices" id="precios-presson">
+              <div class="prices">
+                <dl class="prices__list prices__list--main">
+                  <div><dt>Set liso</dt><dd>$20.000</dd></div>
+                  <div><dt>Kit de aplicación</dt><dd>$8.000</dd></div>
+                </dl>
+                <p class="prices__note">Se encargan con una semana de anticipación como mínimo. Podés retirarlas en el estudio sin costo o pedir un envío con repartidor (el costo depende de la aplicación).</p>
+              </div>
+            </div>
           </li>
         </ul>
+        <p class="service-hint">Los precios de diseño son un estimativo para que puedas calcular el total: te confirmo el precio final por Instagram.</p>
         <p class="service-hint">Girá las uñas arrastrando con el mouse o con dos dedos en el celular. Para acercar: Ctrl + rueda del mouse, o pellizcando la pantalla.</p>
         </div>
       </div>
