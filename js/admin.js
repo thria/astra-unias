@@ -19,7 +19,7 @@
   var STATUS = { pendiente: 'Pendiente', confirmado: 'Confirmado', asistio: 'Vino', 'no-vino': 'No vino' };
   var DAYS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
   var MONTHS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-  var DEPOSIT = 5000;
+  var DEPOSIT = 10000;
 
   // ---- Utilidades ----
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return '&#' + c.charCodeAt(0) + ';'; }); }
